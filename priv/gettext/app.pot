@@ -9,3 +9,28 @@
 ## edit them in PO (`.po`) files instead.
 msgid ""
 msgstr ""
+
+#: lib/web_template_web/email.ex:64
+#, elixir-autogen, elixir-format
+msgid "Hi %{name}, thanks for signing up. We're glad you're here."
+msgstr ""
+
+#: lib/web_template_web/email.ex:74
+#, elixir-autogen, elixir-format
+msgid "Talk soon."
+msgstr ""
+
+#: lib/web_template_web/email.ex:82
+#, elixir-autogen, elixir-format
+msgid "Welcome to WebTemplate"
+msgstr ""
+
+#: lib/web_template_web/email.ex:62
+#, elixir-autogen, elixir-format
+msgid "Welcome!"
+msgstr ""
+
+#: lib/web_template_web/email.ex:70
+#, elixir-autogen, elixir-format
+msgid "Your account is ready. Sign in any time to get started."
+msgstr ""

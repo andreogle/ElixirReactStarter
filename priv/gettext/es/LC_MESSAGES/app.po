@@ -9,3 +9,28 @@
 msgid ""
 msgstr ""
 "Language: es\n"
+
+#: lib/web_template_web/email.ex:64
+#, elixir-autogen, elixir-format
+msgid "Hi %{name}, thanks for signing up. We're glad you're here."
+msgstr "Hola %{name}, gracias por registrarte. Nos alegra tenerte aquí."
+
+#: lib/web_template_web/email.ex:74
+#, elixir-autogen, elixir-format
+msgid "Talk soon."
+msgstr "Hasta pronto."
+
+#: lib/web_template_web/email.ex:82
+#, elixir-autogen, elixir-format
+msgid "Welcome to WebTemplate"
+msgstr "Bienvenido a WebTemplate"
+
+#: lib/web_template_web/email.ex:62
+#, elixir-autogen, elixir-format
+msgid "Welcome!"
+msgstr "¡Bienvenido!"
+
+#: lib/web_template_web/email.ex:70
+#, elixir-autogen, elixir-format
+msgid "Your account is ready. Sign in any time to get started."
+msgstr "Tu cuenta está lista. Inicia sesión en cualquier momento para empezar."

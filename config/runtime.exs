@@ -94,21 +94,14 @@ if config_env() == :prod do
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
 
-  # ## Configuring the mailer
+  # Outbound mail via Mailjet. `Swoosh.Adapters.Mailjet` ships with the
+  # `:swoosh` package, so no extra mix dep is needed. The API client
+  # (`Swoosh.ApiClient.Req`) is wired at compile time in config/prod.exs.
   #
-  # In production you need to configure the mailer to use a different adapter.
-  # Here is an example configuration for Mailgun:
-  #
-  #     config :web_template, WebTemplate.Mailer,
-  #       adapter: Swoosh.Adapters.Mailgun,
-  #       api_key: System.get_env("MAILGUN_API_KEY"),
-  #       domain: System.get_env("MAILGUN_DOMAIN")
-  #
-  # Most non-SMTP adapters require an API client. Swoosh supports Req, Hackney,
-  # and Finch out-of-the-box. This configuration is typically done at
-  # compile-time in your config/prod.exs:
-  #
-  #     config :swoosh, :api_client, Swoosh.ApiClient.Req
-  #
-  # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+  # Provision an API key + secret at https://app.mailjet.com/account/api_keys
+  # and expose them as MAILJET_API_KEY / MAILJET_SECRET in the deploy env.
+  config :web_template, WebTemplate.Mailer,
+    adapter: Swoosh.Adapters.Mailjet,
+    api_key: get_env!.("MAILJET_API_KEY"),
+    secret: get_env!.("MAILJET_SECRET")
 end
