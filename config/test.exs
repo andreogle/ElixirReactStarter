@@ -26,6 +26,19 @@ config :web_template, WebTemplate.Mailer, adapter: Swoosh.Adapters.Test
 # Disable swoosh api client as it is only required for production adapters
 config :swoosh, :api_client, false
 
+# Skip SSR in tests — no Node.js worker pool is started under MIX_ENV=test,
+# and Inertia's controller would block trying to call into it. Tests assert
+# on the JSON page payload embedded in the HTML response, not on rendered
+# React output.
+config :inertia, ssr: false
+
+# Use fast hashing in tests
+config :argon2_elixir, t_cost: 1, m_cost: 8
+
+# Run Oban in manual testing mode — jobs are enqueued but not executed
+# automatically. Tests assert on the job queue or drain explicitly.
+config :web_template, Oban, testing: :manual
+
 # Print only warnings and errors during test
 config :logger, level: :warning
 

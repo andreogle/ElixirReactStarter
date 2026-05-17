@@ -2,6 +2,6 @@ defmodule WebTemplateWeb.PageController do
   use WebTemplateWeb, :controller
 
   def home(conn, _params) do
-    render(conn, :home)
+    render_inertia(conn, "Home")
   end
 end

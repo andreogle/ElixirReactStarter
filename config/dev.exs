@@ -26,6 +26,8 @@ config :web_template, WebTemplateWeb.Endpoint,
   secret_key_base: "cxv85lAQCKdwQQYuRC7eeX4DytlQDl7mBLv283CTNcnpqtcTd2lfYbJmD9oa9DgV",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:web_template, ~w(--sourcemap=inline --watch)]},
+    node: ["build/watch-ssr-pages.js", cd: Path.expand("../assets", __DIR__)],
+    esbuild_ssr: {Esbuild, :install_and_run, [:web_template_ssr, ~w(--watch)]},
     tailwind: {Tailwind, :install_and_run, [:web_template, ~w(--watch)]}
   ]
 

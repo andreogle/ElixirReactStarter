@@ -26,6 +26,9 @@ config :swoosh, api_client: Swoosh.ApiClient.Req
 # Disable Swoosh Local Memory Storage
 config :swoosh, local: false
 
+# Gracefully fall back to client-side rendering on SSR errors
+config :inertia, raise_on_ssr_failure: false
+
 # Do not print debug messages in production
 config :logger, level: :info
 

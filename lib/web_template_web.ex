@@ -43,6 +43,7 @@ defmodule WebTemplateWeb do
       use Gettext, backend: WebTemplateWeb.Gettext
 
       import Plug.Conn
+      import Inertia.Controller
 
       unquote(verified_routes())
     end
@@ -72,6 +73,8 @@ defmodule WebTemplateWeb do
       import Phoenix.Controller,
         only: [get_csrf_token: 0, view_module: 1, view_template: 1]
 
+      import Inertia.HTML
+
       # Include general helpers for rendering HTML
       unquote(html_helpers())
     end
@@ -84,8 +87,6 @@ defmodule WebTemplateWeb do
 
       # HTML escaping functionality
       import Phoenix.HTML
-      # Core UI components
-      import WebTemplateWeb.CoreComponents
 
       # Common modules used in templates
       alias Phoenix.LiveView.JS

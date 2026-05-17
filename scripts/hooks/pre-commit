@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Pre-commit hook to run mix precommit
+# This ensures code quality checks pass before committing
+
+echo "Running mix precommit..."
+mix precommit
+
+# Exit with the same code as mix precommit
+exit $?

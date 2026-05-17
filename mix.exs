@@ -40,32 +40,38 @@ defmodule WebTemplate.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.8.7"},
-      {:phoenix_ecto, "~> 4.5"},
+      {:argon2_elixir, "~> 4.1"},
+      {:inertia, "~> 2.0"},
+      {:bandit, "~> 1.5"},
+      {:dns_cluster, "~> 0.2.0"},
       {:ecto_sql, "~> 3.13"},
-      {:postgrex, ">= 0.0.0"},
+      {:exflect, "~> 1.0"},
+      {:gettext, "~> 1.0"},
+      {:hammer, "~> 7.0"},
+      {:jason, "~> 1.2"},
+      {:oban, "~> 2.19"},
+      {:phoenix, "~> 1.8.5"},
+      {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 1.1.0"},
-      {:lazy_html, ">= 0.1.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
-      {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
-      {:heroicons,
-       github: "tailwindlabs/heroicons",
-       tag: "v2.2.0",
-       sparse: "optimized",
-       app: false,
-       compile: false,
-       depth: 1},
-      {:swoosh, "~> 1.16"},
+      {:phoenix_live_view, "~> 1.1.0"},
+      {:postgrex, ">= 0.0.0"},
       {:req, "~> 0.5"},
+      {:swoosh, "~> 1.16"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
-      {:gettext, "~> 1.0"},
-      {:jason, "~> 1.2"},
-      {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:tzdata, "~> 1.1"},
+      {:uniq, "~> 0.6"},
+
+      # Dev/test
+      {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
+      {:ex_doc, "~> 0.34", only: [:dev, :test], runtime: false},
+      {:ex_machina, "~> 2.8.0", only: :test},
+      {:lazy_html, ">= 0.1.0", only: :test},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev}
     ]
   end
 
@@ -77,18 +83,44 @@ defmodule WebTemplate.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["compile", "tailwind web_template", "esbuild web_template"],
+      # esbuild's --splitting writes content-hashed chunk filenames without
+      # cleaning stale ones. Wipe the chunks dir first so the only files left
+      # after a build are the ones the current bundle actually references.
+      "assets.build": [
+        "compile",
+        "tailwind web_template",
+        "cmd rm -rf priv/static/assets/chunks",
+        "esbuild web_template",
+        "cmd node assets/build/generate-ssr-pages.js",
+        "esbuild web_template_ssr"
+      ],
       "assets.deploy": [
         "tailwind web_template --minify",
+        "cmd rm -rf priv/static/assets/chunks",
         "esbuild web_template --minify",
-        "phx.digest"
+        "cmd node assets/build/generate-ssr-pages.js",
+        "esbuild web_template_ssr",
+        "phx.digest",
+        # phx.digest writes `.gz` next to every asset; this step writes the
+        # brotli sibling so Plug.Static can serve whichever the request
+        # accepts. Keep it last so it sees both the hashed and plain files.
+        "cmd node assets/build/compress-assets.js"
       ],
-      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
+      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "git.hooks": ["cmd git config core.hooksPath scripts/hooks"],
+      precommit: [
+        "compile --warnings-as-errors",
+        "lint",
+        "i18n.check",
+        "deps.unlock --unused",
+        "format",
+        "test",
+        "docs"
+      ],
+      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build", "git.hooks"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]
   end
 end

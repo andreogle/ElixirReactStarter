@@ -12,6 +12,7 @@ defmodule WebTemplate.Application do
       WebTemplate.Repo,
       {DNSCluster, query: Application.get_env(:web_template, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: WebTemplate.PubSub},
+      {Inertia.SSR, path: Application.app_dir(:web_template, "priv")},
       # Start a worker by calling: WebTemplate.Worker.start_link(arg)
       # {WebTemplate.Worker, arg},
       # Start to serve requests, typically the last entry

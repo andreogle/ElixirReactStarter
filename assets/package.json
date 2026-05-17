@@ -1,0 +1,31 @@
+{
+  "engines": {
+    "npm": ">=11.10.0"
+  },
+  "scripts": {
+    "fmt": "npm run lint:fix && biome format --write",
+    "lint": "biome check build/ css/ js/",
+    "lint:fix": "biome check --write build/ css/ js/"
+  },
+  "dependencies": {
+    "@api3/promise-utils": "^0.4.0",
+    "@inertiajs/react": "^3.0.3",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-toast": "^1.2.15",
+    "@types/phoenix": "^1.6.7",
+    "i18next": "^26.0.3",
+    "lucide-react": "^1.11.0",
+    "phoenix": "^1.8.5",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-i18next": "^17.0.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.10",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3"
+  }
+}

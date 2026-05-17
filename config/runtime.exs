@@ -20,22 +20,21 @@ if System.get_env("PHX_SERVER") do
   config :web_template, WebTemplateWeb.Endpoint, server: true
 end
 
-config :web_template, WebTemplateWeb.Endpoint,
-  http: [port: String.to_integer(System.get_env("PORT", "4000"))]
-
 if config_env() == :prod do
-  database_url =
-    System.get_env("DATABASE_URL") ||
-      raise """
-      environment variable DATABASE_URL is missing.
-      For example: ecto://USER:PASS@HOST/DATABASE
-      """
+  # Tiny helper for the common "fetch env var, raise if missing" pattern.
+  get_env! = fn name ->
+    System.get_env(name) ||
+      raise("environment variable #{name} is missing")
+  end
+
+  config :web_template, WebTemplateWeb.Endpoint,
+    http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
   config :web_template, WebTemplate.Repo,
     # ssl: true,
-    url: database_url,
+    url: get_env!.("DATABASE_URL"),
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     # For machines with several cores, consider starting multiple pools of `pool_size`
     # pool_count: 4,
@@ -45,13 +44,8 @@ if config_env() == :prod do
   # A default value is used in config/dev.exs and config/test.exs but you
   # want to use a different value for prod and you most likely don't want
   # to check this value into version control, so we use an environment
-  # variable instead.
-  secret_key_base =
-    System.get_env("SECRET_KEY_BASE") ||
-      raise """
-      environment variable SECRET_KEY_BASE is missing.
-      You can generate one by calling: mix phx.gen.secret
-      """
+  # variable instead. Generate one with `mix phx.gen.secret`.
+  secret_key_base = get_env!.("SECRET_KEY_BASE")
 
   host = System.get_env("PHX_HOST") || "example.com"
 
