@@ -1,6 +1,5 @@
 export default {
   common: {
-    login: 'Iniciar sesión',
     logout: 'Cerrar sesión',
     settings: 'Ajustes',
     dashboard: 'Panel',
@@ -11,6 +10,5 @@ export default {
     searchTimezones: 'Buscar zonas horarias',
     searchTimezonesPlaceholder: 'Escribe una ciudad, país o desfase…',
     timezones: 'Zonas horarias',
-    copyright: '© {{year}} WebTemplate. Todos los derechos reservados.',
   },
 };

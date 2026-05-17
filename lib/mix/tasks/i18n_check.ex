@@ -3,17 +3,42 @@ defmodule Mix.Tasks.I18n.Check do
   @moduledoc """
   Validates that:
 
-  1. All backend Gettext strings have translations in every locale
-  2. All frontend locale files have the same set of keys
-  3. No hardcoded user-facing strings in controllers, plugs, or email modules
+  1. Every backend Gettext msgid in every `.pot` file has a non-empty
+     translation in every locale `.po`
+  2. Translations preserve every `%{interpolation}` placeholder present
+     in the source msgid
+  3. No translations are marked `#, fuzzy` (mix gettext.extract --merge
+     flags ambiguous merges that need human review)
+  4. Frontend locale files have identical key shapes across locales
+  5. Every `t('key.path')` call in `assets/js/**/*.{ts,tsx}` resolves to
+     a key in the default locale, and every defined key is used
+     somewhere
+  6. No hardcoded user-facing strings sneak into controllers, plugs, or
+     the email composition module
+
+  Run with:
 
       mix i18n.check
+
+  Locales and pot domains are discovered automatically:
+    * locales: `Application.fetch_env!(:web_template, :supported_locales)`
+    * pot domains: every `priv/gettext/*.pot` file
   """
 
   use Mix.Task
 
-  @locales ["en", "es"]
-  @gettext_domains ["app", "errors"]
+  alias Expo.Message
+  alias Expo.PO
+
+  @otp_app :web_template
+  @default_locale "en"
+
+  @hardcoded_patterns [
+    {~r/put_flash\(:(info|error),\s*"[^"]+"\)/, "put_flash with hardcoded string (use dgettext)"},
+    {~r/\|>\s*subject\("[^"]+"\)/, "email subject with hardcoded string (use dgettext)"},
+    {~r/add_error\(\s*[^,]+,\s*:\w+,\s*"[^"]+"/,
+     "add_error with hardcoded string (use dgettext on the message arg)"}
+  ]
 
   @backend_scan_paths [
     "lib/web_template_web/controllers/**/*.ex",
@@ -21,16 +46,20 @@ defmodule Mix.Tasks.I18n.Check do
     "lib/web_template_web/email.ex"
   ]
 
-  @hardcoded_patterns [
-    {~r/put_flash\(:(info|error),\s*"[^"]+"\)/, "put_flash with hardcoded string (use dgettext)"},
-    {~r/\|>\s*subject\("[^"]+"\)/, "email subject with hardcoded string (use dgettext)"}
-  ]
-
   @impl true
   def run(_args) do
+    Mix.Task.run("loadconfig")
+
+    locales = locales!()
+    domains = discover_pot_domains()
+    non_default_locales = locales -- [@default_locale]
+
     errors =
-      check_gettext_coverage() ++
-        check_frontend_locale_parity() ++
+      check_gettext_coverage(non_default_locales, domains) ++
+        check_interpolation_parity(non_default_locales, domains) ++
+        check_fuzzy_translations(non_default_locales, domains) ++
+        check_frontend_locale_parity(locales) ++
+        check_frontend_key_usage() ++
         check_hardcoded_strings()
 
     if errors == [] do
@@ -43,30 +72,48 @@ defmodule Mix.Tasks.I18n.Check do
   end
 
   # =============================================================================
-  # Check 1: Gettext coverage (non-English locales only)
+  # Config
   # =============================================================================
-  defp check_gettext_coverage do
-    gettext_dir = Path.join(File.cwd!(), "priv/gettext")
+  defp locales! do
+    Application.fetch_env!(@otp_app, :supported_locales)
+  end
 
-    for domain <- @gettext_domains,
-        pot_path = Path.join(gettext_dir, "#{domain}.pot"),
-        File.exists?(pot_path),
-        locale <- @locales -- ["en"],
-        error <- check_locale_coverage(gettext_dir, domain, locale, pot_path) do
+  defp gettext_dir, do: Path.join(File.cwd!(), "priv/gettext")
+
+  defp discover_pot_domains do
+    gettext_dir()
+    |> Path.join("*.pot")
+    |> Path.wildcard()
+    |> Enum.map(&Path.basename(&1, ".pot"))
+    |> Enum.sort()
+  end
+
+  defp pot_path(domain), do: Path.join(gettext_dir(), "#{domain}.pot")
+
+  defp po_path(locale, domain),
+    do: Path.join([gettext_dir(), locale, "LC_MESSAGES", "#{domain}.po"])
+
+  # =============================================================================
+  # Check 1: Gettext coverage
+  # =============================================================================
+  defp check_gettext_coverage(non_default_locales, domains) do
+    for domain <- domains,
+        locale <- non_default_locales,
+        error <- check_locale_coverage(domain, locale) do
       error
     end
   end
 
-  defp check_locale_coverage(gettext_dir, domain, locale, pot_path) do
-    po_path = Path.join([gettext_dir, locale, "LC_MESSAGES", "#{domain}.po"])
+  defp check_locale_coverage(domain, locale) do
+    po_path = po_path(locale, domain)
 
     if File.exists?(po_path) do
-      pot_msgids = extract_msgids(pot_path)
-      po_translations = extract_translations(po_path)
+      pot_msgids = pot_path(domain) |> parse_po!() |> all_msgids()
+      translations = po_path |> parse_po!() |> translation_map()
 
       for msgid <- pot_msgids,
-          Map.get(po_translations, msgid, "") == "" do
-        "[#{locale}/#{domain}] Missing translation for: \"#{msgid}\""
+          empty?(Map.get(translations, msgid)) do
+        "[#{locale}/#{domain}] Missing translation for: \"#{truncate(msgid)}\""
       end
     else
       ["[#{locale}/#{domain}] Missing .po file: #{po_path}"]
@@ -74,46 +121,185 @@ defmodule Mix.Tasks.I18n.Check do
   end
 
   # =============================================================================
-  # Check 2: Frontend locale parity
+  # Check 2: Interpolation parity
+  # %{var} in msgid must appear in msgstr; otherwise the rendered string
+  # is broken at runtime.
   # =============================================================================
-  defp check_frontend_locale_parity do
-    locales_dir = Path.join(File.cwd!(), "assets/js/i18n/locales")
-    locale_keys = load_frontend_locale_keys(locales_dir)
-
-    case Map.get(locale_keys, "en") do
-      nil -> ["[frontend] Missing locale file: en.ts"]
-      en_keys -> compare_frontend_locales(locale_keys, en_keys)
+  defp check_interpolation_parity(non_default_locales, domains) do
+    for domain <- domains,
+        locale <- non_default_locales,
+        po_path = po_path(locale, domain),
+        File.exists?(po_path),
+        message <- parse_po!(po_path).messages,
+        error <- check_message_interpolation(message, locale, domain) do
+      error
     end
   end
 
-  defp load_frontend_locale_keys(locales_dir) do
-    Map.new(@locales, fn locale ->
+  defp check_message_interpolation(
+         %Message.Singular{msgid: msgid, msgstr: msgstr},
+         locale,
+         domain
+       ) do
+    placeholders_match(join(msgid), join(msgstr), locale, domain)
+  end
+
+  defp check_message_interpolation(
+         %Message.Plural{msgid: msgid, msgid_plural: msgid_plural, msgstr: msgstr_map},
+         locale,
+         domain
+       ) do
+    singular = join(msgid)
+    plural = join(msgid_plural)
+
+    msgstr_map
+    |> Enum.flat_map(fn {index, parts} ->
+      translated = join(parts)
+      # Index 0 must preserve singular placeholders; all others must
+      # preserve plural placeholders.
+      source = if index == 0, do: singular, else: plural
+      placeholders_match(source, translated, locale, domain)
+    end)
+    |> Enum.uniq()
+  end
+
+  defp placeholders_match(_msgid, "", _locale, _domain), do: []
+
+  defp placeholders_match(msgid, msgstr, locale, domain) do
+    expected = MapSet.new(placeholders(msgid))
+    actual = MapSet.new(placeholders(msgstr))
+    missing = MapSet.difference(expected, actual)
+
+    if MapSet.size(missing) == 0 do
+      []
+    else
+      vars =
+        missing
+        |> MapSet.to_list()
+        |> Enum.sort()
+        |> Enum.map_join(", ", &"%{#{&1}}")
+
+      [
+        "[#{locale}/#{domain}] Translation drops interpolation #{vars} from: \"#{truncate(msgid)}\""
+      ]
+    end
+  end
+
+  defp placeholders(s) do
+    ~r/%\{(\w+)\}/
+    |> Regex.scan(s, capture: :all_but_first)
+    |> Enum.map(&hd/1)
+  end
+
+  # =============================================================================
+  # Check 3: Fuzzy translations
+  # mix gettext.extract --merge marks ambiguous merges `#, fuzzy`. They
+  # render but were never verified by a translator.
+  # =============================================================================
+  defp check_fuzzy_translations(non_default_locales, domains) do
+    for domain <- domains,
+        locale <- non_default_locales,
+        po_path = po_path(locale, domain),
+        File.exists?(po_path),
+        message <- parse_po!(po_path).messages,
+        fuzzy?(message) do
+      "[#{locale}/#{domain}] Fuzzy translation (needs review): \"#{truncate(msgid_of(message))}\""
+    end
+  end
+
+  defp fuzzy?(%{flags: flags}) when is_list(flags) do
+    Enum.any?(flags, &Enum.member?(&1, "fuzzy"))
+  end
+
+  defp fuzzy?(_), do: false
+
+  # =============================================================================
+  # Check 4: Frontend locale parity
+  # =============================================================================
+  defp check_frontend_locale_parity(locales) do
+    locales_dir = Path.join(File.cwd!(), "assets/js/i18n/locales")
+    locale_keys = load_frontend_locale_keys(locales, locales_dir)
+
+    case Map.get(locale_keys, @default_locale) do
+      nil ->
+        ["[frontend] Missing locale file: #{@default_locale}.ts"]
+
+      en_keys ->
+        for locale <- locales -- [@default_locale],
+            error <- compare_locale_to_default(locale, Map.get(locale_keys, locale), en_keys) do
+          error
+        end
+    end
+  end
+
+  defp load_frontend_locale_keys(locales, locales_dir) do
+    Map.new(locales, fn locale ->
       path = Path.join(locales_dir, "#{locale}.ts")
       {locale, if(File.exists?(path), do: extract_ts_keys(path))}
     end)
   end
 
-  defp compare_frontend_locales(locale_keys, en_keys) do
-    for locale <- @locales -- ["en"],
-        error <- compare_locale_to_en(locale, Map.get(locale_keys, locale), en_keys) do
-      error
-    end
-  end
-
-  defp compare_locale_to_en(locale, nil, _en_keys) do
+  defp compare_locale_to_default(locale, nil, _en_keys) do
     ["[frontend] Missing locale file: #{locale}.ts"]
   end
 
-  defp compare_locale_to_en(locale, other_keys, en_keys) do
+  defp compare_locale_to_default(locale, other_keys, en_keys) do
     missing_in_other = MapSet.difference(en_keys, other_keys)
-    missing_in_en = MapSet.difference(other_keys, en_keys)
+    missing_in_default = MapSet.difference(other_keys, en_keys)
 
     Enum.map(missing_in_other, &"[frontend/#{locale}] Missing key: #{&1}") ++
-      Enum.map(missing_in_en, &"[frontend/en] Missing key: #{&1} (present in #{locale})")
+      Enum.map(
+        missing_in_default,
+        &"[frontend/#{@default_locale}] Missing key: #{&1} (present in #{locale})"
+      )
   end
 
   # =============================================================================
-  # Check 3: Hardcoded strings
+  # Check 5: Frontend key usage cross-check
+  # Every `t('key.path')` in .ts/.tsx must exist in the default locale.
+  # Every key in the default locale must be referenced somewhere.
+  # =============================================================================
+  defp check_frontend_key_usage do
+    en_path = Path.join([File.cwd!(), "assets/js/i18n/locales/#{@default_locale}.ts"])
+
+    if File.exists?(en_path) do
+      en_keys = extract_ts_keys(en_path)
+      used_keys = scan_t_calls()
+
+      undefined = MapSet.difference(used_keys, en_keys) |> MapSet.to_list() |> Enum.sort()
+      unused = MapSet.difference(en_keys, used_keys) |> MapSet.to_list() |> Enum.sort()
+
+      Enum.map(
+        undefined,
+        &"[frontend] t('#{&1}') referenced in code but not defined in #{@default_locale}.ts"
+      ) ++
+        Enum.map(
+          unused,
+          &"[frontend] Defined in #{@default_locale}.ts but never used: #{&1}"
+        )
+    else
+      []
+    end
+  end
+
+  defp scan_t_calls do
+    "assets/js/**/*.{ts,tsx}"
+    |> Path.wildcard()
+    |> Enum.reject(&String.contains?(&1, "/i18n/locales/"))
+    |> Enum.flat_map(&extract_t_keys_from_file/1)
+    |> MapSet.new()
+  end
+
+  defp extract_t_keys_from_file(path) do
+    content = File.read!(path)
+
+    ~r/\bt\(\s*['"]([\w.]+)['"]/
+    |> Regex.scan(content, capture: :all_but_first)
+    |> Enum.map(&hd/1)
+  end
+
+  # =============================================================================
+  # Check 6: Hardcoded strings
   # =============================================================================
   defp check_hardcoded_strings do
     for path <- Enum.flat_map(@backend_scan_paths, &Path.wildcard/1),
@@ -133,63 +319,49 @@ defmodule Mix.Tasks.I18n.Check do
   end
 
   # =============================================================================
-  # Gettext PO/POT parsing
+  # PO helpers (Expo-backed)
   # =============================================================================
-  defp extract_msgids(pot_path) do
-    lines = pot_path |> File.read!() |> String.split("\n")
+  defp parse_po!(path) do
+    PO.parse_file!(path)
+  end
 
-    lines
-    |> Enum.with_index()
-    |> Enum.filter(fn {line, _i} -> String.starts_with?(line, "msgid \"") end)
-    |> Enum.reject(fn {_line, i} -> plural_entry?(lines, i) end)
-    |> Enum.map(fn {line, _i} -> extract_quoted_string(line) end)
+  defp all_msgids(%Expo.Messages{messages: messages}) do
+    messages
+    |> Enum.flat_map(fn
+      %Message.Singular{msgid: msgid} -> [join(msgid)]
+      %Message.Plural{msgid: msgid, msgid_plural: plural} -> [join(msgid), join(plural)]
+    end)
     |> Enum.reject(&(&1 == ""))
   end
 
-  defp extract_translations(po_path) do
-    lines = po_path |> File.read!() |> String.split("\n")
+  defp translation_map(%Expo.Messages{messages: messages}) do
+    Enum.reduce(messages, %{}, fn
+      %Message.Singular{msgid: msgid, msgstr: msgstr}, acc ->
+        Map.put(acc, join(msgid), join(msgstr))
 
-    lines
-    |> Enum.with_index()
-    |> Enum.reduce(%{}, fn {line, i}, acc ->
-      if String.starts_with?(line, "msgid \"") do
-        parse_msgid_entry(lines, line, i, acc)
-      else
+      %Message.Plural{msgid: msgid, msgid_plural: plural, msgstr: msgstr_map}, acc ->
         acc
-      end
+        |> Map.put(join(msgid), msgstr_map |> Map.get(0, []) |> join())
+        |> Map.put(join(plural), msgstr_map |> Map.get(1, []) |> join())
     end)
   end
 
-  defp parse_msgid_entry(lines, line, i, acc) do
-    next = Enum.at(lines, i + 1, "")
+  defp msgid_of(%Message.Singular{msgid: msgid}), do: join(msgid)
+  defp msgid_of(%Message.Plural{msgid: msgid}), do: join(msgid)
 
-    cond do
-      plural_entry?(lines, i) -> acc
-      String.starts_with?(next, "msgstr \"") -> put_translation(acc, line, next)
-      true -> acc
-    end
-  end
+  defp join(parts) when is_list(parts), do: Enum.join(parts, "")
+  defp join(nil), do: ""
 
-  defp plural_entry?(lines, i) do
-    next = Enum.at(lines, i + 1, "")
-    String.starts_with?(next, "msgid_plural")
-  end
+  defp empty?(nil), do: true
+  defp empty?(""), do: true
+  defp empty?(_), do: false
 
-  defp put_translation(acc, msgid_line, msgstr_line) do
-    msgid = extract_quoted_string(msgid_line)
-    msgstr = extract_quoted_string(msgstr_line)
-    if msgid != "", do: Map.put(acc, msgid, msgstr), else: acc
-  end
-
-  defp extract_quoted_string(line) do
-    case Regex.run(~r/"(.*)"/, line) do
-      [_, content] -> content
-      _ -> ""
-    end
+  defp truncate(s, n \\ 80) do
+    if String.length(s) > n, do: String.slice(s, 0..(n - 1)) <> "…", else: s
   end
 
   # =============================================================================
-  # Frontend TS key extraction
+  # Frontend TS key extraction (kept for the flat locale-file shape)
   # =============================================================================
   defp extract_ts_keys(path) do
     path

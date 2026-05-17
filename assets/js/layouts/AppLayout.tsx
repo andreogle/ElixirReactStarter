@@ -1,16 +1,6 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import type { TFunction } from 'i18next';
-import {
-  CalendarDays,
-  ChevronDown,
-  CircleUserRound,
-  GraduationCap,
-  LayoutDashboard,
-  LogOut,
-  Settings,
-  ShieldCheck,
-  UsersRound,
-} from 'lucide-react';
+import { ChevronDown, CircleUserRound, LayoutDashboard, LogOut, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
@@ -94,33 +84,12 @@ export default function AppLayout({ title, children }: AppLayoutProps) {
 // =============================================================================
 
 /**
- * Role-aware top-nav items. Dashboard is always present; other items only
- * surface when the user has the membership / role to act on them. Admins
- * also see Availability because in small schools (e.g. Ubuntu) the owner
- * usually teaches as well.
+ * Top-nav items. Extend this with role-aware items as the app grows —
+ * gate visibility on `membership.role` (passed in from `usePage`) and
+ * add entries to the returned list.
  */
-function navItemsFor(membership: CurrentMembership | null, t: TFunction): NavItem[] {
-  const dashboard: NavItem = { href: '/dashboard', label: t('common.dashboard'), icon: LayoutDashboard };
-  if (!membership) return [dashboard];
-
-  const lessons: NavItem = { href: '/lessons', label: t('common.lessons'), icon: GraduationCap };
-  const availability: NavItem = {
-    href: '/availability',
-    label: t('common.availability'),
-    icon: CalendarDays,
-  };
-  const teachers: NavItem = { href: '/teachers', label: t('common.teachers'), icon: UsersRound };
-  const members: NavItem = { href: '/admin/members', label: t('common.admin'), icon: ShieldCheck };
-
-  switch (membership.role) {
-    case 'owner':
-    case 'admin':
-      return [dashboard, lessons, members, availability];
-    case 'teacher':
-      return [dashboard, lessons, availability];
-    default: // student, member
-      return [dashboard, lessons, teachers];
-  }
+function navItemsFor(_membership: CurrentMembership | null, t: TFunction): NavItem[] {
+  return [{ href: '/dashboard', label: t('common.dashboard'), icon: LayoutDashboard }];
 }
 
 function isActive(currentPath: string, itemHref: string): boolean {

@@ -1,6 +1,5 @@
 export default {
   common: {
-    login: 'Log in',
     logout: 'Log out',
     settings: 'Settings',
     dashboard: 'Dashboard',
@@ -11,6 +10,5 @@ export default {
     searchTimezones: 'Search timezones',
     searchTimezonesPlaceholder: 'Type a city, country, or offset…',
     timezones: 'Timezones',
-    copyright: '© {{year}} WebTemplate. All rights reserved.',
   },
 };
