@@ -23,6 +23,10 @@ defmodule WebTemplate.MixProject do
     [
       name: "WebTemplate",
       main: "readme",
+      # Drop the epub formatter (default `[:html, :epub, :markdown]`).
+      # `:html` is what `/dev/docs` serves; `:markdown` produces the
+      # llms.txt dump useful for feeding into LLM context windows.
+      formatters: ["html", "markdown"],
       extras: ["README.md", "CLAUDE.md"],
       groups_for_modules: [
         Web: ~r/^WebTemplateWeb($|\.)/,
