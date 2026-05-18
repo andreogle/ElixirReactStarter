@@ -24,12 +24,10 @@ interface NavItem {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
-// The shell uses one container width across the whole app so switching
-// pages (or in-page views) never reflows the chrome. Pages that want
-// narrower content can constrain their own inner sections — don't add
-// per-page overrides here.
-const navContainerClass = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
-const mainContainerClass = 'max-w-6xl mx-auto px-4 sm:px-6 lg:px-8';
+// One container width across the whole app so switching pages (or
+// in-page views) never reflows the chrome. Pages that want narrower
+// content can constrain their own inner sections.
+const containerClass = 'max-w-6xl mx-auto px-4 sm:px-6 lg:px-8';
 
 export default function AppLayout({ title, children }: AppLayoutProps) {
   const { current_user, current_membership } = usePage<{
@@ -46,17 +44,13 @@ export default function AppLayout({ title, children }: AppLayoutProps) {
   return (
     <>
       <Head title={title} />
-      <div className="min-h-screen text-charcoal-blue-900 dark:text-charcoal-blue-50">
-        <header className="border-b border-blaze-orange-500/15 dark:border-blaze-orange-500/20 bg-page/80 dark:bg-charcoal-blue-950/80 backdrop-blur sticky top-0 z-30">
-          <div className={`${navContainerClass} py-3 sm:py-4 flex items-center justify-between gap-3`}>
+      <div className="min-h-screen">
+        <header className="border-b border-gray-200 dark:border-gray-800">
+          <div className={`${containerClass} py-3 flex items-center justify-between gap-3`}>
             <div className="flex items-center gap-6 min-w-0">
-              <Link
-                href="/dashboard"
-                className="text-lg font-bold text-charcoal-blue-900 dark:text-charcoal-blue-50 hover:text-blaze-orange-500 transition shrink-0 tracking-tight"
-              >
+              <Link href="/dashboard" className="text-base font-semibold shrink-0">
                 WebTemplate
               </Link>
-              {/* Desktop nav — collapsed into the avatar dropdown on small screens. */}
               <nav aria-label={t('common.mainNav')} className="hidden md:flex items-center gap-1">
                 {items.map((item) => (
                   <PrimaryNavLink key={item.href} item={item} active={isActive(currentPath, item.href)} />
@@ -72,16 +66,12 @@ export default function AppLayout({ title, children }: AppLayoutProps) {
         </header>
 
         <main className="py-6 sm:py-10">
-          <div className={mainContainerClass}>{children}</div>
+          <div className={containerClass}>{children}</div>
         </main>
       </div>
     </>
   );
 }
-
-// =============================================================================
-// Nav items per role
-// =============================================================================
 
 /**
  * Top-nav items. Extend this with role-aware items as the app grows —
@@ -97,21 +87,15 @@ function isActive(currentPath: string, itemHref: string): boolean {
   return currentPath === itemHref || currentPath.startsWith(`${itemHref}/`);
 }
 
-// =============================================================================
-// Desktop primary nav link
-// =============================================================================
 function PrimaryNavLink({ item, active }: { item: NavItem; active: boolean }) {
   const Icon = item.icon;
   return (
     <Link
       href={item.href}
       aria-current={active ? 'page' : undefined}
-      className={[
-        'inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blaze-orange-500',
-        active
-          ? 'bg-blaze-orange-500 text-white shadow-sm'
-          : 'text-charcoal-blue-700 dark:text-charcoal-blue-50/70 hover:bg-blaze-orange-100/40 dark:hover:bg-blaze-orange-500/15 hover:text-charcoal-blue-900 dark:hover:text-charcoal-blue-50',
-      ].join(' ')}
+      className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+        active ? 'bg-gray-100 dark:bg-gray-800 font-medium' : 'hover:bg-gray-50 dark:hover:bg-gray-900'
+      }`}
     >
       <Icon className="w-4 h-4" aria-hidden="true" />
       <span>{item.label}</span>
@@ -119,11 +103,6 @@ function PrimaryNavLink({ item, active }: { item: NavItem; active: boolean }) {
   );
 }
 
-// =============================================================================
-// Avatar dropdown — Settings + Logout always; primary nav items added on
-// small screens so the dropdown stays a complete fallback when the
-// horizontal nav is hidden.
-// =============================================================================
 function UserMenu({
   displayName,
   mobileNavItems,
@@ -137,17 +116,15 @@ function UserMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={t('common.userMenu')}
-        className="flex items-center gap-1.5 rounded-full px-2 py-1.5 text-sm font-semibold text-charcoal-blue-700 dark:text-charcoal-blue-50/80 hover:bg-blaze-orange-100/40 dark:hover:bg-blaze-orange-500/15 hover:text-charcoal-blue-900 dark:hover:text-charcoal-blue-50 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blaze-orange-500 transition"
+        className="flex items-center gap-1.5 rounded px-2 py-1.5 text-sm cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
-        <CircleUserRound className="w-5 h-5 text-blaze-orange-500" aria-hidden="true" />
+        <CircleUserRound className="w-5 h-5" aria-hidden="true" />
         <span className="sr-only sm:not-sr-only truncate max-w-[10rem]">{displayName}</span>
-        <ChevronDown className="w-4 h-4 text-charcoal-blue-700 dark:text-charcoal-blue-50/70" aria-hidden="true" />
+        <ChevronDown className="w-4 h-4" aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <div className="px-3 py-2 border-b border-blaze-orange-500/15 dark:border-blaze-orange-500/20">
-          <p className="text-sm font-semibold text-charcoal-blue-900 dark:text-charcoal-blue-50 truncate">
-            {displayName}
-          </p>
+        <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+          <p className="text-sm font-medium truncate">{displayName}</p>
         </div>
 
         {/* Primary nav fallback — only visible when the desktop nav is hidden. */}
@@ -156,21 +133,21 @@ function UserMenu({
             const Icon = item.icon;
             return (
               <DropdownMenuItem key={item.href} onSelect={() => router.visit(item.href)}>
-                <Icon className="w-4 h-4 text-blaze-orange-500" aria-hidden="true" />
+                <Icon className="w-4 h-4" aria-hidden="true" />
                 <span className="flex-1">{item.label}</span>
               </DropdownMenuItem>
             );
           })}
-          <DropdownMenuSeparator className="my-1 h-px bg-blaze-orange-500/15 dark:bg-blaze-orange-500/20" />
+          <DropdownMenuSeparator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
         </div>
 
         <DropdownMenuItem onSelect={() => router.visit('/settings')}>
-          <Settings className="w-4 h-4 text-blaze-orange-500" aria-hidden="true" />
+          <Settings className="w-4 h-4" aria-hidden="true" />
           <span className="flex-1">{t('common.settings')}</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="my-1 h-px bg-blaze-orange-500/15 dark:bg-blaze-orange-500/20" />
+        <DropdownMenuSeparator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
         <DropdownMenuItem onSelect={() => router.delete('/logout')}>
-          <LogOut className="w-4 h-4 text-blaze-orange-500" aria-hidden="true" />
+          <LogOut className="w-4 h-4" aria-hidden="true" />
           <span className="flex-1">{t('common.logout')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

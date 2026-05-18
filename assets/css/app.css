@@ -6,3 +6,10 @@
 
 /* Dark mode via class on <html> or prefers-color-scheme */
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* Single accent token. Components reference it as `bg-primary`,
+   `text-primary`, `focus-visible:outline-primary`, etc.
+   Replace with your project's brand color when forking. */
+@theme {
+  --color-primary: oklch(0.55 0.2 250);
+}

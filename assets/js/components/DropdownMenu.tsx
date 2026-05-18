@@ -18,19 +18,12 @@ export function DropdownMenuContent({
         sideOffset={sideOffset}
         align={align}
         onCloseAutoFocus={(event) => {
-          // Prevent the trigger from getting a visible focus ring after the
-          // menu closes (Radix's default is to return focus to it). Keyboard
-          // users can still Tab to the trigger; callers can override by
-          // passing their own handler.
+          // Suppress Radix's default focus-ring on the trigger after the
+          // menu closes. Keyboard users can still Tab to it.
           event.preventDefault();
           onCloseAutoFocus?.(event);
         }}
-        className={[
-          'z-50 min-w-[10rem] overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg py-1',
-          className,
-        ]
-          .filter(Boolean)
-          .join(' ')}
+        className={`z-50 min-w-[10rem] overflow-hidden rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 py-1 ${className}`}
         {...props}
       />
     </RadixDropdownMenu.Portal>
@@ -43,14 +36,7 @@ export function DropdownMenuItem({
 }: ComponentPropsWithoutRef<typeof RadixDropdownMenu.Item>) {
   return (
     <RadixDropdownMenu.Item
-      className={[
-        'flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 outline-none cursor-pointer select-none',
-        'data-[highlighted]:bg-slate-100 dark:data-[highlighted]:bg-slate-700/50 data-[highlighted]:text-slate-900 dark:data-[highlighted]:text-white',
-        'data-[disabled]:opacity-50 data-[disabled]:pointer-events-none',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      className={`flex items-center gap-2 px-3 py-2 text-sm outline-none cursor-pointer select-none data-[highlighted]:bg-gray-100 dark:data-[highlighted]:bg-gray-800 data-[disabled]:opacity-50 data-[disabled]:pointer-events-none ${className}`}
       {...props}
     />
   );

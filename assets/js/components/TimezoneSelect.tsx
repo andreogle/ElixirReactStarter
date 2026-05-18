@@ -119,30 +119,22 @@ export default function TimezoneSelect({
         aria-haspopup="listbox"
         aria-controls={open ? listboxId : undefined}
         disabled={disabled}
-        className={[
-          'w-full flex items-center justify-between gap-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3.5 py-2.5 text-sm text-left text-slate-900 dark:text-white cursor-pointer',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:border-transparent',
-          'disabled:opacity-50 disabled:cursor-not-allowed transition',
-          !selected ? 'text-slate-400' : '',
-          className,
-        ]
-          .filter(Boolean)
-          .join(' ')}
+        className={`w-full flex items-center justify-between gap-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50 disabled:cursor-not-allowed ${!selected ? 'text-gray-400' : ''} ${className}`}
         {...ariaProps}
       >
         <span className="truncate">{triggerLabel}</span>
-        <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
+        <ChevronDown className="w-4 h-4 text-gray-500 shrink-0" aria-hidden="true" />
       </RadixPopover.Trigger>
       <RadixPopover.Portal>
         <RadixPopover.Content
           align="start"
           sideOffset={4}
           collisionPadding={8}
-          className="z-50 w-[var(--radix-popover-trigger-width)] max-h-[min(24rem,var(--radix-popover-content-available-height))] overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg"
+          className="z-50 w-[var(--radix-popover-trigger-width)] max-h-[min(24rem,var(--radix-popover-content-available-height))] overflow-hidden rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 px-3 py-2">
-            <Search className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
+          <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 px-3 py-2">
+            <Search className="w-4 h-4 text-gray-500 shrink-0" aria-hidden="true" />
             <input
               ref={inputRef}
               type="text"
@@ -159,7 +151,7 @@ export default function TimezoneSelect({
               aria-controls={listboxId}
               aria-activedescendant={filtered[activeIndex] ? optionId(listboxId, activeIndex) : undefined}
               placeholder={t('common.searchTimezonesPlaceholder')}
-              className="flex-1 bg-transparent text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none"
+              className="flex-1 bg-transparent text-sm outline-none"
               autoComplete="off"
               spellCheck={false}
             />
@@ -175,7 +167,7 @@ export default function TimezoneSelect({
             className="max-h-80 overflow-y-auto p-1"
           >
             {filtered.length === 0 ? (
-              <div className="px-3 py-2 text-sm italic text-slate-500 dark:text-slate-400">{t('common.noResults')}</div>
+              <div className="px-3 py-2 text-sm italic text-gray-500">{t('common.noResults')}</div>
             ) : (
               filtered.map((opt, i) => {
                 const isActive = i === activeIndex;
@@ -192,16 +184,10 @@ export default function TimezoneSelect({
                     onMouseEnter={() => setActiveIndex(i)}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => commit(opt)}
-                    className={[
-                      'relative flex items-center justify-between gap-2 px-3 py-2 rounded-md text-sm cursor-pointer select-none',
-                      isActive ? 'bg-coral/10 text-coral' : 'text-slate-700 dark:text-slate-200',
-                      isSelected ? 'font-medium' : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
+                    className={`flex items-center justify-between gap-2 px-3 py-2 rounded text-sm cursor-pointer select-none ${isActive ? 'bg-gray-100 dark:bg-gray-800' : ''} ${isSelected ? 'font-medium' : ''}`}
                   >
                     <span className="truncate">{opt.label}</span>
-                    {isSelected && <Check className="w-4 h-4 text-coral shrink-0" aria-hidden="true" />}
+                    {isSelected && <Check className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />}
                   </div>
                 );
               })

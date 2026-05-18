@@ -3,12 +3,6 @@ import { CircleAlert, CircleCheck, Info, X } from 'lucide-react';
 import type { ComponentType, SVGProps } from 'react';
 import { dismissToast, type ToastVariant, useToasts } from './toast';
 
-const variantClasses: Record<ToastVariant, string> = {
-  info: 'border-slate-200 dark:border-slate-700',
-  success: 'border-emerald-200 dark:border-emerald-800',
-  error: 'border-red-200 dark:border-red-800',
-};
-
 const iconFor: Record<ToastVariant, ComponentType<SVGProps<SVGSVGElement>>> = {
   info: Info,
   success: CircleCheck,
@@ -16,7 +10,7 @@ const iconFor: Record<ToastVariant, ComponentType<SVGProps<SVGSVGElement>>> = {
 };
 
 const iconColor: Record<ToastVariant, string> = {
-  info: 'text-slate-400',
+  info: 'text-gray-500',
   success: 'text-emerald-500',
   error: 'text-red-500',
 };
@@ -34,23 +28,13 @@ export default function Toaster() {
             onOpenChange={(open) => {
               if (!open) dismissToast(id);
             }}
-            className={[
-              'group pointer-events-auto flex items-start gap-3 rounded-lg border bg-white dark:bg-slate-800 p-4 shadow-lg',
-              'data-[state=open]:animate-toast-in',
-              'data-[state=closed]:animate-toast-out',
-              'data-[swipe=move]:translate-x-(--radix-toast-swipe-move-x) data-[swipe=move]:transition-none',
-              'data-[swipe=cancel]:translate-x-0 data-[swipe=cancel]:transition-transform data-[swipe=cancel]:duration-200',
-              'data-[swipe=end]:animate-toast-swipe-out',
-              variantClasses[variant],
-            ].join(' ')}
+            className="pointer-events-auto flex items-start gap-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4"
           >
             <Icon className={`w-5 h-5 shrink-0 mt-0.5 ${iconColor[variant]}`} aria-hidden="true" />
-            <RadixToast.Description className="flex-1 text-sm text-slate-700 dark:text-slate-200">
-              {description}
-            </RadixToast.Description>
+            <RadixToast.Description className="flex-1 text-sm">{description}</RadixToast.Description>
             <RadixToast.Close
               aria-label="Dismiss"
-              className="shrink-0 rounded-md p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-700/50 dark:hover:text-slate-200 cursor-pointer transition"
+              className="shrink-0 rounded p-0.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
             >
               <X className="w-4 h-4" aria-hidden="true" />
             </RadixToast.Close>
