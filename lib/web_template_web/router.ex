@@ -21,10 +21,13 @@ defmodule WebTemplateWeb.Router do
     get "/", PageController, :home
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", WebTemplateWeb do
-  #   pipe_through :api
-  # end
+  scope "/", WebTemplateWeb do
+    pipe_through :api
+
+    # Liveness probe for load balancers / k8s / uptime monitors. Cheap
+    # by design — no DB, no external calls.
+    get "/health", HealthController, :show
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:web_template, :dev_routes) do

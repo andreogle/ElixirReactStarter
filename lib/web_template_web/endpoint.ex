@@ -27,6 +27,15 @@ defmodule WebTemplateWeb.Endpoint do
     only: WebTemplateWeb.static_paths(),
     raise_on_missing_only: code_reloading?
 
+  # Self-served ex_doc. `mix docs` writes HTML + search index to `doc/`
+  # (gitignored). `DocsIndexRedirect` bounces `/dev/docs` and
+  # `/dev/docs/` to `/dev/docs/index.html` so relative links inside the
+  # generated HTML resolve against the right directory.
+  if Application.compile_env(:web_template, :dev_routes) do
+    plug WebTemplateWeb.Plugs.DocsIndexRedirect
+    plug Plug.Static, at: "/dev/docs", from: Path.expand("../../doc", __DIR__)
+  end
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do

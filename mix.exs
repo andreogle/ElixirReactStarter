@@ -10,8 +10,25 @@ defmodule WebTemplate.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
+      docs: docs(),
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
       listeners: [Phoenix.CodeReloader]
+    ]
+  end
+
+  # Local-only ex_doc config. `mix docs` writes HTML to `doc/`, which is
+  # gitignored; in dev the endpoint serves it at /dev/docs/index.html.
+  # ex_doc's HTML ships with full-text search built in.
+  defp docs do
+    [
+      name: "WebTemplate",
+      main: "readme",
+      extras: ["README.md", "CLAUDE.md"],
+      groups_for_modules: [
+        Web: ~r/^WebTemplateWeb($|\.)/,
+        Ecto: ~r/^WebTemplate\.Ecto\./,
+        "Mix Tasks": ~r/^Mix\.Tasks\./
+      ]
     ]
   end
 
@@ -117,10 +134,18 @@ defmodule WebTemplate.MixProject do
         "deps.unlock --unused",
         "format",
         "test",
-        "docs"
+        "docs",
+        # ex_doc's HTML references `docs_config.js` (intended for the
+        # multi-version switcher) but never generates it. Write a stub
+        # so every page load doesn't 404 when self-served at /dev/docs.
+        &write_docs_config_stub/1
       ],
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build", "git.hooks"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]
+  end
+
+  defp write_docs_config_stub(_args) do
+    File.write!("doc/docs_config.js", "var versionNodes = [];\n")
   end
 end
