@@ -283,16 +283,38 @@ defmodule Mix.Tasks.I18n.Check do
   # Check 5: Frontend key usage cross-check
   # Every `t('key.path')` in .ts/.tsx must exist in the default locale.
   # Every key in the default locale must be referenced somewhere.
+  #
+  # Two patterns are recognised beyond plain string literals:
+  #
+  #   1. i18next plural suffixes — `t('foo.bar', { count })` resolves to
+  #      `foo.bar_one` / `foo.bar_other` at runtime. We treat suffixed
+  #      keys as used if the base key is used, and we treat the base key
+  #      as defined if any plural form of it is defined.
+  #
+  #   2. Dynamic template-literal keys — `t(\`prefix.${var}.suffix\`)`
+  #      can't be statically resolved. We extract the static prefix
+  #      ("prefix.") and treat every defined key starting with that
+  #      prefix as potentially used so the dead-key check doesn't
+  #      flag every branch of the dispatch table.
   # =============================================================================
+  @plural_suffixes ~w(_zero _one _two _few _many _other)
+
   defp check_frontend_key_usage(default_locale) do
     en_path = Path.join([File.cwd!(), "assets/js/i18n/locales/#{default_locale}.ts"])
 
     if File.exists?(en_path) do
       default_keys = extract_ts_keys(en_path)
-      used_keys = scan_t_calls()
+      {static_used, dynamic_prefixes} = scan_t_calls()
 
-      undefined = MapSet.difference(used_keys, default_keys) |> MapSet.to_list() |> Enum.sort()
-      unused = MapSet.difference(default_keys, used_keys) |> MapSet.to_list() |> Enum.sort()
+      undefined =
+        static_used
+        |> Enum.reject(&defined_directly_or_via_plural?(&1, default_keys))
+        |> Enum.sort()
+
+      unused =
+        default_keys
+        |> Enum.reject(&used_directly_or_via_plural_or_prefix?(&1, static_used, dynamic_prefixes))
+        |> Enum.sort()
 
       Enum.map(
         undefined,
@@ -307,15 +329,37 @@ defmodule Mix.Tasks.I18n.Check do
     end
   end
 
+  defp defined_directly_or_via_plural?(key, default_keys) do
+    MapSet.member?(default_keys, key) or
+      Enum.any?(@plural_suffixes, &MapSet.member?(default_keys, key <> &1))
+  end
+
+  defp used_directly_or_via_plural_or_prefix?(key, static_used, dynamic_prefixes) do
+    MapSet.member?(static_used, key) or
+      plural_base_used?(key, static_used) or
+      Enum.any?(dynamic_prefixes, &String.starts_with?(key, &1 <> "."))
+  end
+
+  defp plural_base_used?(key, static_used) do
+    Enum.any?(@plural_suffixes, fn suffix ->
+      String.ends_with?(key, suffix) and
+        MapSet.member?(static_used, String.replace_suffix(key, suffix, ""))
+    end)
+  end
+
   # Production .ts/.tsx files only. Locale files and test files are
   # excluded because their `t()` calls (if any) would skew dead-key
   # detection in either direction.
   defp scan_t_calls do
-    "assets/js/**/*.{ts,tsx}"
-    |> Path.wildcard()
-    |> Enum.reject(&excluded_t_call_source?/1)
-    |> Enum.flat_map(&extract_t_keys_from_file/1)
-    |> MapSet.new()
+    files =
+      "assets/js/**/*.{ts,tsx}"
+      |> Path.wildcard()
+      |> Enum.reject(&excluded_t_call_source?/1)
+
+    static = files |> Enum.flat_map(&extract_t_keys_from_file/1) |> MapSet.new()
+    dynamic = files |> Enum.flat_map(&extract_t_dynamic_prefixes_from_file/1) |> Enum.uniq()
+
+    {static, dynamic}
   end
 
   defp excluded_t_call_source?(path) do
@@ -327,6 +371,17 @@ defmodule Mix.Tasks.I18n.Check do
     content = File.read!(path)
 
     ~r/\bt\(\s*['"]([\w.]+)['"]/
+    |> Regex.scan(content, capture: :all_but_first)
+    |> Enum.map(&hd/1)
+  end
+
+  # Captures the static prefix before the first `${...}` in a
+  # backtick-quoted `t()` key, e.g. `t(\`admin.members.roles.${role}\`)`
+  # yields "admin.members.roles".
+  defp extract_t_dynamic_prefixes_from_file(path) do
+    content = File.read!(path)
+
+    ~r/\bt\(\s*`([\w.]+)\.\$\{/
     |> Regex.scan(content, capture: :all_but_first)
     |> Enum.map(&hd/1)
   end
