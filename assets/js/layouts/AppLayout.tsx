@@ -1,6 +1,6 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import type { TFunction } from 'i18next';
-import { ChevronDown, CircleUserRound, LayoutDashboard, LogOut, Settings } from 'lucide-react';
+import { ChevronDown, CircleUserRound, LogOut, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
@@ -11,7 +11,7 @@ import {
 } from '../components/DropdownMenu';
 import Link from '../components/Link';
 import LocaleSelector from '../components/LocaleSelector';
-import type { CurrentMembership, CurrentUser } from '../types';
+import type { CurrentUser } from '../types';
 
 interface AppLayoutProps {
   title: string;
@@ -30,15 +30,12 @@ interface NavItem {
 const containerClass = 'max-w-6xl mx-auto px-4 sm:px-6 lg:px-8';
 
 export default function AppLayout({ title, children }: AppLayoutProps) {
-  const { current_user, current_membership } = usePage<{
-    current_user: CurrentUser;
-    current_membership: CurrentMembership | null;
-  }>().props;
+  const { current_user } = usePage<{ current_user: CurrentUser }>().props;
   const { url } = usePage();
   const { t } = useTranslation();
 
-  const displayName = current_user.name || current_user.email;
-  const items = navItemsFor(current_membership, t);
+  const displayName = current_user.email;
+  const items = navItemsFor(t);
   const currentPath = url.split('?')[0];
 
   return (
@@ -48,7 +45,7 @@ export default function AppLayout({ title, children }: AppLayoutProps) {
         <header className="border-b border-gray-200 dark:border-gray-800">
           <div className={`${containerClass} py-3 flex items-center justify-between gap-3`}>
             <div className="flex items-center gap-6 min-w-0">
-              <Link href="/dashboard" className="text-base font-semibold shrink-0">
+              <Link href="/" className="text-base font-semibold shrink-0">
                 WebTemplate
               </Link>
               <nav aria-label={t('common.mainNav')} className="hidden md:flex items-center gap-1">
@@ -73,17 +70,13 @@ export default function AppLayout({ title, children }: AppLayoutProps) {
   );
 }
 
-/**
- * Top-nav items. Extend this with role-aware items as the app grows —
- * gate visibility on `membership.role` (passed in from `usePage`) and
- * add entries to the returned list.
- */
-function navItemsFor(_membership: CurrentMembership | null, t: TFunction): NavItem[] {
-  return [{ href: '/dashboard', label: t('common.dashboard'), icon: LayoutDashboard }];
+function navItemsFor(_t: TFunction): NavItem[] {
+  // Add nav items as the app grows. Returning an empty list collapses
+  // the header into just the brand + user menu.
+  return [];
 }
 
 function isActive(currentPath: string, itemHref: string): boolean {
-  if (itemHref === '/dashboard') return currentPath === '/dashboard';
   return currentPath === itemHref || currentPath.startsWith(`${itemHref}/`);
 }
 

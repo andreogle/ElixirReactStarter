@@ -2,7 +2,6 @@ export default {
   common: {
     logout: 'Cerrar sesión',
     settings: 'Ajustes',
-    dashboard: 'Panel',
     userMenu: 'Menú de usuario',
     mainNav: 'Navegación principal',
     select: 'Seleccionar…',

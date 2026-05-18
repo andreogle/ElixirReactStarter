@@ -1,21 +1,20 @@
 defmodule WebTemplateWeb.Email do
   @moduledoc """
   Email composition. Builds Swoosh emails with both HTML and plain-text
-  bodies. Content is translated via Gettext based on the recipient's
-  locale.
+  bodies. Content is translated via Gettext based on the request locale
+  (which the auth plug resolves from `Accept-Language`).
 
   ## Adding a new email
 
   1. Add a function here that returns a `%Swoosh.Email{}`. Use
-     `dgettext("app", ...)` for every user-visible string and call
-     `Gettext.put_locale/2` once at the top so all subsequent
-     translations resolve in the recipient's language.
+     `dgettext("app", ...)` for every user-visible string.
   2. Add matching `email_html/<name>.html.heex` and
      `email_text/<name>.text.heex` templates under the controllers
      directory. The HTML version uses the `<.email_layout>` slot
      component from `WebTemplateWeb.EmailHTML`.
   3. Reference the templates as `EmailHTML.<name>(assigns)` and
-     `EmailText.<name>(assigns)` and pipe each through `render_to_string/1`.
+     `EmailText.<name>(assigns)` and pipe each through
+     `render_to_string/1`.
   4. Run `mix gettext.extract --merge` to pick up the new strings.
 
   ## Why both HTML and plain text
@@ -26,8 +25,8 @@ defmodule WebTemplateWeb.Email do
 
   ## Security
 
-  Never put codes or tokens in the subject line — they show on lock
-  screens. Body only.
+  Never put tokens in the subject line — they show on lock screens.
+  Body only.
   """
 
   import Swoosh.Email
@@ -44,44 +43,68 @@ defmodule WebTemplateWeb.Email do
   alias WebTemplate.Log
   alias WebTemplateWeb.EmailHTML
   alias WebTemplateWeb.EmailText
+  alias WebTemplateWeb.Endpoint
 
   @from {"WebTemplate", "noreply@example.com"}
 
   @doc """
-  Builds a welcome email for a newly registered user. Demonstrates the
-  full pattern: locale switching, dgettext lookups, matched HTML and
-  text bodies.
-
-  `recipient` is anything with `:name`, `:email`, and `:locale` keys —
-  typically a user struct but a plain map works too (handy from tests).
+  Builds the email-confirmation message. The `raw_token` is embedded in
+  a single-click URL the recipient opens to confirm.
   """
-  def welcome_email(%{name: name, email: email, locale: locale}) do
-    Gettext.put_locale(WebTemplateWeb.Gettext, locale || "en")
+  def confirmation_email(%{email: email}, raw_token) do
+    url = Endpoint.url() <> ~p"/confirm-email?token=#{raw_token}"
 
     assigns = %{
-      heading: dgettext("app", "Welcome!"),
+      url: url,
+      heading: dgettext("app", "Confirm your email"),
       greeting:
-        dgettext(
-          "app",
-          "Hi %{name}, thanks for signing up. We're glad you're here.",
-          name: name
-        ),
-      body:
-        dgettext(
-          "app",
-          "Your account is ready. Sign in any time to get started."
-        ),
-      closing: dgettext("app", "Talk soon.")
+        dgettext("app", "Welcome — click the button below to confirm your email address."),
+      button_label: dgettext("app", "Confirm email"),
+      paste_url_label: dgettext("app", "Or copy and paste this URL into your browser:"),
+      expiry: dgettext("app", "This link expires in 1 hour."),
+      ignore:
+        dgettext("app", "If you didn't create this account, you can safely ignore this email.")
     }
 
-    Logger.info("Sending welcome email to #{Log.redact_email(email)}")
+    Logger.info("Sending confirmation email to #{Log.redact_email(email)}")
 
     new()
-    |> to({name, email})
+    |> to(email)
     |> from(@from)
-    |> subject(dgettext("app", "Welcome to WebTemplate"))
-    |> html_body(render_to_string(EmailHTML.welcome(assigns)))
-    |> text_body(render_to_string(EmailText.welcome(assigns)))
+    |> subject(dgettext("app", "Confirm your email"))
+    |> html_body(render_to_string(EmailHTML.confirm_email(assigns)))
+    |> text_body(render_to_string(EmailText.confirm_email(assigns)))
+  end
+
+  @doc """
+  Builds the password-reset message. The `raw_token` is embedded in a
+  single-click URL that lands the recipient on the reset-password page.
+  """
+  def password_reset_email(%{email: email}, raw_token) do
+    url = Endpoint.url() <> ~p"/reset-password?token=#{raw_token}"
+
+    assigns = %{
+      url: url,
+      heading: dgettext("app", "Reset your password"),
+      greeting: dgettext("app", "Click the button below to choose a new password."),
+      button_label: dgettext("app", "Reset password"),
+      paste_url_label: dgettext("app", "Or copy and paste this URL into your browser:"),
+      expiry:
+        dgettext(
+          "app",
+          "This link expires in 1 hour. If you didn't request a reset, you can safely ignore this email."
+        ),
+      security: dgettext("app", "For your security, never share this link with anyone.")
+    }
+
+    Logger.info("Sending password reset email to #{Log.redact_email(email)}")
+
+    new()
+    |> to(email)
+    |> from(@from)
+    |> subject(dgettext("app", "Reset your password"))
+    |> html_body(render_to_string(EmailHTML.password_reset(assigns)))
+    |> text_body(render_to_string(EmailText.password_reset(assigns)))
   end
 
   defp render_to_string(template) do

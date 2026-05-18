@@ -112,5 +112,7 @@ msgid "must be equal to %{number}"
 msgstr ""
 
 ## Custom validation
+#: lib/web_template/accounts/user.ex:101
+#, elixir-autogen
 msgid "must be a valid email address"
 msgstr ""

@@ -19,7 +19,10 @@ config :web_template, WebTemplate.Repo,
 config :web_template, WebTemplateWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}],
+  http: [ip: {127, 0, 0, 1}, port: 4000],
+  # Used by `Endpoint.url/0` (e.g. when building email links). Prod
+  # overrides this in runtime.exs from PHX_HOST + standard https port.
+  url: [host: "localhost", port: 4000],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
