@@ -10,18 +10,23 @@ defmodule Mix.Tasks.I18n.Check do
   3. No translations are marked `#, fuzzy` (mix gettext.extract --merge
      flags ambiguous merges that need human review)
   4. Frontend locale files have identical key shapes across locales
-  5. Every `t('key.path')` call in `assets/js/**/*.{ts,tsx}` resolves to
-     a key in the default locale, and every defined key is used
-     somewhere
+  5. Every `t('key.path')` call in `assets/js/**/*.{ts,tsx}` (excluding
+     test files) resolves to a key in the default locale, and every
+     defined key is used somewhere
   6. No hardcoded user-facing strings sneak into controllers, plugs, or
      the email composition module
+  7. No hardcoded prose lives in HEEx templates (email + root layout) —
+     they must flow through assigns from a dgettext'd composition module
+  8. The frontend i18next runtime config (`lng:` / `fallbackLng:` in
+     `assets/js/i18n/index.ts`) matches the backend `:default_locale`
 
   Run with:
 
       mix i18n.check
 
-  Locales and pot domains are discovered automatically:
+  Locales, default locale, and pot domains are discovered automatically:
     * locales: `Application.fetch_env!(:web_template, :supported_locales)`
+    * default locale: `Application.fetch_env!(:web_template, :default_locale)`
     * pot domains: every `priv/gettext/*.pot` file
   """
 
@@ -31,7 +36,6 @@ defmodule Mix.Tasks.I18n.Check do
   alias Expo.PO
 
   @otp_app :web_template
-  @default_locale "en"
 
   @hardcoded_patterns [
     {~r/put_flash\(:(info|error),\s*"[^"]+"\)/, "put_flash with hardcoded string (use dgettext)"},
@@ -46,21 +50,32 @@ defmodule Mix.Tasks.I18n.Check do
     "lib/web_template_web/email.ex"
   ]
 
+  # HEEx templates scanned for hardcoded user-facing prose. Component sigil
+  # heredocs inside .ex files are not scanned — keep prose out of those.
+  @heex_scan_paths [
+    "lib/web_template_web/components/layouts/*.html.heex",
+    "lib/web_template_web/controllers/email_html/*.html.heex",
+    "lib/web_template_web/controllers/email_text/*.text.heex"
+  ]
+
   @impl true
   def run(_args) do
     Mix.Task.run("loadconfig")
 
     locales = locales!()
+    default_locale = default_locale!()
     domains = discover_pot_domains()
-    non_default_locales = locales -- [@default_locale]
+    non_default_locales = locales -- [default_locale]
 
     errors =
       check_gettext_coverage(non_default_locales, domains) ++
         check_interpolation_parity(non_default_locales, domains) ++
         check_fuzzy_translations(non_default_locales, domains) ++
-        check_frontend_locale_parity(locales) ++
-        check_frontend_key_usage() ++
-        check_hardcoded_strings()
+        check_frontend_locale_parity(locales, default_locale) ++
+        check_frontend_key_usage(default_locale) ++
+        check_frontend_i18n_config(default_locale) ++
+        check_hardcoded_strings() ++
+        check_heex_hardcoded_strings()
 
     if errors == [] do
       Mix.shell().info("i18n check passed: all translations present, no hardcoded strings found.")
@@ -76,6 +91,10 @@ defmodule Mix.Tasks.I18n.Check do
   # =============================================================================
   defp locales! do
     Application.fetch_env!(@otp_app, :supported_locales)
+  end
+
+  defp default_locale! do
+    Application.fetch_env!(@otp_app, :default_locale)
   end
 
   defp gettext_dir, do: Path.join(File.cwd!(), "priv/gettext")
@@ -216,17 +235,23 @@ defmodule Mix.Tasks.I18n.Check do
   # =============================================================================
   # Check 4: Frontend locale parity
   # =============================================================================
-  defp check_frontend_locale_parity(locales) do
+  defp check_frontend_locale_parity(locales, default_locale) do
     locales_dir = Path.join(File.cwd!(), "assets/js/i18n/locales")
     locale_keys = load_frontend_locale_keys(locales, locales_dir)
 
-    case Map.get(locale_keys, @default_locale) do
+    case Map.get(locale_keys, default_locale) do
       nil ->
-        ["[frontend] Missing locale file: #{@default_locale}.ts"]
+        ["[frontend] Missing locale file: #{default_locale}.ts"]
 
-      en_keys ->
-        for locale <- locales -- [@default_locale],
-            error <- compare_locale_to_default(locale, Map.get(locale_keys, locale), en_keys) do
+      default_keys ->
+        for locale <- locales -- [default_locale],
+            error <-
+              compare_locale_to_default(
+                locale,
+                Map.get(locale_keys, locale),
+                default_keys,
+                default_locale
+              ) do
           error
         end
     end
@@ -239,18 +264,18 @@ defmodule Mix.Tasks.I18n.Check do
     end)
   end
 
-  defp compare_locale_to_default(locale, nil, _en_keys) do
+  defp compare_locale_to_default(locale, nil, _default_keys, _default_locale) do
     ["[frontend] Missing locale file: #{locale}.ts"]
   end
 
-  defp compare_locale_to_default(locale, other_keys, en_keys) do
-    missing_in_other = MapSet.difference(en_keys, other_keys)
-    missing_in_default = MapSet.difference(other_keys, en_keys)
+  defp compare_locale_to_default(locale, other_keys, default_keys, default_locale) do
+    missing_in_other = MapSet.difference(default_keys, other_keys)
+    missing_in_default = MapSet.difference(other_keys, default_keys)
 
     Enum.map(missing_in_other, &"[frontend/#{locale}] Missing key: #{&1}") ++
       Enum.map(
         missing_in_default,
-        &"[frontend/#{@default_locale}] Missing key: #{&1} (present in #{locale})"
+        &"[frontend/#{default_locale}] Missing key: #{&1} (present in #{locale})"
       )
   end
 
@@ -259,35 +284,43 @@ defmodule Mix.Tasks.I18n.Check do
   # Every `t('key.path')` in .ts/.tsx must exist in the default locale.
   # Every key in the default locale must be referenced somewhere.
   # =============================================================================
-  defp check_frontend_key_usage do
-    en_path = Path.join([File.cwd!(), "assets/js/i18n/locales/#{@default_locale}.ts"])
+  defp check_frontend_key_usage(default_locale) do
+    en_path = Path.join([File.cwd!(), "assets/js/i18n/locales/#{default_locale}.ts"])
 
     if File.exists?(en_path) do
-      en_keys = extract_ts_keys(en_path)
+      default_keys = extract_ts_keys(en_path)
       used_keys = scan_t_calls()
 
-      undefined = MapSet.difference(used_keys, en_keys) |> MapSet.to_list() |> Enum.sort()
-      unused = MapSet.difference(en_keys, used_keys) |> MapSet.to_list() |> Enum.sort()
+      undefined = MapSet.difference(used_keys, default_keys) |> MapSet.to_list() |> Enum.sort()
+      unused = MapSet.difference(default_keys, used_keys) |> MapSet.to_list() |> Enum.sort()
 
       Enum.map(
         undefined,
-        &"[frontend] t('#{&1}') referenced in code but not defined in #{@default_locale}.ts"
+        &"[frontend] t('#{&1}') referenced in code but not defined in #{default_locale}.ts"
       ) ++
         Enum.map(
           unused,
-          &"[frontend] Defined in #{@default_locale}.ts but never used: #{&1}"
+          &"[frontend] Defined in #{default_locale}.ts but never used: #{&1}"
         )
     else
       []
     end
   end
 
+  # Production .ts/.tsx files only. Locale files and test files are
+  # excluded because their `t()` calls (if any) would skew dead-key
+  # detection in either direction.
   defp scan_t_calls do
     "assets/js/**/*.{ts,tsx}"
     |> Path.wildcard()
-    |> Enum.reject(&String.contains?(&1, "/i18n/locales/"))
+    |> Enum.reject(&excluded_t_call_source?/1)
     |> Enum.flat_map(&extract_t_keys_from_file/1)
     |> MapSet.new()
+  end
+
+  defp excluded_t_call_source?(path) do
+    String.contains?(path, "/i18n/locales/") or
+      Regex.match?(~r/\.(test|spec)\.tsx?$/, path)
   end
 
   defp extract_t_keys_from_file(path) do
@@ -299,7 +332,7 @@ defmodule Mix.Tasks.I18n.Check do
   end
 
   # =============================================================================
-  # Check 6: Hardcoded strings
+  # Check 6: Hardcoded strings in .ex files
   # =============================================================================
   defp check_hardcoded_strings do
     for path <- Enum.flat_map(@backend_scan_paths, &Path.wildcard/1),
@@ -315,6 +348,98 @@ defmodule Mix.Tasks.I18n.Check do
     for {pattern, message} <- @hardcoded_patterns,
         Regex.match?(pattern, content) do
       "[#{relative}] #{message}"
+    end
+  end
+
+  # =============================================================================
+  # Check 7: Hardcoded prose in HEEx templates
+  #
+  # Heuristic — flag text nodes that look like English prose (≥3 letter
+  # sequences, at least one ≥4 chars, at least one lowercase letter).
+  # Brand strings ("WebTemplate"), single-word labels, and pure
+  # interpolated content (`{@assigns}`) are deliberately not flagged.
+  # =============================================================================
+  defp check_heex_hardcoded_strings do
+    for path <- Enum.flat_map(@heex_scan_paths, &Path.wildcard/1),
+        error <- scan_heex_for_prose(path) do
+      error
+    end
+  end
+
+  defp scan_heex_for_prose(path) do
+    relative = Path.relative_to_cwd(path)
+
+    path
+    |> File.read!()
+    |> strip_interpolations()
+    |> extract_text_nodes()
+    |> Enum.filter(&prose?/1)
+    |> Enum.map(&"[#{relative}] Hardcoded prose (use dgettext via assigns): \"#{truncate(&1)}\"")
+  end
+
+  # Drops `{...}`, `<% ... %>`, `<%= ... %>`, `<%! ... %>`, `<%# ... %>`
+  # so what remains is the static text the template would emit verbatim.
+  defp strip_interpolations(content) do
+    content
+    |> String.replace(~r/\{[^{}]*\}/, " ")
+    |> String.replace(~r/<%[!=#]?.*?%>/s, " ")
+  end
+
+  # Pull text nodes — anything between `>` and `<` for tagged templates,
+  # plus raw lines for tag-less text templates like `welcome.text.heex`.
+  defp extract_text_nodes(content) do
+    has_tags? = Regex.match?(~r/<\/?[a-zA-Z]/, content)
+
+    if has_tags? do
+      ~r/>([^<]+)</
+      |> Regex.scan(content, capture: :all_but_first)
+      |> Enum.map(&hd/1)
+    else
+      String.split(content, "\n")
+    end
+    |> Enum.map(&String.trim/1)
+    |> Enum.reject(&(&1 == ""))
+  end
+
+  defp prose?(text) do
+    words = Regex.scan(~r/[A-Za-z]{2,}/, text) |> Enum.map(&hd/1)
+
+    length(words) >= 3 and
+      Enum.any?(words, &(String.length(&1) >= 4)) and
+      Regex.match?(~r/[a-z]/, text)
+  end
+
+  # =============================================================================
+  # Check 8: Frontend i18next runtime config
+  # `assets/js/i18n/index.ts` declares the runtime `lng:` / `fallbackLng:`.
+  # If those drift from the backend `:default_locale`, the frontend will
+  # render the wrong locale for anonymous traffic.
+  # =============================================================================
+  defp check_frontend_i18n_config(default_locale) do
+    path = Path.join(File.cwd!(), "assets/js/i18n/index.ts")
+
+    if File.exists?(path) do
+      content = File.read!(path)
+
+      check_i18n_key(content, "lng", default_locale) ++
+        check_i18n_key(content, "fallbackLng", default_locale)
+    else
+      []
+    end
+  end
+
+  defp check_i18n_key(content, key, expected) do
+    case Regex.run(~r/#{key}:\s*['"]([^'"]+)['"]/, content) do
+      [_, ^expected] ->
+        []
+
+      [_, actual] ->
+        [
+          "[frontend] i18n/index.ts #{key}: '#{actual}' does not match backend :default_locale '#{expected}'"
+        ]
+
+      nil ->
+        ["[frontend] i18n/index.ts is missing #{key}: '...' — expected '#{expected}'"]
     end
   end
 
