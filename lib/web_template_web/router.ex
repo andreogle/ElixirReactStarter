@@ -49,6 +49,7 @@ defmodule WebTemplateWeb.Router do
   scope "/", WebTemplateWeb do
     pipe_through [:browser, :require_authenticated_user]
 
+    get "/dashboard", DashboardController, :show
     delete "/logout", AuthController, :logout
 
     get "/settings", SettingsController, :show

@@ -58,10 +58,10 @@ defmodule WebTemplateWeb.AuthControllerTest do
       %{user: :user |> build() |> confirmed() |> insert()}
     end
 
-    test "logs in with valid credentials and redirects to /", %{conn: conn, user: user} do
+    test "logs in with valid credentials and redirects to /dashboard", %{conn: conn, user: user} do
       conn = post(conn, ~p"/login", %{email: user.email, password: "valid_password123"})
 
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/dashboard"
       assert get_session(conn, "user_token")
     end
 
@@ -106,7 +106,7 @@ defmodule WebTemplateWeb.AuthControllerTest do
 
       conn = get(conn, ~p"/confirm-email?token=#{token}")
 
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/dashboard"
       assert get_session(conn, "user_token")
       assert Accounts.get_user_by_email(user.email) |> User.confirmed?()
     end

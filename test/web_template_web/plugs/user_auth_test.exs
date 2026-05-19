@@ -97,10 +97,10 @@ defmodule WebTemplateWeb.UserAuthTest do
   end
 
   describe "redirect_if_user_is_authenticated/2" do
-    test "redirects to / when current_user is set", %{conn: conn, user: user} do
+    test "redirects to /dashboard when current_user is set", %{conn: conn, user: user} do
       conn = conn |> assign(:current_user, user) |> UserAuth.redirect_if_user_is_authenticated([])
       assert conn.halted
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/dashboard"
     end
 
     test "passes through when current_user is nil", %{conn: conn} do
@@ -110,10 +110,10 @@ defmodule WebTemplateWeb.UserAuthTest do
   end
 
   describe "log_in_user/2" do
-    test "writes a session token and redirects to /", %{conn: conn, user: user} do
+    test "writes a session token and redirects to /dashboard", %{conn: conn, user: user} do
       conn = UserAuth.log_in_user(conn, user)
 
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/dashboard"
       assert get_session(conn, @session_key)
     end
 

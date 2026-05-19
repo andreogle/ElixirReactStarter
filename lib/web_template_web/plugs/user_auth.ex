@@ -98,7 +98,7 @@ defmodule WebTemplateWeb.UserAuth do
   def redirect_if_user_is_authenticated(conn, _opts) do
     if conn.assigns[:current_user] do
       conn
-      |> redirect(to: ~p"/")
+      |> redirect(to: ~p"/dashboard")
       |> halt()
     else
       conn
@@ -123,7 +123,7 @@ defmodule WebTemplateWeb.UserAuth do
     conn
     |> renew_session()
     |> put_session(@session_key, token)
-    |> redirect(to: return_to || ~p"/")
+    |> redirect(to: return_to || ~p"/dashboard")
   end
 
   @doc """
