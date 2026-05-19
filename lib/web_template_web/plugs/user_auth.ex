@@ -41,10 +41,21 @@ defmodule WebTemplateWeb.UserAuth do
     |> assign(:locale, locale)
   end
 
+  # Precedence:
+  #   1. session — set by `SettingsController.update_locale`, survives
+  #      across tabs but clears on logout.
+  #   2. Accept-Language header — first match against supported locales.
+  #   3. @default_locale fallback.
   defp request_locale(conn) do
-    case get_req_header(conn, "accept-language") do
-      [header | _] -> parse_accept_language(header)
-      _ -> @default_locale
+    case get_session(conn, "locale") do
+      locale when locale in @supported_locales ->
+        locale
+
+      _ ->
+        case get_req_header(conn, "accept-language") do
+          [header | _] -> parse_accept_language(header)
+          _ -> @default_locale
+        end
     end
   end
 

@@ -143,32 +143,37 @@ msgstr ""
 msgid "Welcome — click the button below to confirm your email address."
 msgstr ""
 
-#: lib/web_template_web/plugs/user_auth.ex:74
+#: lib/web_template_web/plugs/user_auth.ex:85
 #, elixir-autogen, elixir-format
 msgid "You must log in to access this page."
 msgstr ""
 
-#: lib/web_template_web/controllers/settings_controller.ex:42
+#: lib/web_template_web/controllers/settings_controller.ex:73
 #, elixir-autogen, elixir-format
 msgid "Current and new password are required"
 msgstr ""
 
-#: lib/web_template_web/controllers/settings_controller.ex:61
+#: lib/web_template_web/controllers/settings_controller.ex:92
 #, elixir-autogen, elixir-format
 msgid "Incorrect password"
 msgstr ""
 
-#: lib/web_template_web/controllers/settings_controller.ex:68
+#: lib/web_template_web/controllers/settings_controller.ex:99
 #, elixir-autogen, elixir-format
 msgid "Password is required"
 msgstr ""
 
-#: lib/web_template_web/controllers/settings_controller.ex:30
+#: lib/web_template_web/controllers/settings_controller.ex:61
 #, elixir-autogen, elixir-format
 msgid "Password updated."
 msgstr ""
 
-#: lib/web_template_web/controllers/settings_controller.ex:56
+#: lib/web_template_web/controllers/settings_controller.ex:87
 #, elixir-autogen, elixir-format
 msgid "Your account has been deleted."
+msgstr ""
+
+#: lib/web_template_web/controllers/settings_controller.ex:32
+#, elixir-autogen, elixir-format
+msgid "Unsupported locale"
 msgstr ""

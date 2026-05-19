@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { RealtimeProvider } from './realtime/provider';
 
 // =============================================================================
 // App-wide React context providers.
@@ -18,5 +19,5 @@ import type { ReactNode } from 'react';
 // =============================================================================
 
 export function AppProviders({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+  return <RealtimeProvider>{children}</RealtimeProvider>;
 }

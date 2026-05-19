@@ -53,6 +53,7 @@ defmodule WebTemplateWeb.Router do
     delete "/logout", AuthController, :logout
 
     get "/settings", SettingsController, :show
+    put "/settings/locale", SettingsController, :update_locale
     put "/settings/password", SettingsController, :update_password
     delete "/settings/account", SettingsController, :delete_account
   end

@@ -13,3 +13,20 @@
 @theme {
   --color-primary: oklch(0.55 0.2 250);
 }
+
+/* Slow heartbeat-style pulse for the live-connection indicator.
+   Slower than Tailwind's `animate-pulse` and with a deeper opacity dip
+   so it reads as a flashing status light rather than a UI shimmer. */
+@keyframes slow-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@utility animate-slow-pulse {
+  animation: slow-pulse 2s ease-in-out infinite;
+}

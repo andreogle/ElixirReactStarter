@@ -6,8 +6,39 @@ defmodule WebTemplateWeb.SettingsController do
 
   action_fallback WebTemplateWeb.FallbackController
 
+  @supported_locales Application.compile_env(:web_template, :supported_locales, ["en"])
+
   def show(conn, _params) do
     render_inertia(conn, "Settings")
+  end
+
+  # =============================================================================
+  # Change locale
+  #
+  # Stored in the session — there's no user.locale column on this
+  # template, so per-user persistence is deliberately out of scope.
+  # The session survives across tabs but is cleared on logout; if a
+  # project needs durable locale persistence, add a `locale` field on
+  # the User schema and update `UserAuth.fetch_current_user/2` to read
+  # from it instead.
+  # =============================================================================
+  def update_locale(conn, %{"locale" => locale}) when locale in @supported_locales do
+    conn
+    |> put_session("locale", locale)
+    |> redirect(to: get_req_header(conn, "referer") |> List.first() |> safe_referer())
+  end
+
+  def update_locale(_conn, _params) do
+    {:error, {:bad_request, dgettext("app", "Unsupported locale")}}
+  end
+
+  defp safe_referer(nil), do: ~p"/dashboard"
+
+  defp safe_referer(referer) do
+    case URI.parse(referer) do
+      %URI{path: "/" <> _ = path} -> path
+      _ -> ~p"/dashboard"
+    end
   end
 
   # =============================================================================

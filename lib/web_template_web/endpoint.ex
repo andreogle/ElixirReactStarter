@@ -15,6 +15,12 @@ defmodule WebTemplateWeb.Endpoint do
     websocket: [connect_info: [session: @session_options]],
     longpoll: [connect_info: [session: @session_options]]
 
+  # User-authenticated socket for application channels (`global`,
+  # `user:<id>`). Auth is by signed Phoenix.Token from SharedData. No
+  # longpoll fallback — clients on networks that block WebSockets fall
+  # back to plain Inertia until the network is fixed.
+  socket "/socket", WebTemplateWeb.UserSocket, websocket: true, longpoll: false
+
   # Serve at "/" the static files from "priv/static" directory.
   #
   # When code reloading is disabled (e.g., in production),

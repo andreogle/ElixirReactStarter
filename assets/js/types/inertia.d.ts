@@ -7,6 +7,7 @@ declare module '@inertiajs/core' {
       current_user: CurrentUser | null;
       locale: string;
       flash: Flash;
+      socket_token: string | null;
     };
   }
 }
