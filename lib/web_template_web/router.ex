@@ -50,6 +50,10 @@ defmodule WebTemplateWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     delete "/logout", AuthController, :logout
+
+    get "/settings", SettingsController, :show
+    put "/settings/password", SettingsController, :update_password
+    delete "/settings/account", SettingsController, :delete_account
   end
 
   scope "/", WebTemplateWeb do

@@ -15,13 +15,21 @@ export default function Home() {
           <p className="text-base text-gray-600 dark:text-gray-400">Phoenix 1.8 · Inertia.js · React · SSR</p>
 
           {current_user ? (
-            <div className="flex items-center justify-center gap-3 pt-2">
+            <div className="space-y-3 pt-2">
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Signed in as <span className="font-medium">{current_user.email}</span>
               </p>
-              <Button variant="secondary" onClick={() => router.delete('/logout')}>
-                Log out
-              </Button>
+              <div className="flex items-center justify-center gap-3">
+                <Link
+                  href="/settings"
+                  className="inline-flex items-center justify-center rounded px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500"
+                >
+                  Settings
+                </Link>
+                <Button variant="secondary" onClick={() => router.delete('/logout')}>
+                  Log out
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="flex items-center justify-center gap-3 pt-2">

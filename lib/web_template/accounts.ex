@@ -139,7 +139,55 @@ defmodule WebTemplate.Accounts do
   end
 
   # =============================================================================
-  # Password reset
+  # Password change (authenticated)
+  # =============================================================================
+  @doc """
+  Changes the user's password after verifying the current one.
+  Invalidates every session token — the caller should reissue a fresh
+  session for the current browser to keep it logged in.
+  """
+  def change_user_password(user, current_password, new_password_attrs) do
+    if User.valid_password?(user, current_password) do
+      Repo.delete_all(UserToken.delete_user_tokens_by_context_query(user.id, "session"))
+
+      user
+      |> User.password_changeset(new_password_attrs)
+      |> Repo.update()
+      |> log_result("Password changed for user #{user.id}")
+    else
+      Logger.warning(
+        "Failed password change attempt for user #{user.id}: incorrect current password"
+      )
+
+      changeset =
+        user
+        |> Ecto.Changeset.change()
+        |> Ecto.Changeset.add_error(:current_password, "is incorrect")
+
+      {:error, changeset}
+    end
+  end
+
+  # =============================================================================
+  # Account deletion
+  # =============================================================================
+  @doc """
+  Deletes the user after verifying their password. The `:delete_all`
+  cascade on `user_tokens` removes every token for the user as a side
+  effect.
+  """
+  def delete_user_account(user, password) do
+    if User.valid_password?(user, password) do
+      Logger.info("Account deleted for user #{user.id}")
+      Repo.delete(user)
+    else
+      Logger.warning("Failed account deletion attempt for user #{user.id}: incorrect password")
+      {:error, :invalid_password}
+    end
+  end
+
+  # =============================================================================
+  # Password reset (unauthenticated)
   # =============================================================================
   @doc """
   Resets the user's password. Deletes all password-reset tokens and all

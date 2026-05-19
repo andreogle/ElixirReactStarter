@@ -178,6 +178,79 @@ defmodule WebTemplate.AccountsTest do
     end
   end
 
+  describe "change_user_password/3" do
+    setup do
+      %{user: :user |> build() |> confirmed() |> insert()}
+    end
+
+    test "updates the password and wipes all sessions", %{user: user} do
+      _session1 = Accounts.generate_user_session_token(user)
+      _session2 = Accounts.generate_user_session_token(user)
+
+      assert {:ok, updated} =
+               Accounts.change_user_password(user, "valid_password123", %{
+                 password: "fresh_password"
+               })
+
+      assert updated.hashed_password != user.hashed_password
+
+      assert WebTemplate.Repo.aggregate(
+               UserToken.delete_user_tokens_by_context_query(user.id, "session"),
+               :count,
+               :id
+             ) == 0
+
+      assert Accounts.get_user_by_email_and_password(updated.email, "fresh_password")
+      refute Accounts.get_user_by_email_and_password(updated.email, "valid_password123")
+    end
+
+    test "rejects an incorrect current password", %{user: user} do
+      _session = Accounts.generate_user_session_token(user)
+
+      assert {:error, changeset} =
+               Accounts.change_user_password(user, "wrong_password", %{password: "fresh_password"})
+
+      assert "is incorrect" in errors_on(changeset).current_password
+
+      # Sessions NOT wiped on a failed attempt.
+      assert WebTemplate.Repo.aggregate(
+               UserToken.delete_user_tokens_by_context_query(user.id, "session"),
+               :count,
+               :id
+             ) == 1
+    end
+  end
+
+  describe "delete_user_account/2" do
+    setup do
+      %{user: :user |> build() |> confirmed() |> insert()}
+    end
+
+    test "deletes the user with a valid password", %{user: user} do
+      assert {:ok, _user} = Accounts.delete_user_account(user, "valid_password123")
+      refute Accounts.get_user_by_email(user.email)
+    end
+
+    test "cascades the user_tokens delete", %{user: user} do
+      _session = Accounts.generate_user_session_token(user)
+      _link = Accounts.generate_user_link_token(user, "password_reset")
+
+      {:ok, _} = Accounts.delete_user_account(user, "valid_password123")
+
+      # All tokens for the user are gone via FK cascade.
+      assert WebTemplate.Repo.aggregate(
+               UserToken.delete_user_tokens_by_context_query(user.id, "session"),
+               :count,
+               :id
+             ) == 0
+    end
+
+    test "rejects an incorrect password", %{user: user} do
+      assert {:error, :invalid_password} = Accounts.delete_user_account(user, "wrong")
+      assert Accounts.get_user_by_email(user.email)
+    end
+  end
+
   describe "reset_user_password/2" do
     test "updates the password and wipes session + reset tokens" do
       user = :user |> build() |> confirmed() |> insert()

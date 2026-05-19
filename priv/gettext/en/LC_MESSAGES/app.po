@@ -15,115 +15,115 @@ msgstr ""
 msgid "Bad request."
 msgstr "Bad request."
 
-#: lib/web_template_web/email.ex:87
+#: lib/web_template_web/email.ex:89
 #, elixir-autogen, elixir-format
 msgid "Click the button below to choose a new password."
 msgstr "Click the button below to choose a new password."
 
-#: lib/web_template_web/email.ex:61
+#: lib/web_template_web/email.ex:62
 #, elixir-autogen, elixir-format
 msgid "Confirm email"
 msgstr "Confirm email"
 
 #: lib/web_template_web/email.ex:59
-#: lib/web_template_web/email.ex:72
+#: lib/web_template_web/email.ex:74
 #, elixir-autogen, elixir-format
 msgid "Confirm your email"
 msgstr "Confirm your email"
 
-#: lib/web_template_web/controllers/auth_controller.ex:100
+#: lib/web_template_web/controllers/auth_controller.ex:108
 #, elixir-autogen, elixir-format
 msgid "Could not confirm your account. Please try again."
 msgstr "Could not confirm your account. Please try again."
 
-#: lib/web_template_web/controllers/auth_controller.ex:40
-#: lib/web_template_web/controllers/auth_controller.ex:73
+#: lib/web_template_web/controllers/auth_controller.ex:43
+#: lib/web_template_web/controllers/auth_controller.ex:79
 #, elixir-autogen, elixir-format
 msgid "Email and password are required"
 msgstr "Email and password are required"
 
-#: lib/web_template_web/controllers/auth_controller.ex:134
-#: lib/web_template_web/controllers/auth_controller.ex:162
+#: lib/web_template_web/controllers/auth_controller.ex:143
+#: lib/web_template_web/controllers/auth_controller.ex:171
 #, elixir-autogen, elixir-format
 msgid "Email is required"
 msgstr "Email is required"
 
-#: lib/web_template_web/email.ex:95
+#: lib/web_template_web/email.ex:97
 #, elixir-autogen, elixir-format
 msgid "For your security, never share this link with anyone."
 msgstr "For your security, never share this link with anyone."
 
-#: lib/web_template_web/controllers/auth_controller.ex:128
+#: lib/web_template_web/controllers/auth_controller.ex:137
 #, elixir-autogen, elixir-format
 msgid "If that email is registered, we've sent a new confirmation link."
 msgstr "If that email is registered, we've sent a new confirmation link."
 
-#: lib/web_template_web/controllers/auth_controller.ex:156
+#: lib/web_template_web/controllers/auth_controller.ex:165
 #, elixir-autogen, elixir-format
 msgid "If that email is registered, we've sent a password reset link."
 msgstr "If that email is registered, we've sent a password reset link."
 
-#: lib/web_template_web/email.ex:64
+#: lib/web_template_web/email.ex:66
 #, elixir-autogen, elixir-format
 msgid "If you didn't create this account, you can safely ignore this email."
 msgstr "If you didn't create this account, you can safely ignore this email."
 
-#: lib/web_template_web/controllers/auth_controller.ex:56
+#: lib/web_template_web/controllers/auth_controller.ex:59
 #, elixir-autogen, elixir-format
 msgid "Invalid email or password"
 msgstr "Invalid email or password"
 
-#: lib/web_template_web/controllers/auth_controller.ex:90
-#: lib/web_template_web/controllers/auth_controller.ex:108
+#: lib/web_template_web/controllers/auth_controller.ex:96
+#: lib/web_template_web/controllers/auth_controller.ex:117
 #, elixir-autogen, elixir-format
 msgid "Invalid or expired confirmation link."
 msgstr "Invalid or expired confirmation link."
 
-#: lib/web_template_web/controllers/auth_controller.ex:172
-#: lib/web_template_web/controllers/auth_controller.ex:182
-#: lib/web_template_web/controllers/auth_controller.ex:192
+#: lib/web_template_web/controllers/auth_controller.ex:181
+#: lib/web_template_web/controllers/auth_controller.ex:191
+#: lib/web_template_web/controllers/auth_controller.ex:201
 #, elixir-autogen, elixir-format
 msgid "Invalid or expired reset link."
 msgstr "Invalid or expired reset link."
 
-#: lib/web_template_web/email.ex:62
-#: lib/web_template_web/email.ex:89
+#: lib/web_template_web/email.ex:63
+#: lib/web_template_web/email.ex:91
 #, elixir-autogen, elixir-format
 msgid "Or copy and paste this URL into your browser:"
 msgstr "Or copy and paste this URL into your browser:"
 
-#: lib/web_template_web/controllers/auth_controller.ex:202
+#: lib/web_template_web/controllers/auth_controller.ex:213
 #, elixir-autogen, elixir-format
 msgid "Password reset successfully. Please log in."
 msgstr "Password reset successfully. Please log in."
 
-#: lib/web_template_web/controllers/auth_controller.ex:63
+#: lib/web_template_web/controllers/auth_controller.ex:68
 #, elixir-autogen, elixir-format
 msgid "Please confirm your email — we've sent you a new link."
 msgstr "Please confirm your email — we've sent you a new link."
 
-#: lib/web_template_web/email.ex:88
+#: lib/web_template_web/email.ex:90
 #, elixir-autogen, elixir-format
 msgid "Reset password"
 msgstr "Reset password"
 
-#: lib/web_template_web/email.ex:86
-#: lib/web_template_web/email.ex:103
+#: lib/web_template_web/email.ex:88
+#: lib/web_template_web/email.ex:105
 #, elixir-autogen, elixir-format
 msgid "Reset your password"
 msgstr "Reset your password"
 
-#: lib/web_template_web/email.ex:63
+#: lib/web_template_web/email.ex:64
 #, elixir-autogen, elixir-format
 msgid "This link expires in 1 hour."
 msgstr "This link expires in 1 hour."
 
-#: lib/web_template_web/email.ex:91
+#: lib/web_template_web/email.ex:93
 #, elixir-autogen, elixir-format
 msgid "This link expires in 1 hour. If you didn't request a reset, you can safely ignore this email."
 msgstr "This link expires in 1 hour. If you didn't request a reset, you can safely ignore this email."
 
-#: lib/web_template_web/controllers/auth_controller.ex:215
+#: lib/web_template_web/controllers/auth_controller.ex:226
 #, elixir-autogen, elixir-format
 msgid "Token and password are required"
 msgstr "Token and password are required"
@@ -133,12 +133,12 @@ msgstr "Token and password are required"
 msgid "Unauthorized."
 msgstr "Unauthorized."
 
-#: lib/web_template_web/controllers/auth_controller.ex:29
+#: lib/web_template_web/controllers/auth_controller.ex:31
 #, elixir-autogen, elixir-format
 msgid "We've sent you a confirmation link. Check your inbox."
 msgstr "We've sent you a confirmation link. Check your inbox."
 
-#: lib/web_template_web/email.ex:60
+#: lib/web_template_web/email.ex:61
 #, elixir-autogen, elixir-format
 msgid "Welcome — click the button below to confirm your email address."
 msgstr "Welcome — click the button below to confirm your email address."
@@ -147,3 +147,28 @@ msgstr "Welcome — click the button below to confirm your email address."
 #, elixir-autogen, elixir-format
 msgid "You must log in to access this page."
 msgstr "You must log in to access this page."
+
+#: lib/web_template_web/controllers/settings_controller.ex:42
+#, elixir-autogen, elixir-format
+msgid "Current and new password are required"
+msgstr "Current and new password are required"
+
+#: lib/web_template_web/controllers/settings_controller.ex:61
+#, elixir-autogen, elixir-format
+msgid "Incorrect password"
+msgstr "Incorrect password"
+
+#: lib/web_template_web/controllers/settings_controller.ex:68
+#, elixir-autogen, elixir-format
+msgid "Password is required"
+msgstr "Password is required"
+
+#: lib/web_template_web/controllers/settings_controller.ex:30
+#, elixir-autogen, elixir-format
+msgid "Password updated."
+msgstr "Password updated."
+
+#: lib/web_template_web/controllers/settings_controller.ex:56
+#, elixir-autogen, elixir-format
+msgid "Your account has been deleted."
+msgstr "Your account has been deleted."
