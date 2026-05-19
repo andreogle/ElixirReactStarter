@@ -36,11 +36,15 @@
   "linter": {
     "enabled": true,
     "includes": ["**", "!**/dist/", "!**/node_modules/", "!**/.docusaurus/**", "!**/build/", "!**/server/static/**"],
+    "domains": {
+      "react": "recommended",
+      "test": "recommended"
+    },
     "rules": {
       "recommended": true,
       "complexity": {
         "noAdjacentSpacesInRegex": "error",
-        "noBannedTypes": "off",
+        "noBannedTypes": "error",
         "noExtraBooleanCast": "error",
         "noForEach": "error",
         "noStaticOnlyClass": "error",
@@ -58,7 +62,7 @@
         "noInnerDeclarations": "error",
         "noInvalidBuiltinInstantiation": "error",
         "noInvalidConstructorSuper": "error",
-        "noInvalidUseBeforeDeclaration": "off",
+        "noInvalidUseBeforeDeclaration": "error",
         "noNonoctalDecimalEscape": "error",
         "noPrecisionLoss": "error",
         "noSelfAssign": "error",
@@ -71,6 +75,7 @@
         "noUnsafeOptionalChaining": "error",
         "noUnusedLabels": "error",
         "noUnusedVariables": "error",
+        "useExhaustiveDependencies": "error",
         "useIsNan": "error",
         "useValidForDirection": "error",
         "useValidTypeof": "error",
@@ -79,8 +84,8 @@
       "style": {
         "noInferrableTypes": "error",
         "noNamespace": "error",
-        "noNegationElse": "off",
-        "noNonNullAssertion": "off",
+        "noNegationElse": "error",
+        "noNonNullAssertion": "error",
         "noParameterAssign": "error",
         "noParameterProperties": "error",
         "noRestrictedImports": {
@@ -96,7 +101,7 @@
         },
         "noUnusedTemplateLiteral": "error",
         "noUselessElse": "error",
-        "useArrayLiterals": "off",
+        "useArrayLiterals": "error",
         "useAsConstAssertion": "error",
         "useConsistentCurlyBraces": "error",
         "useDefaultParameterLast": "error",
@@ -114,6 +119,10 @@
         "noCatchAssign": "error",
         "noClassAssign": "error",
         "noCompareNegZero": "error",
+        "noConsole": {
+          "level": "error",
+          "options": { "allow": ["warn", "error"] }
+        },
         "noControlCharactersInRegex": "error",
         "noDebugger": "error",
         "noDoubleEquals": "error",
@@ -122,7 +131,7 @@
         "noDuplicateObjectKeys": "error",
         "noDuplicateParameters": "error",
         "noEmptyBlockStatements": "error",
-        "noExplicitAny": "off",
+        "noExplicitAny": "error",
         "noExtraNonNullAssertion": "error",
         "noFallthroughSwitchClause": "error",
         "noFunctionAssign": "error",
@@ -140,11 +149,28 @@
         "noWith": "error",
         "useGetterReturn": "error",
         "useIsArray": "error"
+      },
+      "nursery": {
+        "noReactStringRefs": "error",
+        "useTestHooksInOrder": "error",
+        "useTestHooksOnTop": "error"
       }
     }
   },
   "css": {
     "parser": { "tailwindDirectives": true }
   },
-  "overrides": [{ "includes": ["**/*.ts"] }]
+  "overrides": [
+    { "includes": ["**/*.ts"] },
+    {
+      "includes": ["build/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    }
+  ]
 }

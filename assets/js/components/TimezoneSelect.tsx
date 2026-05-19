@@ -119,7 +119,7 @@ export default function TimezoneSelect({
         aria-haspopup="listbox"
         aria-controls={open ? listboxId : undefined}
         disabled={disabled}
-        className={`w-full flex items-center justify-between gap-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50 disabled:cursor-not-allowed ${!selected ? 'text-gray-400' : ''} ${className}`}
+        className={`w-full flex items-center justify-between gap-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50 disabled:cursor-not-allowed ${selected ? '' : 'text-gray-400'} ${className}`}
         {...ariaProps}
       >
         <span className="truncate">{triggerLabel}</span>

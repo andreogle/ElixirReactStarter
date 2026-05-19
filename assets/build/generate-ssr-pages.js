@@ -57,6 +57,7 @@ ${imports}
 // Inertia injects props from the page protocol at render time, so components
 // in this map don't have props supplied by a React parent. ComponentType<any>
 // reflects that contract — pages with required props still type-check.
+// biome-ignore lint/suspicious/noExplicitAny: see comment above
 const pages: Record<string, React.ComponentType<any>> = {
 ${entries}
 };
