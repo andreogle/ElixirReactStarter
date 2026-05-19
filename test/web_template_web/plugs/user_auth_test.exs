@@ -53,6 +53,19 @@ defmodule WebTemplateWeb.UserAuthTest do
       conn = UserAuth.fetch_current_user(conn, [])
       assert conn.assigns.locale == "en"
     end
+
+    test "prefers user.locale over Accept-Language for authenticated users", %{conn: conn} do
+      es_user = :user |> build(locale: "es") |> confirmed() |> insert()
+      token = Accounts.generate_user_session_token(es_user)
+
+      conn =
+        conn
+        |> put_session(@session_key, token)
+        |> put_req_header("accept-language", "fr-FR,fr;q=0.9,en;q=0.5")
+        |> UserAuth.fetch_current_user([])
+
+      assert conn.assigns.locale == "es"
+    end
   end
 
   describe "require_authenticated_user/2" do

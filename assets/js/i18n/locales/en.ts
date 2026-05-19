@@ -9,5 +9,73 @@ export default {
     searchTimezones: 'Search timezones',
     searchTimezonesPlaceholder: 'Type a city, country, or offset…',
     timezones: 'Timezones',
+    connected: 'Connected',
+    disconnected: 'Disconnected',
+  },
+  home: {
+    welcome: 'Welcome to WebTemplate',
+    stack: 'Phoenix 1.8 · Inertia.js · React · SSR',
+    signedInAs: 'Signed in as',
+    goToDashboard: 'Go to dashboard',
+    login: 'Log in',
+    createAccount: 'Create account',
+  },
+  dashboard: {
+    title: 'Dashboard',
+    signedInAs: 'Signed in as',
+    placeholder:
+      'This is your dashboard. Replace this card with whatever the post-login landing should show — recent activity, quick actions, KPIs, etc.',
+  },
+  settings: {
+    title: 'Settings',
+    changePassword: {
+      title: 'Change password',
+      warning: 'Updating your password will log you out of any other devices.',
+      currentPassword: 'Current password',
+      newPassword: 'New password',
+      submit: 'Update password',
+    },
+    deleteAccount: {
+      title: 'Delete account',
+      warning: 'This is permanent. Your account and all associated data will be removed.',
+      button: 'Delete my account',
+      confirmTitle: 'Are you sure?',
+      confirmBody: 'Enter your password to confirm. This cannot be undone.',
+      passwordPlaceholder: 'Password',
+      cancel: 'Cancel',
+      confirm: 'Delete account',
+    },
+  },
+  auth: {
+    email: 'Email',
+    password: 'Password',
+    backToLogin: 'Back to log in',
+    login: {
+      title: 'Log in',
+      submit: 'Log in',
+      createAccount: 'Create account',
+      forgotPassword: 'Forgot password?',
+    },
+    register: {
+      title: 'Create account',
+      submit: 'Create account',
+      alreadyHaveAccount: 'Already have an account?',
+      logIn: 'Log in',
+    },
+    forgotPassword: {
+      title: 'Reset password',
+      subtitle: "Enter your email and we'll send you a reset link.",
+      submit: 'Send reset link',
+    },
+    resetPassword: {
+      title: 'Set a new password',
+      newPassword: 'New password',
+      submit: 'Set password',
+    },
+    resendConfirmation: {
+      title: 'Resend confirmation',
+      subtitle: "Enter your email and we'll send you a new confirmation link.",
+      submit: 'Send confirmation link',
+    },
   },
 };

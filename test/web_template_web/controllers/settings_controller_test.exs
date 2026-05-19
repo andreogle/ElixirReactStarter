@@ -63,6 +63,28 @@ defmodule WebTemplateWeb.SettingsControllerTest do
     end
   end
 
+  describe "PUT /settings/locale" do
+    @tag :authenticated
+    test "updates user.locale and redirects to the referer", %{conn: conn, user: user} do
+      conn =
+        conn
+        |> put_req_header("referer", "http://www.example.com/dashboard")
+        |> put(~p"/settings/locale", %{locale: "es"})
+
+      assert redirected_to(conn) == "/dashboard"
+      assert Accounts.get_user_by_email(user.email).locale == "es"
+    end
+
+    @tag :authenticated
+    test "rejects an unsupported locale", %{conn: conn, user: user} do
+      conn = put(conn, ~p"/settings/locale", %{locale: "fr"})
+
+      # action_fallback redirects to / for :bad_request
+      assert redirected_to(conn) == ~p"/"
+      assert Accounts.get_user_by_email(user.email).locale == "en"
+    end
+  end
+
   describe "DELETE /settings/account" do
     @tag :authenticated
     test "deletes the user and clears the session", %{conn: conn, user: user} do

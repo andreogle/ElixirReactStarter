@@ -26,7 +26,7 @@ defmodule WebTemplateWeb.Plugs.SharedData do
   defp serialize_user(nil), do: nil
 
   defp serialize_user(user) do
-    %{id: user.id, email: user.email}
+    %{id: user.id, email: user.email, locale: user.locale}
   end
 
   # Signs a short-lived token the React realtime provider hands to

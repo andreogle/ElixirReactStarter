@@ -27,13 +27,12 @@ defmodule WebTemplateWeb.UserAuth do
   # =============================================================================
   @doc """
   Reads the session token and assigns the current user (or nil) to the
-  conn. Also resolves the request locale from `Accept-Language` and
-  hands it to Gettext.
+  conn. Resolves the request locale and hands it to Gettext.
   """
   def fetch_current_user(conn, _opts) do
     token = get_session(conn, @session_key)
     user = token && Accounts.get_user_by_session_token(token)
-    locale = request_locale(conn)
+    locale = request_locale(conn, user)
     Gettext.put_locale(WebTemplateWeb.Gettext, locale)
 
     conn
@@ -42,20 +41,16 @@ defmodule WebTemplateWeb.UserAuth do
   end
 
   # Precedence:
-  #   1. session — set by `SettingsController.update_locale`, survives
-  #      across tabs but clears on logout.
-  #   2. Accept-Language header — first match against supported locales.
+  #   1. user.locale — persisted preference, follows the user across
+  #      devices and sessions. Only available when authenticated.
+  #   2. Accept-Language header — first supported-locale match.
   #   3. @default_locale fallback.
-  defp request_locale(conn) do
-    case get_session(conn, "locale") do
-      locale when locale in @supported_locales ->
-        locale
+  defp request_locale(_conn, %{locale: locale}) when locale in @supported_locales, do: locale
 
-      _ ->
-        case get_req_header(conn, "accept-language") do
-          [header | _] -> parse_accept_language(header)
-          _ -> @default_locale
-        end
+  defp request_locale(conn, _user) do
+    case get_req_header(conn, "accept-language") do
+      [header | _] -> parse_accept_language(header)
+      _ -> @default_locale
     end
   end
 

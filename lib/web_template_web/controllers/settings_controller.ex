@@ -15,17 +15,20 @@ defmodule WebTemplateWeb.SettingsController do
   # =============================================================================
   # Change locale
   #
-  # Stored in the session — there's no user.locale column on this
-  # template, so per-user persistence is deliberately out of scope.
-  # The session survives across tabs but is cleared on logout; if a
-  # project needs durable locale persistence, add a `locale` field on
-  # the User schema and update `UserAuth.fetch_current_user/2` to read
-  # from it instead.
+  # Persisted on the user row so the preference follows them across
+  # devices and sessions. UserAuth.fetch_current_user reads user.locale
+  # for every authenticated request.
   # =============================================================================
   def update_locale(conn, %{"locale" => locale}) when locale in @supported_locales do
-    conn
-    |> put_session("locale", locale)
-    |> redirect(to: get_req_header(conn, "referer") |> List.first() |> safe_referer())
+    user = conn.assigns.current_user
+
+    case Accounts.update_user_locale(user, %{locale: locale}) do
+      {:ok, _user} ->
+        redirect(conn, to: safe_referer(List.first(get_req_header(conn, "referer"))))
+
+      {:error, _changeset} ->
+        {:error, {:bad_request, dgettext("app", "Unsupported locale")}}
+    end
   end
 
   def update_locale(_conn, _params) do

@@ -8,6 +8,7 @@ defmodule WebTemplate.Repo.Migrations.CreateUsers do
       add :id, :uuid, primary_key: true, null: false
       add :email, :citext, null: false
       add :hashed_password, :string, null: false
+      add :locale, :string, null: false, default: "en"
       add :confirmed_at, :utc_datetime
 
       timestamps(type: :utc_datetime)

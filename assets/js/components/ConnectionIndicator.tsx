@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useConnectionStatus } from '../realtime/hooks';
 import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip';
 
@@ -10,7 +11,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip';
 export default function ConnectionIndicator() {
   const status = useConnectionStatus();
   const connected = status === 'connected';
-  const label = connected ? 'Connected' : 'Disconnected';
+  const { t } = useTranslation();
+  const label = connected ? t('common.connected') : t('common.disconnected');
 
   return (
     <Tooltip>

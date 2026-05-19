@@ -8,6 +8,7 @@
 export interface CurrentUser {
   id: string;
   email: string;
+  locale: string;
 }
 
 export interface Flash {

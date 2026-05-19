@@ -9,5 +9,73 @@ export default {
     searchTimezones: 'Buscar zonas horarias',
     searchTimezonesPlaceholder: 'Escribe una ciudad, país o desfase…',
     timezones: 'Zonas horarias',
+    connected: 'Conectado',
+    disconnected: 'Desconectado',
+  },
+  home: {
+    welcome: 'Bienvenido a WebTemplate',
+    stack: 'Phoenix 1.8 · Inertia.js · React · SSR',
+    signedInAs: 'Sesión iniciada como',
+    goToDashboard: 'Ir al panel',
+    login: 'Iniciar sesión',
+    createAccount: 'Crear cuenta',
+  },
+  dashboard: {
+    title: 'Panel',
+    signedInAs: 'Sesión iniciada como',
+    placeholder:
+      'Este es tu panel. Sustituye esta tarjeta por lo que deba mostrar la pantalla principal tras iniciar sesión — actividad reciente, acciones rápidas, indicadores, etc.',
+  },
+  settings: {
+    title: 'Ajustes',
+    changePassword: {
+      title: 'Cambiar contraseña',
+      warning: 'Cambiar tu contraseña cerrará tu sesión en los demás dispositivos.',
+      currentPassword: 'Contraseña actual',
+      newPassword: 'Nueva contraseña',
+      submit: 'Actualizar contraseña',
+    },
+    deleteAccount: {
+      title: 'Eliminar cuenta',
+      warning: 'Esta acción es permanente. Tu cuenta y todos tus datos se eliminarán.',
+      button: 'Eliminar mi cuenta',
+      confirmTitle: '¿Seguro?',
+      confirmBody: 'Introduce tu contraseña para confirmar. Esto no se puede deshacer.',
+      passwordPlaceholder: 'Contraseña',
+      cancel: 'Cancelar',
+      confirm: 'Eliminar cuenta',
+    },
+  },
+  auth: {
+    email: 'Correo',
+    password: 'Contraseña',
+    backToLogin: 'Volver a iniciar sesión',
+    login: {
+      title: 'Iniciar sesión',
+      submit: 'Iniciar sesión',
+      createAccount: 'Crear cuenta',
+      forgotPassword: '¿Has olvidado tu contraseña?',
+    },
+    register: {
+      title: 'Crear cuenta',
+      submit: 'Crear cuenta',
+      alreadyHaveAccount: '¿Ya tienes una cuenta?',
+      logIn: 'Iniciar sesión',
+    },
+    forgotPassword: {
+      title: 'Restablecer contraseña',
+      subtitle: 'Introduce tu correo y te enviaremos un enlace para restablecerla.',
+      submit: 'Enviar enlace',
+    },
+    resetPassword: {
+      title: 'Establece una nueva contraseña',
+      newPassword: 'Nueva contraseña',
+      submit: 'Establecer contraseña',
+    },
+    resendConfirmation: {
+      title: 'Reenviar confirmación',
+      subtitle: 'Introduce tu correo y te enviaremos un nuevo enlace de confirmación.',
+      submit: 'Enviar enlace de confirmación',
+    },
   },
 };

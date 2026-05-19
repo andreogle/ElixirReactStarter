@@ -183,6 +183,22 @@ defmodule WebTemplate.AccountsTest do
     end
   end
 
+  describe "update_user_locale/2" do
+    setup do
+      %{user: :user |> build() |> confirmed() |> insert()}
+    end
+
+    test "updates the locale to a supported value", %{user: user} do
+      assert {:ok, updated} = Accounts.update_user_locale(user, %{locale: "es"})
+      assert updated.locale == "es"
+    end
+
+    test "rejects an unsupported locale", %{user: user} do
+      assert {:error, changeset} = Accounts.update_user_locale(user, %{locale: "fr"})
+      assert "is not a supported locale" in errors_on(changeset).locale
+    end
+  end
+
   describe "change_user_password/3" do
     setup do
       %{user: :user |> build() |> confirmed() |> insert()}

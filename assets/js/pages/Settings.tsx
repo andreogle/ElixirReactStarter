@@ -1,5 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,10 +16,12 @@ import { inputClass } from '../components/ui';
 import AppLayout from '../layouts/AppLayout';
 
 export default function Settings() {
+  const { t } = useTranslation();
+
   return (
-    <AppLayout title="Settings">
+    <AppLayout title={t('settings.title')}>
       <div className="max-w-xl space-y-12">
-        <h1 className="text-2xl font-semibold">Settings</h1>
+        <h1 className="text-2xl font-semibold">{t('settings.title')}</h1>
         <ChangePasswordSection />
         <DeleteAccountSection />
       </div>
@@ -27,6 +30,7 @@ export default function Settings() {
 }
 
 function ChangePasswordSection() {
+  const { t } = useTranslation();
   const { data, setData, put, processing, errors, reset } = useForm({
     current_password: '',
     password: '',
@@ -35,10 +39,8 @@ function ChangePasswordSection() {
   return (
     <section className="space-y-4">
       <header>
-        <h2 className="text-lg font-medium">Change password</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Updating your password will log you out of any other devices.
-        </p>
+        <h2 className="text-lg font-medium">{t('settings.changePassword.title')}</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.changePassword.warning')}</p>
       </header>
       <form
         onSubmit={(e) => {
@@ -49,7 +51,7 @@ function ChangePasswordSection() {
       >
         <div>
           <label htmlFor="current_password" className="block text-sm mb-1">
-            Current password
+            {t('settings.changePassword.currentPassword')}
           </label>
           <input
             id="current_password"
@@ -65,7 +67,7 @@ function ChangePasswordSection() {
 
         <div>
           <label htmlFor="password" className="block text-sm mb-1">
-            New password
+            {t('settings.changePassword.newPassword')}
           </label>
           <input
             id="password"
@@ -81,7 +83,7 @@ function ChangePasswordSection() {
         </div>
 
         <Button type="submit" disabled={processing}>
-          Update password
+          {t('settings.changePassword.submit')}
         </Button>
       </form>
     </section>
@@ -89,6 +91,7 @@ function ChangePasswordSection() {
 }
 
 function DeleteAccountSection() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const {
     data,
@@ -104,10 +107,8 @@ function DeleteAccountSection() {
   return (
     <section className="space-y-4">
       <header>
-        <h2 className="text-lg font-medium">Delete account</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          This is permanent. Your account and all associated data will be removed.
-        </p>
+        <h2 className="text-lg font-medium">{t('settings.deleteAccount.title')}</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.deleteAccount.warning')}</p>
       </header>
 
       <AlertDialog
@@ -122,13 +123,13 @@ function DeleteAccountSection() {
             type="button"
             className="inline-flex items-center justify-center rounded px-4 py-2 text-sm font-medium border border-red-300 text-red-700 dark:border-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
           >
-            Delete my account
+            {t('settings.deleteAccount.button')}
           </button>
         </AlertDialogTrigger>
 
         <AlertDialogContent>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>Enter your password to confirm. This cannot be undone.</AlertDialogDescription>
+          <AlertDialogTitle>{t('settings.deleteAccount.confirmTitle')}</AlertDialogTitle>
+          <AlertDialogDescription>{t('settings.deleteAccount.confirmBody')}</AlertDialogDescription>
 
           <form
             onSubmit={(e) => {
@@ -143,16 +144,16 @@ function DeleteAccountSection() {
               value={data.password}
               onChange={(e) => setData('password', e.target.value)}
               className={inputClass}
-              placeholder="Password"
+              placeholder={t('settings.deleteAccount.passwordPlaceholder')}
               required
-              aria-label="Password"
+              aria-label={t('settings.deleteAccount.passwordPlaceholder')}
             />
             {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
 
             <AlertDialogFooter>
               <AlertDialogCancel asChild>
                 <Button type="button" variant="secondary">
-                  Cancel
+                  {t('settings.deleteAccount.cancel')}
                 </Button>
               </AlertDialogCancel>
               <AlertDialogAction asChild>
@@ -161,7 +162,7 @@ function DeleteAccountSection() {
                   disabled={processing}
                   className="inline-flex items-center justify-center rounded px-4 py-2 text-sm font-medium bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
                 >
-                  Delete account
+                  {t('settings.deleteAccount.confirm')}
                 </button>
               </AlertDialogAction>
             </AlertDialogFooter>

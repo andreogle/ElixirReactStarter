@@ -1,17 +1,19 @@
 import { useForm } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import Button from '../../components/Button';
 import Link from '../../components/Link';
 import { inputClass } from '../../components/ui';
 import AuthLayout from '../../layouts/AuthLayout';
 
 export default function Register() {
+  const { t } = useTranslation();
   const { data, setData, post, processing, errors } = useForm({
     email: '',
     password: '',
   });
 
   return (
-    <AuthLayout title="Create account">
+    <AuthLayout title={t('auth.register.title')}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -21,7 +23,7 @@ export default function Register() {
       >
         <div>
           <label htmlFor="email" className="block text-sm mb-1">
-            Email
+            {t('auth.email')}
           </label>
           <input
             id="email"
@@ -37,7 +39,7 @@ export default function Register() {
 
         <div>
           <label htmlFor="password" className="block text-sm mb-1">
-            Password
+            {t('auth.password')}
           </label>
           <input
             id="password"
@@ -53,13 +55,13 @@ export default function Register() {
         </div>
 
         <Button type="submit" disabled={processing} className="w-full">
-          Create account
+          {t('auth.register.submit')}
         </Button>
 
         <p className="text-sm text-center">
-          Already have an account?{' '}
+          {t('auth.register.alreadyHaveAccount')}{' '}
           <Link href="/login" className="text-primary hover:underline">
-            Log in
+            {t('auth.register.logIn')}
           </Link>
         </p>
       </form>

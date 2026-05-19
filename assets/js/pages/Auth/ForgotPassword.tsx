@@ -1,16 +1,18 @@
 import { useForm } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import Button from '../../components/Button';
 import Link from '../../components/Link';
 import { inputClass } from '../../components/ui';
 import AuthLayout from '../../layouts/AuthLayout';
 
 export default function ForgotPassword() {
+  const { t } = useTranslation();
   const { data, setData, post, processing } = useForm({
     email: '',
   });
 
   return (
-    <AuthLayout title="Reset password" subtitle="Enter your email and we'll send you a reset link.">
+    <AuthLayout title={t('auth.forgotPassword.title')} subtitle={t('auth.forgotPassword.subtitle')}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -20,7 +22,7 @@ export default function ForgotPassword() {
       >
         <div>
           <label htmlFor="email" className="block text-sm mb-1">
-            Email
+            {t('auth.email')}
           </label>
           <input
             id="email"
@@ -34,12 +36,12 @@ export default function ForgotPassword() {
         </div>
 
         <Button type="submit" disabled={processing} className="w-full">
-          Send reset link
+          {t('auth.forgotPassword.submit')}
         </Button>
 
         <p className="text-sm text-center">
           <Link href="/login" className="text-primary hover:underline">
-            Back to log in
+            {t('auth.backToLogin')}
           </Link>
         </p>
       </form>

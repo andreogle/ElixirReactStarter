@@ -1,17 +1,19 @@
 import { useForm } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import Button from '../../components/Button';
 import Link from '../../components/Link';
 import { inputClass } from '../../components/ui';
 import AuthLayout from '../../layouts/AuthLayout';
 
 export default function Login() {
+  const { t } = useTranslation();
   const { data, setData, post, processing, errors } = useForm({
     email: '',
     password: '',
   });
 
   return (
-    <AuthLayout title="Log in">
+    <AuthLayout title={t('auth.login.title')}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -21,7 +23,7 @@ export default function Login() {
       >
         <div>
           <label htmlFor="email" className="block text-sm mb-1">
-            Email
+            {t('auth.email')}
           </label>
           <input
             id="email"
@@ -37,7 +39,7 @@ export default function Login() {
 
         <div>
           <label htmlFor="password" className="block text-sm mb-1">
-            Password
+            {t('auth.password')}
           </label>
           <input
             id="password"
@@ -51,15 +53,15 @@ export default function Login() {
         </div>
 
         <Button type="submit" disabled={processing} className="w-full">
-          Log in
+          {t('auth.login.submit')}
         </Button>
 
         <div className="flex justify-between text-sm">
           <Link href="/register" className="text-primary hover:underline">
-            Create account
+            {t('auth.login.createAccount')}
           </Link>
           <Link href="/forgot-password" className="text-primary hover:underline">
-            Forgot password?
+            {t('auth.login.forgotPassword')}
           </Link>
         </div>
       </form>

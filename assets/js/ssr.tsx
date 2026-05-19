@@ -34,9 +34,7 @@ export function render(page: any) {
     setup: ({ App, props }) => (
       <App {...props}>
         {({ Component, props: pageProps, key }) => (
-          <AppProviders>
-            {createElement(Component, { key: key ?? undefined, ...pageProps })}
-          </AppProviders>
+          <AppProviders>{createElement(Component, { key: key ?? undefined, ...pageProps })}</AppProviders>
         )}
       </App>
     ),

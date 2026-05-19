@@ -18,24 +18,29 @@ defmodule WebTemplate.Accounts.User do
   @primary_key {:id, WebTemplate.Ecto.UUIDv7, autogenerate: true}
   @foreign_key_type WebTemplate.Ecto.UUIDv7
 
+  @supported_locales Application.compile_env(:web_template, :supported_locales, ["en"])
+
   schema "users" do
     field :email, :string, redact: true
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
+    field :locale, :string, default: "en"
     field :confirmed_at, :utc_datetime
 
     timestamps(type: :utc_datetime)
   end
 
   @doc """
-  Changeset for creating a user with email and password.
+  Changeset for creating a user with email and password. Locale is
+  optional; defaults to "en" via the schema.
   """
   def registration_changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :locale])
     |> validate_required([:email, :password])
     |> validate_email()
     |> validate_password()
+    |> validate_locale()
   end
 
   @doc """
@@ -57,6 +62,17 @@ defmodule WebTemplate.Accounts.User do
     |> cast(attrs, [:email])
     |> validate_required([:email])
     |> validate_email()
+  end
+
+  @doc """
+  Changeset for updating only the locale. Rejects values that aren't
+  in `:supported_locales`.
+  """
+  def locale_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:locale])
+    |> validate_required([:locale])
+    |> validate_locale()
   end
 
   @doc """
@@ -102,6 +118,12 @@ defmodule WebTemplate.Accounts.User do
     )
     |> validate_length(:email, max: 160)
     |> unique_constraint(:email)
+  end
+
+  defp validate_locale(changeset) do
+    validate_inclusion(changeset, :locale, @supported_locales,
+      message: dgettext("errors", "is not a supported locale")
+    )
   end
 
   defp validate_password(changeset) do

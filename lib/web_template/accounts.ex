@@ -123,6 +123,19 @@ defmodule WebTemplate.Accounts do
   def verify_user_link_token(_, _), do: nil
 
   # =============================================================================
+  # Locale
+  # =============================================================================
+  @doc """
+  Updates the user's preferred locale. Rejects values that aren't in
+  `:supported_locales`.
+  """
+  def update_user_locale(user, attrs) do
+    user
+    |> User.locale_changeset(attrs)
+    |> Repo.update()
+  end
+
+  # =============================================================================
   # Email confirmation
   # =============================================================================
   @doc """
