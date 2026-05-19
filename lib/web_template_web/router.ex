@@ -29,6 +29,9 @@ defmodule WebTemplateWeb.Router do
     get "/confirm-email", AuthController, :confirm_email
     get "/resend-confirmation", AuthController, :resend_confirmation_page
     post "/resend-confirmation", AuthController, :resend_confirmation
+    # Locale change works for anonymous + authenticated. Cookie always
+    # set; user.locale is also written when signed in.
+    put "/locale", LocaleController, :update
   end
 
   # Guest-only — already-logged-in users get bounced to /dashboard.
@@ -53,7 +56,6 @@ defmodule WebTemplateWeb.Router do
     delete "/logout", AuthController, :logout
 
     get "/settings", SettingsController, :show
-    put "/settings/locale", SettingsController, :update_locale
     put "/settings/password", SettingsController, :update_password
     delete "/settings/account", SettingsController, :delete_account
   end

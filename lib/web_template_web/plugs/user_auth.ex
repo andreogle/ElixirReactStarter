@@ -32,6 +32,7 @@ defmodule WebTemplateWeb.UserAuth do
   def fetch_current_user(conn, _opts) do
     token = get_session(conn, @session_key)
     user = token && Accounts.get_user_by_session_token(token)
+    conn = fetch_cookies(conn)
     locale = request_locale(conn, user)
     Gettext.put_locale(WebTemplateWeb.Gettext, locale)
 
@@ -41,16 +42,24 @@ defmodule WebTemplateWeb.UserAuth do
   end
 
   # Precedence:
-  #   1. user.locale — persisted preference, follows the user across
-  #      devices and sessions. Only available when authenticated.
-  #   2. Accept-Language header — first supported-locale match.
-  #   3. @default_locale fallback.
+  #   1. user.locale — persisted preference, follows authenticated
+  #      users across devices and sessions.
+  #   2. "locale" cookie — anonymous users' last choice; also persists
+  #      across logout so the next visit honours it.
+  #   3. Accept-Language header — first supported-locale match.
+  #   4. @default_locale fallback.
   defp request_locale(_conn, %{locale: locale}) when locale in @supported_locales, do: locale
 
   defp request_locale(conn, _user) do
-    case get_req_header(conn, "accept-language") do
-      [header | _] -> parse_accept_language(header)
-      _ -> @default_locale
+    case conn.cookies["locale"] do
+      locale when locale in @supported_locales ->
+        locale
+
+      _ ->
+        case get_req_header(conn, "accept-language") do
+          [header | _] -> parse_accept_language(header)
+          _ -> @default_locale
+        end
     end
   end
 

@@ -66,6 +66,26 @@ defmodule WebTemplateWeb.UserAuthTest do
 
       assert conn.assigns.locale == "es"
     end
+
+    test "anonymous: locale cookie beats Accept-Language", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_cookie("locale", "es")
+        |> put_req_header("accept-language", "fr-FR,fr;q=0.9,en;q=0.5")
+        |> UserAuth.fetch_current_user([])
+
+      assert conn.assigns.locale == "es"
+    end
+
+    test "anonymous: unsupported cookie value is ignored", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_cookie("locale", "fr")
+        |> put_req_header("accept-language", "es-ES,es;q=0.9")
+        |> UserAuth.fetch_current_user([])
+
+      assert conn.assigns.locale == "es"
+    end
   end
 
   describe "require_authenticated_user/2" do

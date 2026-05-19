@@ -18,7 +18,7 @@ export default function LocaleSelector({ className = '' }: LocaleSelectorProps) 
   function handleSelect(code: string) {
     if (code !== locale) {
       router.put(
-        '/settings/locale',
+        '/locale',
         { locale: code },
         {
           preserveScroll: true,
