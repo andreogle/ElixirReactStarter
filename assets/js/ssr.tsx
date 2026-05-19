@@ -1,7 +1,9 @@
 import './i18n';
 import { createInertiaApp } from '@inertiajs/react';
+import { createElement } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import pages from './_ssr_pages.ts';
+import { AppProviders } from './app-providers';
 import i18n from './i18n';
 
 // Called by Elixir's Inertia.SSR Node.js worker pool with the page
@@ -25,6 +27,18 @@ export function render(page: any) {
       }
       return component;
     },
-    setup: ({ App, props }) => <App {...props} />,
+    // Mirror the client wrapping (see app.tsx): page components are
+    // rendered inside AppProviders so context-dependent components
+    // (Tooltip, etc.) work during SSR. Side-effect providers like
+    // RealtimeProvider are safe — their useEffect doesn't run server-side.
+    setup: ({ App, props }) => (
+      <App {...props}>
+        {({ Component, props: pageProps, key }) => (
+          <AppProviders>
+            {createElement(Component, { key: key ?? undefined, ...pageProps })}
+          </AppProviders>
+        )}
+      </App>
+    ),
   });
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { TooltipProvider } from './components/Tooltip';
 import { RealtimeProvider } from './realtime/provider';
 
 // =============================================================================
@@ -19,5 +20,9 @@ import { RealtimeProvider } from './realtime/provider';
 // =============================================================================
 
 export function AppProviders({ children }: { children: ReactNode }) {
-  return <RealtimeProvider>{children}</RealtimeProvider>;
+  return (
+    <RealtimeProvider>
+      <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
+    </RealtimeProvider>
+  );
 }

@@ -2,6 +2,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import type { TFunction } from 'i18next';
 import { ChevronDown, CircleUserRound, LogOut, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import ConnectionIndicator from '../components/ConnectionIndicator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,7 +56,8 @@ export default function AppLayout({ title, children }: AppLayoutProps) {
               </nav>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <ConnectionIndicator />
               <LocaleSelector />
               <UserMenu displayName={displayName} mobileNavItems={items} t={t} />
             </div>

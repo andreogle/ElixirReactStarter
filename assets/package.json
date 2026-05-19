@@ -15,6 +15,7 @@
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-toast": "^1.2.15",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@types/phoenix": "^1.6.7",
     "i18next": "^26.0.3",
     "lucide-react": "^1.11.0",
