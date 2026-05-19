@@ -1,6 +1,11 @@
 defmodule WebTemplate.AccountsTest do
   use WebTemplate.DataCase, async: true
 
+  # Several tests exercise failure paths that intentionally emit
+  # Logger.warning. Capture them — ExUnit still attaches captured
+  # output to any failing test for debugging.
+  @moduletag :capture_log
+
   import WebTemplate.Factory
 
   alias WebTemplate.Accounts

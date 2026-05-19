@@ -1,6 +1,11 @@
 defmodule WebTemplateWeb.SettingsControllerTest do
   use WebTemplateWeb.ConnCase, async: true
 
+  # The failure-path tests (wrong password, etc.) intentionally emit
+  # Logger.warning. Capture them — ExUnit still attaches captured
+  # output to any failing test for debugging.
+  @moduletag :capture_log
+
   alias WebTemplate.Accounts
 
   describe "GET /settings" do

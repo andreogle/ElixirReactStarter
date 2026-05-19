@@ -1,6 +1,11 @@
 defmodule WebTemplateWeb.AuthControllerTest do
   use WebTemplateWeb.ConnCase, async: true
 
+  # The failure-path tests (bad password, etc.) intentionally emit
+  # Logger.warning. Capture them — ExUnit still attaches captured
+  # output to any failing test for debugging.
+  @moduletag :capture_log
+
   import Swoosh.TestAssertions
 
   alias WebTemplate.Accounts
