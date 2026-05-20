@@ -1,0 +1,10 @@
+# Single source of truth for language runtimes — replaces .tool-versions
+# (asdf) and .nvmrc (nvm). mise auto-activates these versions on `cd`
+# into the repo; run `mise install` to fetch them. Pinning here keeps
+# every developer (and CI) on identical versions.
+[tools]
+erlang = "28.5"
+# OTP-tagged so the precompiled Elixir build is guaranteed to match the
+# Erlang/OTP 28 above.
+elixir = "1.19.5-otp-28"
+node = "26"
