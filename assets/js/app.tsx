@@ -7,6 +7,7 @@ import { AppProviders } from './app-providers';
 import { syncLocale } from './components/LocaleSync';
 import Toaster from './components/Toaster';
 import { toast } from './components/toast';
+import { startThemeWatcher } from './theme';
 
 interface Flash {
   info?: string;
@@ -30,6 +31,7 @@ createInertiaApp({
   },
   setup({ App, el, props }) {
     syncLocale(props.initialPage.props);
+    startThemeWatcher();
 
     // Initial page load: the server embeds flash directly in initialPage props.
     applyFlash(props.initialPage.props.flash as Flash | undefined);

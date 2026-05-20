@@ -11,6 +11,10 @@ export default {
     timezones: 'Timezones',
     connected: 'Connected',
     disconnected: 'Disconnected',
+    theme: 'Theme',
+    themeLight: 'Light',
+    themeDark: 'Dark',
+    themeSystem: 'System',
   },
   home: {
     welcome: 'Welcome to WebTemplate',

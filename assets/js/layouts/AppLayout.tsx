@@ -12,6 +12,7 @@ import {
 } from '../components/DropdownMenu';
 import Link from '../components/Link';
 import LocaleSelector from '../components/LocaleSelector';
+import ThemeToggle from '../components/ThemeToggle';
 import type { CurrentUser } from '../types';
 
 interface AppLayoutProps {
@@ -58,6 +59,7 @@ export default function AppLayout({ title, children }: AppLayoutProps) {
 
             <div className="flex items-center gap-3">
               <ConnectionIndicator />
+              <ThemeToggle />
               <LocaleSelector />
               <UserMenu displayName={displayName} mobileNavItems={items} t={t} />
             </div>
@@ -118,7 +120,7 @@ function UserMenu({
         <ChevronDown className="w-4 h-4" aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+        <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-800">
           <p className="text-sm font-medium truncate">{displayName}</p>
         </div>
 
@@ -133,14 +135,14 @@ function UserMenu({
               </DropdownMenuItem>
             );
           })}
-          <DropdownMenuSeparator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
+          <DropdownMenuSeparator className="my-1 h-px bg-gray-200 dark:bg-gray-800" />
         </div>
 
         <DropdownMenuItem onSelect={() => router.visit('/settings')}>
           <Settings className="w-4 h-4" aria-hidden="true" />
           <span className="flex-1">{t('common.settings')}</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
+        <DropdownMenuSeparator className="my-1 h-px bg-gray-200 dark:bg-gray-800" />
         <DropdownMenuItem onSelect={() => router.delete('/logout')}>
           <LogOut className="w-4 h-4" aria-hidden="true" />
           <span className="flex-1">{t('common.logout')}</span>

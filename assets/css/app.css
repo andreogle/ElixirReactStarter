@@ -14,6 +14,17 @@
   --color-primary: oklch(0.55 0.2 250);
 }
 
+/* Base page colours for both modes. Cards (`bg-white dark:bg-gray-900`)
+   visibly separate from the body in dark mode because the body sits
+   one shade darker (`gray-950`). Components inherit text colour from
+   the body, so individual elements only need overrides when they
+   diverge (muted text, links, etc.). */
+@layer base {
+  body {
+    @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-50;
+  }
+}
+
 /* Slow heartbeat-style pulse for the live-connection indicator.
    Slower than Tailwind's `animate-pulse` and with a deeper opacity dip
    so it reads as a flashing status light rather than a UI shimmer. */

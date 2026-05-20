@@ -23,7 +23,7 @@ export function DropdownMenuContent({
           event.preventDefault();
           onCloseAutoFocus?.(event);
         }}
-        className={`z-50 min-w-[10rem] overflow-hidden rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 py-1 ${className}`}
+        className={`z-50 min-w-[10rem] overflow-hidden rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-1 ${className}`}
         {...props}
       />
     </RadixDropdownMenu.Portal>

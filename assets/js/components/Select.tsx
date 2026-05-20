@@ -45,7 +45,7 @@ export default function Select({
         <RadixSelect.Content
           position="popper"
           sideOffset={4}
-          className="z-50 overflow-hidden rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 min-w-[var(--radix-select-trigger-width)] max-h-[var(--radix-select-content-available-height)]"
+          className="z-50 overflow-hidden rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 min-w-[var(--radix-select-trigger-width)] max-h-[var(--radix-select-content-available-height)]"
         >
           <RadixSelect.ScrollUpButton className="flex items-center justify-center py-1 text-gray-500">
             <ChevronUp className="w-4 h-4" />

@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import LocaleSelector from '../components/LocaleSelector';
+import ThemeToggle from '../components/ThemeToggle';
 
 interface AuthLayoutProps {
   title: string;
@@ -12,9 +13,10 @@ export default function AuthLayout({ title, subtitle, children }: AuthLayoutProp
     <>
       <Head title={title} />
       <div className="min-h-screen flex flex-col px-4">
-        {/* Top-right locale toggle so anonymous users on the auth pages
-            can switch language before signing in. */}
-        <div className="self-end pt-4">
+        {/* Top-right toggles so anonymous users on the auth pages can
+            switch language + theme before signing in. */}
+        <div className="self-end pt-4 flex items-center gap-3">
+          <ThemeToggle />
           <LocaleSelector />
         </div>
 

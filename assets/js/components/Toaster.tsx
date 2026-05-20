@@ -28,7 +28,7 @@ export default function Toaster() {
             onOpenChange={(open) => {
               if (!open) dismissToast(id);
             }}
-            className="pointer-events-auto flex items-start gap-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4"
+            className="pointer-events-auto flex items-start gap-3 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4"
           >
             <Icon className={`w-5 h-5 shrink-0 mt-0.5 ${iconColor[variant]}`} aria-hidden="true" />
             <RadixToast.Description className="flex-1 text-sm">{description}</RadixToast.Description>

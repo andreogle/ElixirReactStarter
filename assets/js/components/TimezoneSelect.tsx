@@ -130,10 +130,10 @@ export default function TimezoneSelect({
           align="start"
           sideOffset={4}
           collisionPadding={8}
-          className="z-50 w-[var(--radix-popover-trigger-width)] max-h-[min(24rem,var(--radix-popover-content-available-height))] overflow-hidden rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+          className="z-50 w-[var(--radix-popover-trigger-width)] max-h-[min(24rem,var(--radix-popover-content-available-height))] overflow-hidden rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 px-3 py-2">
+          <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 px-3 py-2">
             <Search className="w-4 h-4 text-gray-500 shrink-0" aria-hidden="true" />
             <input
               ref={inputRef}

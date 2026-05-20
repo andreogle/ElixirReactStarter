@@ -17,7 +17,7 @@ export default function Dashboard() {
           </p>
         </header>
 
-        <section className="rounded border border-gray-200 dark:border-gray-700 p-6">
+        <section className="rounded border border-gray-200 dark:border-gray-800 p-6">
           <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.placeholder')}</p>
         </section>
       </div>
