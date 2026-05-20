@@ -1,3 +1,7 @@
+<p align="center">
+  <img src=".github/logo.png" alt="WebTemplate" width="180" />
+</p>
+
 # WebTemplate
 
 A Phoenix + Inertia.js (React, SSR) web app.
