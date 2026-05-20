@@ -46,5 +46,15 @@ defmodule WebTemplateWeb.LocaleControllerTest do
       assert redirected_to(conn) == ~p"/"
       refute conn.resp_cookies["locale"]
     end
+
+    test "falls back to / when the referer has no usable path", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("referer", "mailto:nobody@example.com")
+        |> put(~p"/locale", %{locale: "es"})
+
+      assert redirected_to(conn) == ~p"/"
+      assert conn.resp_cookies["locale"][:value] == "es"
+    end
   end
 end

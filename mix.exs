@@ -12,8 +12,46 @@ defmodule WebTemplate.MixProject do
       deps: deps(),
       docs: docs(),
       dialyzer: dialyzer(),
+      test_coverage: test_coverage(),
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
       listeners: [Phoenix.CodeReloader]
+    ]
+  end
+
+  # Coverage scope. We exclude code with no meaningful runtime branches
+  # to test, so the percentage reflects real logic:
+  #
+  #   * Framework boilerplate — supervision tree, Endpoint, Repo, Mailer,
+  #     Gettext backend, Telemetry metric defs, generated release tasks,
+  #     and the Layouts / ErrorHTML shells.
+  #   * Template-/macro-only modules — `Context` and `EmailText` are just
+  #     a macro call (`embed_templates` / `__using__`), so they have no
+  #     trackable source lines and always read 0% even though their
+  #     behaviour is exercised (context_test, email_test).
+  #   * Pure tooling — the custom mix tasks (exercised by CI/precommit).
+  #   * Test-support helpers (`*Case`, `*Factory`) and derived protocol
+  #     impls (the redacted-field `Inspect.*`).
+  defp test_coverage do
+    [
+      summary: [threshold: 90],
+      ignore_modules: [
+        WebTemplate.Application,
+        WebTemplate.Context,
+        WebTemplate.Mailer,
+        WebTemplate.Release,
+        WebTemplate.Repo,
+        WebTemplateWeb.Endpoint,
+        WebTemplateWeb.EmailText,
+        WebTemplateWeb.ErrorHTML,
+        WebTemplateWeb.Gettext,
+        WebTemplateWeb.Layouts,
+        WebTemplateWeb.Telemetry,
+        Mix.Tasks.Lint,
+        Mix.Tasks.I18n.Check,
+        ~r/^Inspect\./,
+        ~r/Case$/,
+        ~r/Factory$/
+      ]
     ]
   end
 

@@ -61,6 +61,14 @@ defmodule WebTemplateWeb.SettingsControllerTest do
       assert redirected_to(conn) == ~p"/settings"
       assert Accounts.get_user_by_email_and_password(user.email, "valid_password123")
     end
+
+    @tag :authenticated
+    test "rejects missing params", %{conn: conn, user: user} do
+      conn = put(conn, ~p"/settings/password", %{})
+
+      assert redirected_to(conn) == ~p"/settings"
+      assert Accounts.get_user_by_email_and_password(user.email, "valid_password123")
+    end
   end
 
   describe "DELETE /settings/account" do
@@ -79,6 +87,14 @@ defmodule WebTemplateWeb.SettingsControllerTest do
 
       assert redirected_to(conn) == ~p"/settings"
       assert get_session(conn, "user_token")
+      assert Accounts.get_user_by_email(user.email)
+    end
+
+    @tag :authenticated
+    test "rejects a missing password", %{conn: conn, user: user} do
+      conn = delete(conn, ~p"/settings/account", %{})
+
+      assert redirected_to(conn) == ~p"/settings"
       assert Accounts.get_user_by_email(user.email)
     end
   end

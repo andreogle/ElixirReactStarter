@@ -21,6 +21,25 @@ defmodule WebTemplateWeb.AuthControllerTest do
     end
   end
 
+  describe "GET guest auth pages" do
+    test "GET /login renders the Inertia Login page", %{conn: conn} do
+      conn = get(conn, ~p"/login")
+      assert html_response(conn, 200) =~ ~s(&quot;component&quot;:&quot;Auth/Login&quot;)
+    end
+
+    test "GET /forgot-password renders the Inertia ForgotPassword page", %{conn: conn} do
+      conn = get(conn, ~p"/forgot-password")
+      assert html_response(conn, 200) =~ ~s(&quot;component&quot;:&quot;Auth/ForgotPassword&quot;)
+    end
+
+    test "GET /resend-confirmation renders the Inertia ResendConfirmation page", %{conn: conn} do
+      conn = get(conn, ~p"/resend-confirmation")
+
+      assert html_response(conn, 200) =~
+               ~s(&quot;component&quot;:&quot;Auth/ResendConfirmation&quot;)
+    end
+  end
+
   describe "POST /register" do
     test "creates a user, sends a confirmation email, redirects to /login", %{conn: conn} do
       conn = post(conn, ~p"/register", %{email: "new@example.com", password: "valid_password"})
