@@ -33,6 +33,14 @@ createInertiaApp({
     syncLocale(props.initialPage.props);
     startThemeWatcher();
 
+    // Dev-only accessibility auditing. The whole branch — and axe-core —
+    // is tree-shaken from the production bundle via the NODE_ENV define.
+    if (process.env.NODE_ENV !== 'production') {
+      void go(() => import('./a11y-audit')).then((result) => {
+        if (result.success) result.data.startA11yAudit();
+      });
+    }
+
     // Initial page load: the server embeds flash directly in initialPage props.
     applyFlash(props.initialPage.props.flash as Flash | undefined);
 

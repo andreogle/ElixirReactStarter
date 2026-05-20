@@ -163,14 +163,14 @@ defmodule WebTemplate.MixProject do
         "compile",
         "tailwind web_template",
         "cmd rm -rf priv/static/assets/chunks",
-        "esbuild web_template",
+        ~s(esbuild web_template --define:process.env.NODE_ENV='"development"'),
         "cmd node assets/build/generate-ssr-pages.js",
         "esbuild web_template_ssr"
       ],
       "assets.deploy": [
         "tailwind web_template --minify",
         "cmd rm -rf priv/static/assets/chunks",
-        "esbuild web_template --minify",
+        ~s(esbuild web_template --minify --define:process.env.NODE_ENV='"production"'),
         "cmd node assets/build/generate-ssr-pages.js",
         "esbuild web_template_ssr",
         "phx.digest",

@@ -27,6 +27,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.10",
     "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "axe-core": "^4.11.4"
   }
 }
