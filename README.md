@@ -25,6 +25,19 @@ To start your Phoenix server:
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
+## Documentation
+
+Detailed, searchable developer guides (and the module reference) live in
+ex_doc. Generate and browse them with:
+
+```bash
+mix docs
+```
+
+In dev they're also served at
+[`/dev/docs`](http://localhost:4000/dev/docs/index.html). Topic guides live
+in `docs/` — e.g. [End-to-End Testing](docs/e2e-testing.md).
+
 Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
 
 ## Learn more

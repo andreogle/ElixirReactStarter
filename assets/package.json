@@ -3,6 +3,10 @@
     "npm": ">=11.10.0"
   },
   "scripts": {
+    "e2e": "playwright test",
+    "e2e:headed": "playwright test --headed",
+    "e2e:install": "playwright install chromium",
+    "e2e:ui": "playwright test --ui",
     "fmt": "npm run lint:fix && biome format --write",
     "lint": "biome check build/ css/ js/",
     "lint:fix": "biome check --write build/ css/ js/"
@@ -26,6 +30,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.10",
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.8.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "axe-core": "^4.11.4"

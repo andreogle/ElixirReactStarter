@@ -40,6 +40,7 @@ defmodule WebTemplate.MixProject do
         WebTemplate.Mailer,
         WebTemplate.Release,
         WebTemplate.Repo,
+        WebTemplateWeb.DevE2EController,
         WebTemplateWeb.Endpoint,
         WebTemplateWeb.EmailText,
         WebTemplateWeb.ErrorHTML,
@@ -79,7 +80,13 @@ defmodule WebTemplate.MixProject do
       # `:html` is what `/dev/docs` serves; `:markdown` produces the
       # llms.txt dump useful for feeding into LLM context windows.
       formatters: ["html", "markdown"],
-      extras: ["README.md", "CLAUDE.md"],
+      # README is the landing page (getting started). Developer guides live
+      # in docs/ and are picked up automatically — drop a new `.md` there and
+      # it shows up under "Guides".
+      extras: ["README.md", "CLAUDE.md"] ++ Path.wildcard("docs/*.md"),
+      groups_for_extras: [
+        Guides: ~r"docs/"
+      ],
       groups_for_modules: [
         Web: ~r/^WebTemplateWeb($|\.)/,
         Ecto: ~r/^WebTemplate\.Ecto\./,

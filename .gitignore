@@ -46,7 +46,15 @@ web_template-*.tar
 # In case you use Node.js/npm, you want to ignore these.
 npm-debug.log
 /assets/node_modules/
-/e2e/node_modules/
+
+# Playwright E2E (assets/e2e) artefacts
+/assets/playwright-report/
+/assets/test-results/
+/assets/blob-report/
+/assets/playwright/.cache/
+
+# TypeScript incremental build info (e.g. from `tsc -p tsconfig.e2e.json`)
+*.tsbuildinfo
 
 # Auto-generated SSR pages registry
 /assets/js/_ssr_pages.ts

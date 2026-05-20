@@ -83,5 +83,14 @@ defmodule WebTemplateWeb.Router do
       live_dashboard "/dashboard", metrics: WebTemplateWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+
+    # E2E fixture provisioning. JSON only — the Playwright suite (assets/e2e)
+    # POSTs here to mint a confirmed user and skip the email-link round-trip.
+    # See WebTemplateWeb.DevE2EController.
+    scope "/dev", WebTemplateWeb do
+      pipe_through :api
+
+      post "/e2e/users", DevE2EController, :create
+    end
   end
 end
