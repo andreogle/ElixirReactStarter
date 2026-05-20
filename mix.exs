@@ -11,8 +11,22 @@ defmodule WebTemplate.MixProject do
       aliases: aliases(),
       deps: deps(),
       docs: docs(),
+      dialyzer: dialyzer(),
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
       listeners: [Phoenix.CodeReloader]
+    ]
+  end
+
+  # PLT cache lives under `priv/plts/` and is keyed on `Mix.env()` so
+  # dev and test don't trample each other. CI restores from cache to
+  # avoid the multi-minute first build.
+  defp dialyzer do
+    [
+      plt_core_path: "priv/plts/core.plt",
+      plt_local_path: "priv/plts/#{Mix.env()}.plt",
+      plt_add_apps: [:ex_unit, :mix],
+      ignore_warnings: ".dialyzer_ignore.exs",
+      flags: [:error_handling, :underspecs, :unmatched_returns]
     ]
   end
 
@@ -144,6 +158,10 @@ defmodule WebTemplate.MixProject do
         # so every page load doesn't 404 when self-served at /dev/docs.
         &write_docs_config_stub/1
       ],
+      # `precommit` stays fast (no dialyzer). CI runs `precommit.full`
+      # so PRs still get static-analysis coverage; the PLT cache makes
+      # repeat runs cheap.
+      "precommit.full": ["precommit", "dialyzer"],
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build", "git.hooks"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]

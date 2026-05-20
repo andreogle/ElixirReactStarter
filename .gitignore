@@ -55,6 +55,9 @@ npm-debug.log
 .elixir_ls
 .expert
 
+# Dialyzer PLTs (regenerated; CI restores from cache)
+/priv/plts/
+
 # macOS Finder metadata
 .DS_Store
 

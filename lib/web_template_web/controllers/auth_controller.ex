@@ -153,10 +153,11 @@ defmodule WebTemplateWeb.AuthController do
   def forgot_password(conn, %{"email" => email}) do
     user = Accounts.get_user_by_email(email)
 
-    if user && User.confirmed?(user) do
-      raw_token = Accounts.generate_user_link_token(user, "password_reset")
-      Email.password_reset_email(user, raw_token) |> WebTemplate.Mailer.deliver()
-    end
+    _ =
+      if user && User.confirmed?(user) do
+        raw_token = Accounts.generate_user_link_token(user, "password_reset")
+        Email.password_reset_email(user, raw_token) |> WebTemplate.Mailer.deliver()
+      end
 
     # Always claim success — don't leak which addresses are registered.
     conn
@@ -232,6 +233,9 @@ defmodule WebTemplateWeb.AuthController do
   # =============================================================================
   defp send_confirmation_link(user) do
     raw_token = Accounts.generate_user_link_token(user, "email_confirmation")
-    Email.confirmation_email(user, raw_token) |> WebTemplate.Mailer.deliver()
+    # Fire-and-forget: a delivery error must not stall the auth flow.
+    # The mailer logs failures; callers don't need to react.
+    _ = Email.confirmation_email(user, raw_token) |> WebTemplate.Mailer.deliver()
+    :ok
   end
 end

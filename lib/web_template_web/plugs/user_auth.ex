@@ -34,7 +34,7 @@ defmodule WebTemplateWeb.UserAuth do
     user = token && Accounts.get_user_by_session_token(token)
     conn = fetch_cookies(conn)
     locale = request_locale(conn, user)
-    Gettext.put_locale(WebTemplateWeb.Gettext, locale)
+    _ = Gettext.put_locale(WebTemplateWeb.Gettext, locale)
 
     conn
     |> assign(:current_user, user)
