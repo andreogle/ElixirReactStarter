@@ -1,0 +1,33 @@
+# Keep the build context small and avoid leaking local/dev artifacts
+# into the image. The build stage regenerates everything it needs.
+
+# Elixir build output + deps (rebuilt in the image)
+/_build/
+/deps/
+/doc/
+/.elixir_ls/
+/.expert/
+/priv/plts/
+
+# Node deps + built assets (rebuilt in the image)
+/assets/node_modules/
+/priv/static/assets/
+/priv/ssr.js
+
+# VCS + CI + editor
+/.git/
+/.github/
+/.gitignore
+.DS_Store
+
+# Local env / secrets — never bake into an image
+.env
+.env.*
+
+# Tests + fixtures aren't needed for a prod release
+/test/
+
+# The Dockerfile itself + compose files
+Dockerfile
+.dockerignore
+docker-compose*.yml
