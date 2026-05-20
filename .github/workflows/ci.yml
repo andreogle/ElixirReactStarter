@@ -19,7 +19,7 @@ env:
   # Runtime versions (Erlang, Elixir, Node) are read from `.tool-versions`
   # so local asdf and CI stay in lockstep. Postgres isn't an asdf runtime,
   # so it's pinned here — the one place CI needs it.
-  POSTGRES_IMAGE: postgres:16-alpine
+  POSTGRES_IMAGE: postgres:18-alpine
 
 jobs:
   build:

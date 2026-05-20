@@ -1,9 +1,8 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
+import GuestTopBar from '../components/GuestTopBar';
 import Link from '../components/Link';
-import LocaleSelector from '../components/LocaleSelector';
-import ThemeToggle from '../components/ThemeToggle';
 import type { CurrentUser } from '../types';
 
 export default function Home() {
@@ -13,12 +12,10 @@ export default function Home() {
   return (
     <>
       <Head title={t('home.welcome')} />
-      <main className="min-h-screen flex flex-col p-8">
-        <div className="self-end flex items-center gap-3">
-          <ThemeToggle />
-          <LocaleSelector />
-        </div>
-        <div className="flex-1 flex items-center justify-center">
+      <main className="min-h-screen flex flex-col">
+        <GuestTopBar />
+
+        <div className="flex-1 flex items-center justify-center px-4 pb-16">
           <div className="max-w-xl text-center space-y-6">
             <h1 className="text-4xl font-bold tracking-tight">{t('home.welcome')}</h1>
             <p className="text-base text-gray-600 dark:text-gray-400">{t('home.stack')}</p>
