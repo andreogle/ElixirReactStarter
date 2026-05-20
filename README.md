@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/andreogle/WebTemplate/actions/workflows/ci.yml">
-    <img src="https://github.com/andreogle/WebTemplate/actions/workflows/ci.yml/badge.svg" alt="CI" />
+  <a href="https://github.com/andreogle/ElixirReactStarter/actions/workflows/ci.yml">
+    <img src="https://github.com/andreogle/ElixirReactStarter/actions/workflows/ci.yml/badge.svg" alt="CI" />
   </a>
 </p>
 
