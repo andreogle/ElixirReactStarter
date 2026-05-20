@@ -141,3 +141,7 @@ Database migrations run via the release: `bin/migrate`. See Phoenix's
 
 Project architecture, invariants, and coding conventions are documented in
 [`CLAUDE.md`](CLAUDE.md) — start there before making changes.
+
+## License
+
+Released under the **WTFPL** (see the `LICENSE` file) — do what the fuck you want.
