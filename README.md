@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=".github/logo.png" alt="WebTemplate" width="180" />
+  <img src=".github/logo.png" alt="WebTemplate" width="220" />
 </p>
 
 # WebTemplate
