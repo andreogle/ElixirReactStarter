@@ -1,11 +1,11 @@
 import Config
 
 # Configure your database
-config :web_template, WebTemplate.Repo,
+config :elixir_react_starter, ElixirReactStarter.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "web_template_dev",
+  database: "elixir_react_starter_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -16,7 +16,7 @@ config :web_template, WebTemplate.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :web_template, WebTemplateWeb.Endpoint,
+config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
@@ -30,10 +30,13 @@ config :web_template, WebTemplateWeb.Endpoint,
   watchers: [
     esbuild:
       {Esbuild, :install_and_run,
-       [:web_template, ~w(--sourcemap=inline --watch --define:process.env.NODE_ENV="development")]},
+       [
+         :elixir_react_starter,
+         ~w(--sourcemap=inline --watch --define:process.env.NODE_ENV="development")
+       ]},
     node: ["build/watch-ssr-pages.js", cd: Path.expand("../assets", __DIR__)],
-    esbuild_ssr: {Esbuild, :install_and_run, [:web_template_ssr, ~w(--watch)]},
-    tailwind: {Tailwind, :install_and_run, [:web_template, ~w(--watch)]}
+    esbuild_ssr: {Esbuild, :install_and_run, [:elixir_react_starter_ssr, ~w(--watch)]},
+    tailwind: {Tailwind, :install_and_run, [:elixir_react_starter, ~w(--watch)]}
   ]
 
 # ## SSL Support
@@ -60,7 +63,7 @@ config :web_template, WebTemplateWeb.Endpoint,
 # different ports.
 
 # Reload browser tabs when matching files change.
-config :web_template, WebTemplateWeb.Endpoint,
+config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
   live_reload: [
     web_console_logger: true,
     patterns: [
@@ -69,13 +72,13 @@ config :web_template, WebTemplateWeb.Endpoint,
       # Gettext translations
       ~r"priv/gettext/.*\.po$"E,
       # Router, Controllers, LiveViews and LiveComponents
-      ~r"lib/web_template_web/router\.ex$"E,
-      ~r"lib/web_template_web/(controllers|live|components)/.*\.(ex|heex)$"E
+      ~r"lib/elixir_react_starter_web/router\.ex$"E,
+      ~r"lib/elixir_react_starter_web/(controllers|live|components)/.*\.(ex|heex)$"E
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :web_template, dev_routes: true
+config :elixir_react_starter, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"

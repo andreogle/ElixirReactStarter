@@ -10,170 +10,170 @@
 msgid ""
 msgstr ""
 
-#: lib/web_template_web/controllers/fallback_controller.ex:36
+#: lib/elixir_react_starter_web/controllers/fallback_controller.ex:36
 #, elixir-autogen, elixir-format
 msgid "Bad request."
 msgstr ""
 
-#: lib/web_template_web/email.ex:89
+#: lib/elixir_react_starter_web/email.ex:89
 #, elixir-autogen, elixir-format
 msgid "Click the button below to choose a new password."
 msgstr ""
 
-#: lib/web_template_web/email.ex:62
+#: lib/elixir_react_starter_web/email.ex:62
 #, elixir-autogen, elixir-format
 msgid "Confirm email"
 msgstr ""
 
-#: lib/web_template_web/email.ex:59
-#: lib/web_template_web/email.ex:74
+#: lib/elixir_react_starter_web/email.ex:59
+#: lib/elixir_react_starter_web/email.ex:74
 #, elixir-autogen, elixir-format
 msgid "Confirm your email"
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:108
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:108
 #, elixir-autogen, elixir-format
 msgid "Could not confirm your account. Please try again."
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:43
-#: lib/web_template_web/controllers/auth_controller.ex:79
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:43
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:79
 #, elixir-autogen, elixir-format
 msgid "Email and password are required"
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:143
-#: lib/web_template_web/controllers/auth_controller.ex:171
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:143
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:171
 #, elixir-autogen, elixir-format
 msgid "Email is required"
 msgstr ""
 
-#: lib/web_template_web/email.ex:97
+#: lib/elixir_react_starter_web/email.ex:97
 #, elixir-autogen, elixir-format
 msgid "For your security, never share this link with anyone."
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:137
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:137
 #, elixir-autogen, elixir-format
 msgid "If that email is registered, we've sent a new confirmation link."
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:165
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:165
 #, elixir-autogen, elixir-format
 msgid "If that email is registered, we've sent a password reset link."
 msgstr ""
 
-#: lib/web_template_web/email.ex:66
+#: lib/elixir_react_starter_web/email.ex:66
 #, elixir-autogen, elixir-format
 msgid "If you didn't create this account, you can safely ignore this email."
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:59
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:59
 #, elixir-autogen, elixir-format
 msgid "Invalid email or password"
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:96
-#: lib/web_template_web/controllers/auth_controller.ex:117
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:96
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:117
 #, elixir-autogen, elixir-format
 msgid "Invalid or expired confirmation link."
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:181
-#: lib/web_template_web/controllers/auth_controller.ex:191
-#: lib/web_template_web/controllers/auth_controller.ex:201
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:181
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:191
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:201
 #, elixir-autogen, elixir-format
 msgid "Invalid or expired reset link."
 msgstr ""
 
-#: lib/web_template_web/email.ex:63
-#: lib/web_template_web/email.ex:91
+#: lib/elixir_react_starter_web/email.ex:63
+#: lib/elixir_react_starter_web/email.ex:91
 #, elixir-autogen, elixir-format
 msgid "Or copy and paste this URL into your browser:"
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:213
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:213
 #, elixir-autogen, elixir-format
 msgid "Password reset successfully. Please log in."
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:68
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:68
 #, elixir-autogen, elixir-format
 msgid "Please confirm your email — we've sent you a new link."
 msgstr ""
 
-#: lib/web_template_web/email.ex:90
+#: lib/elixir_react_starter_web/email.ex:90
 #, elixir-autogen, elixir-format
 msgid "Reset password"
 msgstr ""
 
-#: lib/web_template_web/email.ex:88
-#: lib/web_template_web/email.ex:105
+#: lib/elixir_react_starter_web/email.ex:88
+#: lib/elixir_react_starter_web/email.ex:105
 #, elixir-autogen, elixir-format
 msgid "Reset your password"
 msgstr ""
 
-#: lib/web_template_web/email.ex:64
+#: lib/elixir_react_starter_web/email.ex:64
 #, elixir-autogen, elixir-format
 msgid "This link expires in 1 hour."
 msgstr ""
 
-#: lib/web_template_web/email.ex:93
+#: lib/elixir_react_starter_web/email.ex:93
 #, elixir-autogen, elixir-format
 msgid "This link expires in 1 hour. If you didn't request a reset, you can safely ignore this email."
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:226
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:226
 #, elixir-autogen, elixir-format
 msgid "Token and password are required"
 msgstr ""
 
-#: lib/web_template_web/controllers/fallback_controller.ex:30
+#: lib/elixir_react_starter_web/controllers/fallback_controller.ex:30
 #, elixir-autogen, elixir-format
 msgid "Unauthorized."
 msgstr ""
 
-#: lib/web_template_web/controllers/auth_controller.ex:31
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:31
 #, elixir-autogen, elixir-format
 msgid "We've sent you a confirmation link. Check your inbox."
 msgstr ""
 
-#: lib/web_template_web/email.ex:61
+#: lib/elixir_react_starter_web/email.ex:61
 #, elixir-autogen, elixir-format
 msgid "Welcome — click the button below to confirm your email address."
 msgstr ""
 
-#: lib/web_template_web/plugs/user_auth.ex:85
+#: lib/elixir_react_starter_web/plugs/user_auth.ex:85
 #, elixir-autogen, elixir-format
 msgid "You must log in to access this page."
 msgstr ""
 
-#: lib/web_template_web/controllers/settings_controller.ex:73
+#: lib/elixir_react_starter_web/controllers/settings_controller.ex:73
 #, elixir-autogen, elixir-format
 msgid "Current and new password are required"
 msgstr ""
 
-#: lib/web_template_web/controllers/settings_controller.ex:92
+#: lib/elixir_react_starter_web/controllers/settings_controller.ex:92
 #, elixir-autogen, elixir-format
 msgid "Incorrect password"
 msgstr ""
 
-#: lib/web_template_web/controllers/settings_controller.ex:99
+#: lib/elixir_react_starter_web/controllers/settings_controller.ex:99
 #, elixir-autogen, elixir-format
 msgid "Password is required"
 msgstr ""
 
-#: lib/web_template_web/controllers/settings_controller.ex:61
+#: lib/elixir_react_starter_web/controllers/settings_controller.ex:61
 #, elixir-autogen, elixir-format
 msgid "Password updated."
 msgstr ""
 
-#: lib/web_template_web/controllers/settings_controller.ex:87
+#: lib/elixir_react_starter_web/controllers/settings_controller.ex:87
 #, elixir-autogen, elixir-format
 msgid "Your account has been deleted."
 msgstr ""
 
-#: lib/web_template_web/controllers/settings_controller.ex:32
+#: lib/elixir_react_starter_web/controllers/settings_controller.ex:32
 #, elixir-autogen, elixir-format
 msgid "Unsupported locale"
 msgstr ""

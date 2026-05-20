@@ -1,4 +1,4 @@
-defmodule WebTemplateWeb.ConnCase do
+defmodule ElixirReactStarterWeb.ConnCase do
   @moduledoc """
   Test case for tests that need a `%Plug.Conn{}`.
 
@@ -13,23 +13,23 @@ defmodule WebTemplateWeb.ConnCase do
 
   use ExUnit.CaseTemplate
 
-  import WebTemplate.Factory
+  import ElixirReactStarter.Factory
 
   using do
     quote do
-      @endpoint WebTemplateWeb.Endpoint
+      @endpoint ElixirReactStarterWeb.Endpoint
 
-      use WebTemplateWeb, :verified_routes
+      use ElixirReactStarterWeb, :verified_routes
 
       import Plug.Conn
       import Phoenix.ConnTest
-      import WebTemplateWeb.ConnCase
-      import WebTemplate.Factory
+      import ElixirReactStarterWeb.ConnCase
+      import ElixirReactStarter.Factory
     end
   end
 
   setup tags do
-    WebTemplate.DataCase.setup_sandbox(tags)
+    ElixirReactStarter.DataCase.setup_sandbox(tags)
     conn = Phoenix.ConnTest.build_conn()
 
     if tags[:authenticated] do
@@ -47,7 +47,7 @@ defmodule WebTemplateWeb.ConnCase do
   scenarios).
   """
   def log_in_user(conn, user) do
-    token = WebTemplate.Accounts.generate_user_session_token(user)
+    token = ElixirReactStarter.Accounts.generate_user_session_token(user)
     Phoenix.ConnTest.init_test_session(conn, %{"user_token" => token})
   end
 end

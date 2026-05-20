@@ -1,9 +1,9 @@
-defmodule WebTemplate.MixProject do
+defmodule ElixirReactStarter.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :web_template,
+      app: :elixir_react_starter,
       version: "0.1.0",
       elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -35,18 +35,18 @@ defmodule WebTemplate.MixProject do
     [
       summary: [threshold: 90],
       ignore_modules: [
-        WebTemplate.Application,
-        WebTemplate.Context,
-        WebTemplate.Mailer,
-        WebTemplate.Release,
-        WebTemplate.Repo,
-        WebTemplateWeb.DevE2EController,
-        WebTemplateWeb.Endpoint,
-        WebTemplateWeb.EmailText,
-        WebTemplateWeb.ErrorHTML,
-        WebTemplateWeb.Gettext,
-        WebTemplateWeb.Layouts,
-        WebTemplateWeb.Telemetry,
+        ElixirReactStarter.Application,
+        ElixirReactStarter.Context,
+        ElixirReactStarter.Mailer,
+        ElixirReactStarter.Release,
+        ElixirReactStarter.Repo,
+        ElixirReactStarterWeb.DevE2EController,
+        ElixirReactStarterWeb.Endpoint,
+        ElixirReactStarterWeb.EmailText,
+        ElixirReactStarterWeb.ErrorHTML,
+        ElixirReactStarterWeb.Gettext,
+        ElixirReactStarterWeb.Layouts,
+        ElixirReactStarterWeb.Telemetry,
         Mix.Tasks.Lint,
         Mix.Tasks.I18n.Check,
         ~r/^Inspect\./,
@@ -74,7 +74,7 @@ defmodule WebTemplate.MixProject do
   # ex_doc's HTML ships with full-text search built in.
   defp docs do
     [
-      name: "WebTemplate",
+      name: "ElixirReactStarter",
       main: "readme",
       # Drop the epub formatter (default `[:html, :epub, :markdown]`).
       # `:html` is what `/dev/docs` serves; `:markdown` produces the
@@ -88,8 +88,8 @@ defmodule WebTemplate.MixProject do
         Guides: ~r"docs/"
       ],
       groups_for_modules: [
-        Web: ~r/^WebTemplateWeb($|\.)/,
-        Ecto: ~r/^WebTemplate\.Ecto\./,
+        Web: ~r/^ElixirReactStarterWeb($|\.)/,
+        Ecto: ~r/^ElixirReactStarter\.Ecto\./,
         "Mix Tasks": ~r/^Mix\.Tasks\./
       ]
     ]
@@ -100,7 +100,7 @@ defmodule WebTemplate.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {WebTemplate.Application, []},
+      mod: {ElixirReactStarter.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -144,7 +144,7 @@ defmodule WebTemplate.MixProject do
 
       # Dev/test
       {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:ex_doc, "~> 0.34", only: [:dev, :test], runtime: false},
       {:ex_machina, "~> 2.8.0", only: :test},
@@ -167,18 +167,18 @@ defmodule WebTemplate.MixProject do
       # after a build are the ones the current bundle actually references.
       "assets.build": [
         "compile",
-        "tailwind web_template",
+        "tailwind elixir_react_starter",
         "cmd rm -rf priv/static/assets/chunks",
-        ~s(esbuild web_template --define:process.env.NODE_ENV='"development"'),
+        ~s(esbuild elixir_react_starter --define:process.env.NODE_ENV='"development"'),
         "cmd node assets/build/generate-ssr-pages.js",
-        "esbuild web_template_ssr"
+        "esbuild elixir_react_starter_ssr"
       ],
       "assets.deploy": [
-        "tailwind web_template --minify",
+        "tailwind elixir_react_starter --minify",
         "cmd rm -rf priv/static/assets/chunks",
-        ~s(esbuild web_template --minify --define:process.env.NODE_ENV='"production"'),
+        ~s(esbuild elixir_react_starter --minify --define:process.env.NODE_ENV='"production"'),
         "cmd node assets/build/generate-ssr-pages.js",
-        "esbuild web_template_ssr",
+        "esbuild elixir_react_starter_ssr",
         "phx.digest",
         # phx.digest writes `.gz` next to every asset; this step writes the
         # brotli sibling so Plug.Static can serve whichever the request

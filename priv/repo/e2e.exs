@@ -28,7 +28,7 @@ unless Mix.env() in [:dev, :test] do
   """
 end
 
-unless Application.get_env(:web_template, :dev_routes, false) do
+unless Application.get_env(:elixir_react_starter, :dev_routes, false) do
   raise """
   priv/repo/e2e.exs requires :dev_routes to be enabled (the same config that \
   exposes the /dev/e2e/users provisioning endpoint). Refusing to run.
@@ -37,8 +37,8 @@ end
 
 import Ecto.Query
 
-alias WebTemplate.Accounts.User
-alias WebTemplate.Repo
+alias ElixirReactStarter.Accounts.User
+alias ElixirReactStarter.Repo
 
 require Logger
 

@@ -8,13 +8,13 @@
 import Config
 
 config :inertia,
-  endpoint: WebTemplateWeb.Endpoint,
+  endpoint: ElixirReactStarterWeb.Endpoint,
   history: [encrypt: true],
   ssr: true,
   raise_on_ssr_failure: true
 
-config :web_template,
-  ecto_repos: [WebTemplate.Repo],
+config :elixir_react_starter,
+  ecto_repos: [ElixirReactStarter.Repo],
   generators: [timestamp_type: :utc_datetime],
   supported_locales: ~w(en es),
   default_locale: "en"
@@ -26,8 +26,8 @@ config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 # Oban powers background jobs. Add per-app cron entries under
 # Oban.Plugins.Cron when workers are introduced.
-config :web_template, Oban,
-  repo: WebTemplate.Repo,
+config :elixir_react_starter, Oban,
+  repo: ElixirReactStarter.Repo,
   engine: Oban.Engines.Basic,
   queues: [default: 10],
   plugins: [
@@ -35,14 +35,14 @@ config :web_template, Oban,
   ]
 
 # Configure the endpoint
-config :web_template, WebTemplateWeb.Endpoint,
+config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: WebTemplateWeb.ErrorHTML, json: WebTemplateWeb.ErrorJSON],
+    formats: [html: ElixirReactStarterWeb.ErrorHTML, json: ElixirReactStarterWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: WebTemplate.PubSub,
+  pubsub_server: ElixirReactStarter.PubSub,
   live_view: [signing_salt: "c16iCWOT"]
 
 # Configure the mailer
@@ -52,12 +52,12 @@ config :web_template, WebTemplateWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :web_template, WebTemplate.Mailer, adapter: Swoosh.Adapters.Local
+config :elixir_react_starter, ElixirReactStarter.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.28.0",
-  web_template: [
+  elixir_react_starter: [
     # --conditions=production picks the "production" branch of every
     # subpath in package.json `exports` blocks. Some packages gate
     # their dist files behind development/production conditions —
@@ -72,7 +72,7 @@ config :esbuild,
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ],
-  web_template_ssr: [
+  elixir_react_starter_ssr: [
     # SSR is Node-side; it never executes React.lazy callbacks, so
     # any CSS / fonts that those chunks pull in are dead weight here.
     # The empty loaders short-circuit them so esbuild can still
@@ -87,7 +87,7 @@ config :esbuild,
 # Configure tailwind (the version is required)
 config :tailwind,
   version: "4.1.12",
-  web_template: [
+  elixir_react_starter: [
     args: ~w(
       --input=assets/css/app.css
       --output=priv/static/assets/css/app.css

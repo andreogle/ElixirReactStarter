@@ -12,12 +12,12 @@ import Config
 # If you use `mix release`, you need to explicitly enable the server
 # by passing the PHX_SERVER=true when you start it:
 #
-#     PHX_SERVER=true bin/web_template start
+#     PHX_SERVER=true bin/elixir_react_starter start
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
-  config :web_template, WebTemplateWeb.Endpoint, server: true
+  config :elixir_react_starter, ElixirReactStarterWeb.Endpoint, server: true
 end
 
 if config_env() == :prod do
@@ -27,12 +27,12 @@ if config_env() == :prod do
       raise("environment variable #{name} is missing")
   end
 
-  config :web_template, WebTemplateWeb.Endpoint,
+  config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
     http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
-  config :web_template, WebTemplate.Repo,
+  config :elixir_react_starter, ElixirReactStarter.Repo,
     # ssl: true,
     url: get_env!.("DATABASE_URL"),
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
@@ -49,9 +49,9 @@ if config_env() == :prod do
 
   host = System.get_env("PHX_HOST") || "example.com"
 
-  config :web_template, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+  config :elixir_react_starter, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
-  config :web_template, WebTemplateWeb.Endpoint,
+  config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
       # Enable IPv6 and bind on all interfaces.
@@ -67,7 +67,7 @@ if config_env() == :prod do
   # To get SSL working, you will need to add the `https` key
   # to your endpoint configuration:
   #
-  #     config :web_template, WebTemplateWeb.Endpoint,
+  #     config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
   #       https: [
   #         ...,
   #         port: 443,
@@ -89,7 +89,7 @@ if config_env() == :prod do
   # We also recommend setting `force_ssl` in your config/prod.exs,
   # ensuring no data is ever sent via http, always redirecting to https:
   #
-  #     config :web_template, WebTemplateWeb.Endpoint,
+  #     config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
@@ -100,7 +100,7 @@ if config_env() == :prod do
   #
   # Provision an API key + secret at https://app.mailjet.com/account/api_keys
   # and expose them as MAILJET_API_KEY / MAILJET_SECRET in the deploy env.
-  config :web_template, WebTemplate.Mailer,
+  config :elixir_react_starter, ElixirReactStarter.Mailer,
     adapter: Swoosh.Adapters.Mailjet,
     api_key: get_env!.("MAILJET_API_KEY"),
     secret: get_env!.("MAILJET_SECRET")

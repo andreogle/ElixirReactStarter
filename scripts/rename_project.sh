@@ -24,6 +24,12 @@
 #
 # Notes:
 #   - Input must be PascalCase: starts uppercase, alphanumeric only.
+#   - Renames the PascalCase and snake_case forms — the two casings this
+#     template uses. It does not rewrite kebab-case or "Title Case" variants
+#     (none exist here).
+#   - Does not rename the repository's own root directory (a script can't
+#     safely rename its own working directory). Rename it yourself if you
+#     like — the script prints the command at the end.
 #   - The script does not touch generated lockfiles (package-lock.json) or
 #     binary artifacts (.beam, priv/ssr.js).
 #   - The script does not commit anything. Run `git diff` afterwards to
@@ -230,3 +236,5 @@ echo
 echo "Rename complete and verified. Suggested follow-up:"
 echo "  git diff      # review the rewrite"
 echo "  git add -A && git commit -m \"Rename $OLD_PASCAL → $NEW_PASCAL\""
+echo "  # optional — rename the repo's own directory (not done automatically):"
+echo "  cd .. && mv \"$(basename "$REPO_ROOT")\" \"$NEW_SNAKE\""

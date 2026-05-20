@@ -48,7 +48,7 @@ export default function AppLayout({ title, children }: AppLayoutProps) {
           <div className={`${containerClass} py-3 flex items-center justify-between gap-3`}>
             <div className="flex items-center gap-6 min-w-0">
               <Link href="/dashboard" className="text-base font-semibold shrink-0">
-                WebTemplate
+                ElixirReactStarter
               </Link>
               <nav aria-label={t('common.mainNav')} className="hidden md:flex items-center gap-1">
                 {items.map((item) => (

@@ -10,7 +10,7 @@ These are the rules that must not be forgotten or looked up — they're the ones
 
 **Security**
 - Hashing: **SHA3-256** (`:sha3_256`). Passwords: **Argon2**. Never SHA-1, SHA-256, or MD5
-- Never log PII. Use `WebTemplate.Log.redact_email/1` when an email must appear; prefer user IDs
+- Never log PII. Use `ElixirReactStarter.Log.redact_email/1` when an email must appear; prefer user IDs
 - Never put security codes/tokens in email **subjects** (they show on lock screens). Body only
 - On sensitive account changes (email, password, 2FA), notify the **old** email too
 - Never trust user-controlled redirect targets (e.g. `Referer`) without validating the path starts with `/`
@@ -34,7 +34,7 @@ These are the rules that must not be forgotten or looked up — they're the ones
 - Never edit `assets/js/_ssr_pages.ts` — it's auto-generated
 - **Validation errors must redirect, not re-render.** On `{:error, changeset}` always use `conn |> assign_errors(changeset) |> redirect(to: ~p"/current-page")`. Do **not** use `put_status(:unprocessable_entity) |> render_inertia(...)` — Inertia updates the browser URL to the POST/PUT target when you re-render, which is both wrong UX and a regression risk. The Inertia plug flashes errors through the session across the redirect, so the form still shows them
 - Use the `~p"/..."` sigil (verified routes) for every internal URL — in controllers, tests, and anywhere else in Elixir. Never write raw route strings; compile-time verification catches typos and broken links
-- **JSON serialisation goes through `*_json.ex` view modules**, never ad-hoc serializer modules (no `*Props`, `*Serializer`, or per-controller helpers). One module per resource at `lib/web_template_web/controllers/<resource>_json.ex` (e.g. `WebTemplateWeb.PostJSON`) exposes `index/1` and `show/1` (the Phoenix 1.8 equivalents of `render_many`/`render_one`) that both delegate to a single `data/2`. Inertia callers use `MyJSON.data(record, viewer)` directly inside `assign_prop`; JSON API endpoints use `index`/`show` via `render`. This keeps the wire shape for a resource in one place so multiple callers can't drift
+- **JSON serialisation goes through `*_json.ex` view modules**, never ad-hoc serializer modules (no `*Props`, `*Serializer`, or per-controller helpers). One module per resource at `lib/elixir_react_starter_web/controllers/<resource>_json.ex` (e.g. `ElixirReactStarterWeb.PostJSON`) exposes `index/1` and `show/1` (the Phoenix 1.8 equivalents of `render_many`/`render_one`) that both delegate to a single `data/2`. Inertia callers use `MyJSON.data(record, viewer)` directly inside `assign_prop`; JSON API endpoints use `index`/`show` via `render`. This keeps the wire shape for a resource in one place so multiple callers can't drift
 
 **Accessibility (non-negotiable)**
 - Every interactive component must support full keyboard navigation, visible focus (`focus-visible` rings), proper ARIA roles/state, and screen-reader labels. No exceptions
@@ -44,7 +44,7 @@ These are the rules that must not be forgotten or looked up — they're the ones
 
 **Phoenix**
 - This is an **Inertia-only** app — there are no LiveViews. The only HEEx that ships is `root.html.heex` (the Inertia shell). Don't reach for `Layouts.app`, `<.flash_group>`, `@current_scope`, `<.form for={@form}>`, or `CoreComponents` — none of that exists here. Build UI as React pages
-- The current user is on `conn.assigns.current_user` (set by `WebTemplateWeb.UserAuth.fetch_current_user`) and reaches the frontend as the `current_user` Inertia prop via `WebTemplateWeb.Plugs.SharedData`
+- The current user is on `conn.assigns.current_user` (set by `ElixirReactStarterWeb.UserAuth.fetch_current_user`) and reaches the frontend as the `current_user` Inertia prop via `ElixirReactStarterWeb.Plugs.SharedData`
 - Auth routes are split into pipelines in `router.ex`: public, guest-only (`redirect_if_user_is_authenticated`), and authenticated (`require_authenticated_user`)
 
 **Elixir style**
@@ -57,22 +57,22 @@ These are the rules that must not be forgotten or looked up — they're the ones
 
 ## Project modules and helpers
 
-### `WebTemplate.Context` macro
+### `ElixirReactStarter.Context` macro
 
 Use it in every context module to get generated CRUD helpers (`list_*`, `get_*`, `get_*!`, `delete_*`, `change_*`, `count_*`, `filter_*`). Custom functions live alongside.
 
 ```elixir
-use WebTemplate.Context,
-  repo: WebTemplate.Repo,
-  schema: WebTemplate.Accounts.User,
+use ElixirReactStarter.Context,
+  repo: ElixirReactStarter.Repo,
+  schema: ElixirReactStarter.Accounts.User,
   changeset: :registration_changeset
 ```
 
-### `WebTemplate.Log.redact_email/1`
+### `ElixirReactStarter.Log.redact_email/1`
 
 Use this when an email must appear in a log line. Prefer logging user IDs over emails.
 
-### `WebTemplate.Factory` (ex_machina)
+### `ElixirReactStarter.Factory` (ex_machina)
 
 **Always** use the factory for test data — never call `Accounts.create_user` or similar **from tests as setup** (unless the function itself is what's under test). Factories live in `test/support/factories/`. Compose with modifier functions:
 
@@ -81,16 +81,16 @@ Use this when an email must appear in a log line. Prefer logging user IDs over e
 :user |> build(email: "test@example.com", locale: "es") |> insert()
 ```
 
-**New schemas must ship a factory alongside them.** Put the factory in `test/support/factories/<schema>_factory.ex` and `use` it from `WebTemplate.Factory`. Parent associations are passed explicitly (no implicit parent creation) so test data stays intentional and unique constraints don't collide under async.
+**New schemas must ship a factory alongside them.** Put the factory in `test/support/factories/<schema>_factory.ex` and `use` it from `ElixirReactStarter.Factory`. Parent associations are passed explicitly (no implicit parent creation) so test data stays intentional and unique constraints don't collide under async.
 
 For authenticated controller tests, use `@tag :authenticated` (or `@describetag`/`@moduletag` at the block level). It creates a confirmed user, logs them in, and puts `%{conn: conn, user: user}` into the test context. For tests that exercise failure paths emitting `Logger.warning`, add `@moduletag :capture_log`.
 
-For channel tests use `WebTemplateWeb.ChannelCase` (`connect/2`, `subscribe_and_join/3`, …).
+For channel tests use `ElixirReactStarterWeb.ChannelCase` (`connect/2`, `subscribe_and_join/3`, …).
 
 ## Esbuild profiles
 
-- `web_template` → `js/app.tsx` → `priv/static/assets/` (ESM, browser, `--splitting`)
-- `web_template_ssr` → `js/ssr.tsx` → `priv/ssr.js` (CJS, Node)
+- `elixir_react_starter` → `js/app.tsx` → `priv/static/assets/` (ESM, browser, `--splitting`)
+- `elixir_react_starter_ssr` → `js/ssr.tsx` → `priv/ssr.js` (CJS, Node)
 
 Both are already wired into `assets.build`, `assets.deploy`, and the dev watcher in `dev.exs`. They can't be merged — the browser bundle and the Node SSR bundle need different formats and targets.
 
@@ -111,15 +111,15 @@ Define your project's brand colors in `assets/css/app.css` as Tailwind theme tok
 
 The template already includes these — extend them, don't rebuild them.
 
-**Auth** (`WebTemplate.Accounts`, `WebTemplateWeb.{AuthController, UserAuth}`)
+**Auth** (`ElixirReactStarter.Accounts`, `ElixirReactStarterWeb.{AuthController, UserAuth}`)
 - Email + password registration, **link-based** email confirmation and password reset (1-hour `UserToken`s; the raw token rides in the email URL, only its SHA3-256 hash is stored). Session tokens use a 60-day sliding window
 - The `User` schema is deliberately minimal: `email`, `hashed_password`, `locale`, `confirmed_at`. Add profile fields (name, avatar, …) per project — there's no `name` column yet
 - Endpoint responses don't leak which emails are registered (resend-confirmation / forgot-password reply identically either way)
 
-**Realtime** (`WebTemplateWeb.{UserSocket, GlobalChannel, UserChannel}` + `assets/js/realtime/`)
+**Realtime** (`ElixirReactStarterWeb.{UserSocket, GlobalChannel, UserChannel}` + `assets/js/realtime/`)
 - Token-authed socket at `/socket`. The provider (mounted in `app-providers.tsx`) auto-joins `global` and `user:<id>` and survives Inertia navigation (keyed on user id, not the rotating token). Hooks: `useConnectionStatus`, `useGlobalChannel`, `useUserChannel`, `useChannel`, `use{Global,User}Event`, `pushChannel`
 
-**Locale** (`WebTemplateWeb.LocaleController`, `PUT /locale`)
+**Locale** (`ElixirReactStarterWeb.LocaleController`, `PUT /locale`)
 - Precedence: `user.locale` (authed) → `locale` cookie (anonymous, 1-year) → `Accept-Language` → `:default_locale`. The public endpoint sets the cookie and, when signed in, also writes `user.locale`. Frontend strings go through `react-i18next` (`useTranslation`); locale files are `assets/js/i18n/locales/{en,es}.ts`
 
 **Theme** (`assets/js/theme.ts`, `ThemeToggle`)

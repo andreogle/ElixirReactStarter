@@ -2,4 +2,4 @@
 set -eu
 
 cd -P -- "$(dirname -- "$0")"
-exec ./web_template eval WebTemplate.Release.migrate
+exec ./elixir_react_starter eval ElixirReactStarter.Release.migrate

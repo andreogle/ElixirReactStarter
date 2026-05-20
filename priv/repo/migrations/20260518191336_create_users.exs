@@ -1,4 +1,4 @@
-defmodule WebTemplate.Repo.Migrations.CreateUsers do
+defmodule ElixirReactStarter.Repo.Migrations.CreateUsers do
   use Ecto.Migration
 
   def change do

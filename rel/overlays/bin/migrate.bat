@@ -1,1 +1,1 @@
-call "%~dp0\web_template" eval WebTemplate.Release.migrate
+call "%~dp0\elixir_react_starter" eval ElixirReactStarter.Release.migrate

@@ -1,8 +1,8 @@
 <p align="center">
-  <img src=".github/logo.png" alt="WebTemplate" width="220" />
+  <img src=".github/logo.png" alt="ElixirReactStarter" width="220" />
 </p>
 
-<h1 align="center">WebTemplate</h1>
+<h1 align="center">ElixirReactStarter</h1>
 
 <p align="center">
   A production-ready Phoenix + Inertia.js (React, SSR) starter — authentication,
@@ -20,7 +20,7 @@
 Every new Phoenix app starts by rebuilding the same foundation — authentication,
 internationalization, real-time, theming, email, and the testing/CI/deployment
 plumbing around them — usually under time pressure and rarely the same way twice.
-WebTemplate ships that foundation already built, wired together, and tested, with
+ElixirReactStarter ships that foundation already built, wired together, and tested, with
 secure and accessible defaults, so you can start on your actual product instead of
 boilerplate. It deliberately pairs Phoenix with **Inertia.js + React (with SSR)**
 rather than LiveView: you get React's component ecosystem and rich client-side
@@ -81,6 +81,16 @@ and without maintaining a separate API and single-page-app build.
 
 **Prerequisites:** [mise](https://mise.jdx.dev) (pins the toolchain) and a running PostgreSQL.
 
+> **Starting a new project from this template?** Rename it to your own name first:
+>
+> ```bash
+> scripts/rename_project.sh YourAppName   # PascalCase
+> ```
+>
+> It rewrites every module, the OTP app name, file/directory paths, and configs
+> (both `PascalCase` and `snake_case` forms), then rebuilds and runs `mix precommit`
+> to verify. Use `--dry-run` to preview the changes first.
+
 ```bash
 # 1. Install the pinned Erlang, Elixir, and Node (versions live in mise.toml)
 mise trust && mise install
@@ -126,12 +136,12 @@ time with `mix phx.gen.secret` and store it in your secrets manager or host conf
 then build and run the release image (reading the stored value from the environment):
 
 ```bash
-docker build -t web_template .
+docker build -t elixir_react_starter .
 docker run -p 4000:4000 \
   -e SECRET_KEY_BASE="$SECRET_KEY_BASE" \
   -e DATABASE_URL="ecto://USER:PASS@HOST/DB" \
   -e PHX_HOST="example.com" \
-  web_template
+  elixir_react_starter
 ```
 
 Database migrations run via the release: `bin/migrate`. See Phoenix's

@@ -2,7 +2,7 @@
 
 @source "../css";
 @source "../js";
-@source "../../lib/web_template_web";
+@source "../../lib/elixir_react_starter_web";
 
 /* Dark mode via class on <html> or prefers-color-scheme */
 @custom-variant dark (&:where(.dark, .dark *));

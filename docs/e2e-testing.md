@@ -98,5 +98,5 @@ assets/
     helpers.ts              # uniqueEmail, provisionUser, loginAs, fetchEmailLink
     tests/                  # one spec per flow
 priv/repo/e2e.exs           # destructive per-run cleanup (dev/test only)
-lib/web_template_web/controllers/dev_e2e_controller.ex  # POST /dev/e2e/users
+lib/elixir_react_starter_web/controllers/dev_e2e_controller.ex  # POST /dev/e2e/users
 ```

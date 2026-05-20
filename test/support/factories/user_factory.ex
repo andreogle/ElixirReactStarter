@@ -1,4 +1,4 @@
-defmodule WebTemplate.UserFactory do
+defmodule ElixirReactStarter.UserFactory do
   @moduledoc """
   Factory for User records. Provides a minimal `user_factory/0` plus
   the `confirmed/1` modifier so most tests can compose as:
@@ -6,7 +6,7 @@ defmodule WebTemplate.UserFactory do
       :user |> build() |> confirmed() |> insert()
   """
 
-  alias WebTemplate.Accounts.User
+  alias ElixirReactStarter.Accounts.User
 
   defmacro __using__(_opts) do
     quote do

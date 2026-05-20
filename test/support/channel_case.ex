@@ -1,4 +1,4 @@
-defmodule WebTemplateWeb.ChannelCase do
+defmodule ElixirReactStarterWeb.ChannelCase do
   @moduledoc """
   Test case for channels. Imports `Phoenix.ChannelTest` so suites can
   use `connect/2`, `subscribe_and_join/3`, `assert_push/2`, etc.
@@ -11,15 +11,15 @@ defmodule WebTemplateWeb.ChannelCase do
   using do
     quote do
       import Phoenix.ChannelTest
-      import WebTemplateWeb.ChannelCase
-      import WebTemplate.Factory
+      import ElixirReactStarterWeb.ChannelCase
+      import ElixirReactStarter.Factory
 
-      @endpoint WebTemplateWeb.Endpoint
+      @endpoint ElixirReactStarterWeb.Endpoint
     end
   end
 
   setup tags do
-    WebTemplate.DataCase.setup_sandbox(tags)
+    ElixirReactStarter.DataCase.setup_sandbox(tags)
     :ok
   end
 end

@@ -17,7 +17,7 @@ export default {
     themeSystem: 'Sistema',
   },
   home: {
-    welcome: 'Bienvenido a WebTemplate',
+    welcome: 'Bienvenido a ElixirReactStarter',
     stack: 'Phoenix 1.8 · Inertia.js · React · SSR',
     signedInAs: 'Sesión iniciada como',
     goToDashboard: 'Ir al panel',
