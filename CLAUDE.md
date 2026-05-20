@@ -30,11 +30,11 @@ These are the rules that must not be forgotten or looked up — they're the ones
 - Layout components live in `assets/js/layouts/` (e.g. `AppLayout`, `AuthLayout`)
 - Reusable UI primitives live flat in `assets/js/components/` (`Button`, `Spinner`, `Select`, `DropdownMenu`, `AlertDialog`, …) — no sub-folders
 - Forms use Inertia's `useForm` hook; errors come from `assign_errors(conn, changeset)` on the server
-- **No raw `try/catch` for async work — wrap every Promise in `go()` from `@api3/promise-utils`** (sync work uses `goSync`). It returns `{ success, data, error }`, which forces every call site to acknowledge the failure path explicitly and prevents the "swallow the error and move on" pattern that hides real bugs. The same applies to dynamic `import()`, `fetch()`, JSON parsing, and any vendor SDK call (`livekit-client`, etc.). The only acceptable exception is at top-level error boundaries that genuinely *do* need to catch everything synchronously
+- **No raw `try/catch` for async work — wrap every Promise in `go()` from `@api3/promise-utils`** (sync work uses `goSync`). It returns `{ success, data, error }`, which forces every call site to acknowledge the failure path explicitly and prevents the "swallow the error and move on" pattern that hides real bugs. The same applies to dynamic `import()`, `fetch()`, JSON parsing, and any vendor SDK call. The only acceptable exception is at top-level error boundaries that genuinely *do* need to catch everything synchronously
 - Never edit `assets/js/_ssr_pages.ts` — it's auto-generated
 - **Validation errors must redirect, not re-render.** On `{:error, changeset}` always use `conn |> assign_errors(changeset) |> redirect(to: ~p"/current-page")`. Do **not** use `put_status(:unprocessable_entity) |> render_inertia(...)` — Inertia updates the browser URL to the POST/PUT target when you re-render, which is both wrong UX and a regression risk. The Inertia plug flashes errors through the session across the redirect, so the form still shows them
 - Use the `~p"/..."` sigil (verified routes) for every internal URL — in controllers, tests, and anywhere else in Elixir. Never write raw route strings; compile-time verification catches typos and broken links
-- **JSON serialisation goes through `*_json.ex` view modules**, never ad-hoc serializer modules (no `*Props`, `*Serializer`, or per-controller helpers). One module per resource at `lib/web_template_web/controllers/<resource>_json.ex` (e.g. `WebTemplateWeb.LessonJSON`) exposes `index/1` and `show/1` (the Phoenix 1.8 equivalents of `render_many`/`render_one`) that both delegate to a single `data/2`. Inertia callers use `MyJSON.data(record, viewer)` directly inside `assign_prop`; JSON API endpoints use `index`/`show` via `render`. This keeps the wire shape for a resource in one place so multiple callers can't drift
+- **JSON serialisation goes through `*_json.ex` view modules**, never ad-hoc serializer modules (no `*Props`, `*Serializer`, or per-controller helpers). One module per resource at `lib/web_template_web/controllers/<resource>_json.ex` (e.g. `WebTemplateWeb.PostJSON`) exposes `index/1` and `show/1` (the Phoenix 1.8 equivalents of `render_many`/`render_one`) that both delegate to a single `data/2`. Inertia callers use `MyJSON.data(record, viewer)` directly inside `assign_prop`; JSON API endpoints use `index`/`show` via `render`. This keeps the wire shape for a resource in one place so multiple callers can't drift
 
 **Accessibility (non-negotiable)**
 - Every interactive component must support full keyboard navigation, visible focus (`focus-visible` rings), proper ARIA roles/state, and screen-reader labels. No exceptions
@@ -43,10 +43,9 @@ These are the rules that must not be forgotten or looked up — they're the ones
 - Don't use `@radix-ui/themes` — it conflicts with the custom Tailwind design system. Wrap primitives with Tailwind classes instead
 
 **Phoenix**
-- Wrap every LiveView template with `<Layouts.app flash={@flash} current_scope={@current_scope} ...>`
-- Access the user as `@current_scope.user` — never `@current_user` in templates/LiveViews
-- `<.flash_group>` only in `layouts.ex` (Phoenix 1.8 moved it there)
-- Always use `<.form for={@form}>` and `<.input field={@form[:field]}>` — never access the changeset in templates
+- This is an **Inertia-only** app — there are no LiveViews. The only HEEx that ships is `root.html.heex` (the Inertia shell). Don't reach for `Layouts.app`, `<.flash_group>`, `@current_scope`, `<.form for={@form}>`, or `CoreComponents` — none of that exists here. Build UI as React pages
+- The current user is on `conn.assigns.current_user` (set by `WebTemplateWeb.UserAuth.fetch_current_user`) and reaches the frontend as the `current_user` Inertia prop via `WebTemplateWeb.Plugs.SharedData`
+- Auth routes are split into pipelines in `router.ex`: public, guest-only (`redirect_if_user_is_authenticated`), and authenticated (`require_authenticated_user`)
 
 **Elixir style**
 - Each `<-` clause in a `with` must fit on a single line. If the right-hand side is a multi-line pipe, a multi-line function call with an inline map, or a multi-line `Ecto.Query.from` — **pre-bind it** to a named variable above the `with` and reference that name. Keep the `with` header scannable: every clause should read as "call this → match that"
@@ -75,18 +74,18 @@ Use this when an email must appear in a log line. Prefer logging user IDs over e
 
 ### `WebTemplate.Factory` (ex_machina)
 
-**Always** use the factory for test data — never call `Accounts.create_user`, `Scheduling.create_availability_rule`, or similar **from tests as setup** (unless the function itself is what's under test). Factories live in `test/support/factories/`. Compose with modifier functions:
+**Always** use the factory for test data — never call `Accounts.create_user` or similar **from tests as setup** (unless the function itself is what's under test). Factories live in `test/support/factories/`. Compose with modifier functions:
 
 ```elixir
-:user |> build(email: "test@example.com") |> confirmed() |> insert()
-insert(:tenant)
-insert(:membership, tenant: tenant, user: user, role: "teacher")
-insert(:availability_rule, user: teacher, day_of_week: 1)
+:user |> build() |> confirmed() |> insert()
+:user |> build(email: "test@example.com", locale: "es") |> insert()
 ```
 
 **New schemas must ship a factory alongside them.** Put the factory in `test/support/factories/<schema>_factory.ex` and `use` it from `WebTemplate.Factory`. Parent associations are passed explicitly (no implicit parent creation) so test data stays intentional and unique constraints don't collide under async.
 
-For authenticated controller tests, use `@tag :authenticated` (or `@describetag`/`@moduletag` at the block level). It creates a confirmed user, logs them in, and puts `%{conn: conn, user: user}` into the test context.
+For authenticated controller tests, use `@tag :authenticated` (or `@describetag`/`@moduletag` at the block level). It creates a confirmed user, logs them in, and puts `%{conn: conn, user: user}` into the test context. For tests that exercise failure paths emitting `Logger.warning`, add `@moduletag :capture_log`.
+
+For channel tests use `WebTemplateWeb.ChannelCase` (`connect/2`, `subscribe_and_join/3`, …).
 
 ## Esbuild profiles
 
@@ -107,6 +106,26 @@ Define your project's brand colors in `assets/css/app.css` as Tailwind theme tok
 - For React pages, use `lucide-react` (imported as `Check`, `CalendarDays`, `GraduationCap`, etc. — no `Icon` suffix). Don't add `@heroicons/react` back; heroicons is effectively unmaintained
 - Inertia `<Link>` is imported from `components/Link.tsx` (our wrapper that defaults `prefetch="hover"`), never from `@inertiajs/react` directly — a Biome rule enforces this
 - No daisyUI. Plain Tailwind for markup; Radix UI for interactive components
+
+## What's shipped
+
+The template already includes these — extend them, don't rebuild them.
+
+**Auth** (`WebTemplate.Accounts`, `WebTemplateWeb.{AuthController, UserAuth}`)
+- Email + password registration, **link-based** email confirmation and password reset (1-hour `UserToken`s; the raw token rides in the email URL, only its SHA3-256 hash is stored). Session tokens use a 60-day sliding window
+- The `User` schema is deliberately minimal: `email`, `hashed_password`, `locale`, `confirmed_at`. Add profile fields (name, avatar, …) per project — there's no `name` column yet
+- Endpoint responses don't leak which emails are registered (resend-confirmation / forgot-password reply identically either way)
+
+**Realtime** (`WebTemplateWeb.{UserSocket, GlobalChannel, UserChannel}` + `assets/js/realtime/`)
+- Token-authed socket at `/socket`. The provider (mounted in `app-providers.tsx`) auto-joins `global` and `user:<id>` and survives Inertia navigation (keyed on user id, not the rotating token). Hooks: `useConnectionStatus`, `useGlobalChannel`, `useUserChannel`, `useChannel`, `use{Global,User}Event`, `pushChannel`
+
+**Locale** (`WebTemplateWeb.LocaleController`, `PUT /locale`)
+- Precedence: `user.locale` (authed) → `locale` cookie (anonymous, 1-year) → `Accept-Language` → `:default_locale`. The public endpoint sets the cookie and, when signed in, also writes `user.locale`. Frontend strings go through `react-i18next` (`useTranslation`); locale files are `assets/js/i18n/locales/{en,es}.ts`
+
+**Theme** (`assets/js/theme.ts`, `ThemeToggle`)
+- light / dark / system, stored in a `theme` cookie. An inline bootstrap in `root.html.heex` applies the `dark` class before first paint (no flash). Dark mode is class-based (`@custom-variant dark`)
+
+**Static analysis** — `mix precommit` stays fast; CI runs `mix precommit.full` which adds dialyzer.
 
 ## UI/UX bar
 
