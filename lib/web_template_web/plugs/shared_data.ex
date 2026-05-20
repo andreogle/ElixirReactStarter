@@ -1,6 +1,13 @@
 defmodule WebTemplateWeb.Plugs.SharedData do
   @moduledoc """
-  Inertia plug that assigns the props every page receives.
+  Inertia plug that assigns the props every page receives:
+
+    * `current_user` — `%{id, email, locale}`, or `nil` when anonymous.
+    * `locale` — the resolved request locale (defaults to `"en"`).
+    * `flash` — the flash map.
+    * `socket_token` — a short-lived signed token the React realtime
+      provider hands to `Phoenix.Socket` on connect; `nil` when
+      anonymous so the frontend skips wiring up the socket.
 
   Runs after `:fetch_current_user` in the browser pipeline so
   `conn.assigns[:current_user]` and `:locale` are populated.

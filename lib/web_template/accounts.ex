@@ -1,11 +1,20 @@
 defmodule WebTemplate.Accounts do
   @moduledoc """
-  Accounts context. Manages users, password-based authentication, email
-  confirmation, and password reset via 8-digit codes.
+  Accounts context: users, password authentication, and the link-based
+  email-confirmation and password-reset flows.
 
-  Minimal by design — settings flows (email change, profile updates,
-  account deletion) live outside this scaffold so each project can
-  shape them around its own data model.
+  Tokens are **link-based**, not codes. Confirmation and reset tokens are
+  32 random bytes; only their SHA3-256 hash is stored, while the raw
+  token rides in a single-click email URL and expires after one hour.
+  Session tokens use a 60-day sliding window.
+
+  Generated CRUD helpers come from `use WebTemplate.Context`. The custom
+  functions here cover registration, the session lifecycle, email
+  confirmation, password reset, authenticated password change, and
+  account deletion (the last two re-verify the current password).
+
+  The `User` schema is deliberately minimal — email, hashed password,
+  locale, confirmed_at. Add profile fields (name, avatar, …) per project.
   """
 
   use WebTemplate.Context,

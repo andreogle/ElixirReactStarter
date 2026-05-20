@@ -1,6 +1,33 @@
 defmodule WebTemplateWeb.UserAuth do
   @moduledoc """
-  Plugs and helpers for user authentication via session tokens.
+  Session-based authentication: the browser-pipeline plugs plus the
+  log-in/log-out helpers controllers call.
+
+  ## Plugs
+
+    * `fetch_current_user/2` — resolves the session token to a user
+      (sliding the 60-day expiry forward on activity) and assigns
+      `:current_user` and `:locale`.
+    * `require_authenticated_user/2` — gate for authenticated routes;
+      redirects to `/login`, stashing the requested GET path so log-in
+      can return the user there afterwards.
+    * `redirect_if_user_is_authenticated/2` — gate for guest-only routes
+      (login, register, …); bounces signed-in users to `/dashboard`.
+
+  ## Session handling
+
+  `log_in_user/2` reads any stored return-to path, then renews the
+  session (a fresh session id — fixation defence) before storing the new
+  token; `log_out_user/1` deletes the token and renews again. Stored
+  return-to paths are validated as local (`/…`, never `//…`) to prevent
+  open redirects, and only GET requests are stored so a redirect can't
+  replay a state-changing action.
+
+  ## Locale precedence
+
+  `fetch_current_user/2` resolves the request locale as: `user.locale`
+  (authenticated) → `locale` cookie → first supported `Accept-Language`
+  match → the configured default, then hands it to Gettext.
   """
 
   import Plug.Conn

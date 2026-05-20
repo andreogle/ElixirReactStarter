@@ -1,4 +1,22 @@
 defmodule WebTemplateWeb.AuthController do
+  @moduledoc """
+  HTTP entrypoint for authentication: registration, login/logout, email
+  confirmation, and password reset. Renders the Inertia auth pages and
+  handles their form submissions.
+
+  Two rules run throughout:
+
+    * **Link-based, single-use tokens.** Confirmation and reset links
+      carry a raw token (only its SHA3-256 hash is stored) and are
+      consumed on use. Confirming an email or completing a reset logs
+      the user in.
+    * **No account enumeration.** Resend-confirmation and forgot-password
+      respond identically whether or not the email is registered, so the
+      endpoints never reveal which addresses have accounts.
+
+  Logging in with an unconfirmed account (and the correct password)
+  re-sends a fresh confirmation link instead of starting a session.
+  """
   use WebTemplateWeb, :controller
 
   require Logger

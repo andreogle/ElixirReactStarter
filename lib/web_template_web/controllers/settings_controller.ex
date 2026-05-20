@@ -1,4 +1,13 @@
 defmodule WebTemplateWeb.SettingsController do
+  @moduledoc """
+  Authenticated account settings: changing the password and deleting the
+  account. Both re-verify the current password before acting.
+
+  Changing the password invalidates every session token for the user
+  (signing out other devices), so this controller immediately issues a
+  fresh session for the current browser to keep it logged in. Deleting
+  the account cascades to its tokens and clears the session.
+  """
   use WebTemplateWeb, :controller
 
   alias WebTemplate.Accounts
