@@ -17,9 +17,7 @@ permissions:
 env:
   MIX_ENV: test
   # Erlang, Elixir, and Node versions come from `mise.toml` (installed by
-  # mise-action below), so local dev and CI stay in lockstep. Postgres
-  # isn't a mise runtime, so it's pinned here — the one place CI needs it.
-  POSTGRES_IMAGE: postgres:18-alpine
+  # mise-action below), so local dev and CI stay in lockstep.
 
 jobs:
   build:
@@ -28,7 +26,10 @@ jobs:
 
     services:
       postgres:
-        image: ${{ env.POSTGRES_IMAGE }}
+        # Pinned inline: GitHub Actions doesn't allow the `env` context in a
+        # service `image:`. Postgres isn't a mise runtime, so it's the one
+        # version CI pins on its own.
+        image: postgres:18-alpine
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
