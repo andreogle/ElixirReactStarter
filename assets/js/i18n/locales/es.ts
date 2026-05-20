@@ -59,6 +59,7 @@ export default {
       submit: 'Iniciar sesión',
       createAccount: 'Crear cuenta',
       forgotPassword: '¿Has olvidado tu contraseña?',
+      resendConfirmation: 'Reenviar correo de confirmación',
     },
     register: {
       title: 'Crear cuenta',

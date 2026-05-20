@@ -38,12 +38,15 @@ export interface ProvisionedUser {
 
 export async function provisionUser(
   request: APIRequestContext,
-  options: { label: string; password?: string }
+  options: { label: string; password?: string; confirmed?: boolean }
 ): Promise<ProvisionedUser> {
   const email = uniqueEmail(options.label);
   const password = options.password ?? 'playwright-secret-1234';
+  const data: Record<string, unknown> = { email, password };
+  // Confirmed by default; pass `confirmed: false` for the resend flow.
+  if (options.confirmed === false) data.confirmed = false;
 
-  const response = await request.post('/dev/e2e/users', { data: { email, password } });
+  const response = await request.post('/dev/e2e/users', { data });
   expect(
     response.ok(),
     `POST /dev/e2e/users failed: ${response.status()} ${await response.text()}`

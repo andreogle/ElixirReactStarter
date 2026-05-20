@@ -64,6 +64,12 @@ export default function Login() {
             {t('auth.login.forgotPassword')}
           </Link>
         </div>
+
+        <p className="text-center text-sm">
+          <Link href="/resend-confirmation" className="text-primary hover:underline">
+            {t('auth.login.resendConfirmation')}
+          </Link>
+        </p>
       </form>
     </AuthLayout>
   );

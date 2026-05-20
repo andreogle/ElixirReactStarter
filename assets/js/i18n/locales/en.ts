@@ -59,6 +59,7 @@ export default {
       submit: 'Log in',
       createAccount: 'Create account',
       forgotPassword: 'Forgot password?',
+      resendConfirmation: 'Resend confirmation email',
     },
     register: {
       title: 'Create account',

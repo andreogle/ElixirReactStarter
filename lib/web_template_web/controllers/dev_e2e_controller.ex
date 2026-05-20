@@ -32,7 +32,7 @@ defmodule WebTemplateWeb.DevE2EController do
     with {:ok, attrs} <- coerce_params(params),
          :ok <- ensure_allowed_email(attrs["email"]),
          {:ok, user} <- Accounts.create_user(attrs),
-         {:ok, user} <- Accounts.confirm_user(user) do
+         {:ok, user} <- maybe_confirm(user, params["confirmed"]) do
       conn
       |> put_status(:created)
       |> json(%{id: user.id, email: user.email})
@@ -59,6 +59,11 @@ defmodule WebTemplateWeb.DevE2EController do
   defp ensure_allowed_email(email) do
     if Regex.match?(@allowed_email, email), do: :ok, else: {:error, :invalid_email}
   end
+
+  # Confirmed by default. Pass `confirmed: false` to provision an
+  # unconfirmed account — used to exercise the confirmation/resend flow.
+  defp maybe_confirm(user, false), do: {:ok, user}
+  defp maybe_confirm(user, _confirmed), do: Accounts.confirm_user(user)
 
   # 24 random URL-safe bytes — callers log in with the password they
   # supplied, so we never need to recover this default.
