@@ -127,7 +127,6 @@ defmodule WebTemplate.MixProject do
       {:ecto_sql, "~> 3.13"},
       {:exflect, "~> 1.0"},
       {:gettext, "~> 1.0"},
-      {:hammer, "~> 7.0"},
       {:jason, "~> 1.2"},
       {:oban, "~> 2.19"},
       {:phoenix, "~> 1.8.5"},
