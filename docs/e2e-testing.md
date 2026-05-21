@@ -57,6 +57,11 @@ parallel workers never collide on the unique email index. Each test also
 runs in its own browser context, so cookies (locale, session) don't leak
 between tests.
 
+Auth **rate limiting is disabled in dev** (`config/dev.exs`), since the
+suite drives the dev server and makes many auth requests from one IP. The
+limiter is a production concern and is covered separately by
+`rate_limit_test.exs`.
+
 ### Fixtures and provisioning
 
 Tests that need an *existing* account call the dev-only fixture endpoint

@@ -13,6 +13,9 @@ defmodule ElixirReactStarter.Application do
       {DNSCluster,
        query: Application.get_env(:elixir_react_starter, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: ElixirReactStarter.PubSub},
+      # Rate-limit counters (auth throttling). Periodic cleanup keeps the
+      # ETS table from growing unbounded.
+      {ElixirReactStarter.RateLimit, [clean_period: :timer.minutes(10)]},
       {Inertia.SSR, path: Application.app_dir(:elixir_react_starter, "priv")},
       # Start a worker by calling: ElixirReactStarter.Worker.start_link(arg)
       # {ElixirReactStarter.Worker, arg},

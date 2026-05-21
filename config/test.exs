@@ -26,6 +26,10 @@ config :elixir_react_starter, ElixirReactStarter.Mailer, adapter: Swoosh.Adapter
 # Disable swoosh api client as it is only required for production adapters
 config :swoosh, :api_client, false
 
+# Disable auth rate limiting in tests so repeated requests from 127.0.0.1
+# don't trip the limiter. The limiter logic is covered by rate_limit_test.
+config :elixir_react_starter, rate_limit_enabled: false
+
 # Skip SSR in tests — no Node.js worker pool is started under MIX_ENV=test,
 # and Inertia's controller would block trying to call into it. Tests assert
 # on the JSON page payload embedded in the HTML response, not on rendered

@@ -104,7 +104,12 @@ msgid "must be equal to %{number}"
 msgstr "debe ser igual a %{number}"
 
 ## Custom validation
-#: lib/elixir_react_starter/accounts/user.ex:101
+#: lib/elixir_react_starter/accounts/user.ex:117
 #, elixir-autogen
 msgid "must be a valid email address"
 msgstr "debe ser una dirección de correo válida"
+
+#: lib/elixir_react_starter/accounts/user.ex:125
+#, elixir-autogen, elixir-format
+msgid "is not a supported locale"
+msgstr "no es un idioma admitido"

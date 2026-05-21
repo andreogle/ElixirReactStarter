@@ -31,6 +31,19 @@ defmodule ElixirReactStarterWeb.AuthController do
 
   action_fallback ElixirReactStarterWeb.FallbackController
 
+  alias ElixirReactStarterWeb.Plugs.RateLimit
+
+  # Per-IP throttle across all auth form posts — blunts brute-forcing.
+  plug RateLimit,
+       [bucket: "auth_ip", limit: 30, scale: :timer.minutes(1)]
+       when action in [:login, :register, :forgot_password, :resend_confirmation, :reset_password]
+
+  # Per-email throttle on the endpoints that send mail — stops password-reset
+  # / confirmation email bombing regardless of source IP.
+  plug RateLimit,
+       [bucket: "auth_email", by: :email, limit: 5, scale: :timer.hours(1)]
+       when action in [:forgot_password, :resend_confirmation]
+
   # =============================================================================
   # Registration
   # =============================================================================

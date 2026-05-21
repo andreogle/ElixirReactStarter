@@ -4,11 +4,16 @@ defmodule ElixirReactStarterWeb.Endpoint do
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
+  #
+  # `secure: true` (enabled in prod via the :session_secure config) marks
+  # the cookie Secure so it is never sent over plain HTTP. Left off in
+  # dev/test so http://localhost keeps working.
   @session_options [
     store: :cookie,
     key: "_elixir_react_starter_key",
     signing_salt: "aeKwL1+9",
-    same_site: "Lax"
+    same_site: "Lax",
+    secure: Application.compile_env(:elixir_react_starter, :session_secure, false)
   ]
 
   socket "/live", Phoenix.LiveView.Socket,

@@ -80,6 +80,12 @@ config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
 # Enable dev routes for dashboard and mailbox
 config :elixir_react_starter, dev_routes: true
 
+# Disable auth rate limiting in development. The Playwright E2E suite drives
+# this server and legitimately makes many requests from one IP; throttling
+# is a production concern (and the limiter is covered by rate_limit_test).
+# Flip to `true` if you want to exercise the limiter locally.
+config :elixir_react_starter, rate_limit_enabled: false
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"
 

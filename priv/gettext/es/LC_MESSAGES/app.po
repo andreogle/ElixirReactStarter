@@ -31,19 +31,19 @@ msgstr "Confirmar correo"
 msgid "Confirm your email"
 msgstr "Confirma tu correo"
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:108
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:137
 #, elixir-autogen, elixir-format
 msgid "Could not confirm your account. Please try again."
 msgstr "No pudimos confirmar tu cuenta. Inténtalo de nuevo."
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:43
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:79
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:72
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:108
 #, elixir-autogen, elixir-format
 msgid "Email and password are required"
 msgstr "El correo y la contraseña son obligatorios"
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:143
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:171
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:172
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:201
 #, elixir-autogen, elixir-format
 msgid "Email is required"
 msgstr "El correo es obligatorio"
@@ -53,12 +53,12 @@ msgstr "El correo es obligatorio"
 msgid "For your security, never share this link with anyone."
 msgstr "Por tu seguridad, nunca compartas este enlace con nadie."
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:137
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:166
 #, elixir-autogen, elixir-format
 msgid "If that email is registered, we've sent a new confirmation link."
 msgstr "Si ese correo está registrado, hemos enviado un nuevo enlace de confirmación."
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:165
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:195
 #, elixir-autogen, elixir-format
 msgid "If that email is registered, we've sent a password reset link."
 msgstr "Si ese correo está registrado, hemos enviado un enlace para restablecer la contraseña."
@@ -68,20 +68,20 @@ msgstr "Si ese correo está registrado, hemos enviado un enlace para restablecer
 msgid "If you didn't create this account, you can safely ignore this email."
 msgstr "Si no creaste esta cuenta, puedes ignorar este correo sin problema."
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:59
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:88
 #, elixir-autogen, elixir-format
 msgid "Invalid email or password"
 msgstr "Correo o contraseña incorrectos"
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:96
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:117
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:125
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:146
 #, elixir-autogen, elixir-format
 msgid "Invalid or expired confirmation link."
 msgstr "Enlace de confirmación inválido o caducado."
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:181
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:191
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:201
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:211
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:221
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:231
 #, elixir-autogen, elixir-format
 msgid "Invalid or expired reset link."
 msgstr "Enlace de restablecimiento inválido o caducado."
@@ -92,12 +92,12 @@ msgstr "Enlace de restablecimiento inválido o caducado."
 msgid "Or copy and paste this URL into your browser:"
 msgstr "O copia y pega esta URL en tu navegador:"
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:213
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:243
 #, elixir-autogen, elixir-format
 msgid "Password reset successfully. Please log in."
 msgstr "Contraseña restablecida correctamente. Inicia sesión."
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:68
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:97
 #, elixir-autogen, elixir-format
 msgid "Please confirm your email — we've sent you a new link."
 msgstr "Confirma tu correo — te hemos enviado un nuevo enlace."
@@ -123,7 +123,7 @@ msgstr "Este enlace expira en 1 hora."
 msgid "This link expires in 1 hour. If you didn't request a reset, you can safely ignore this email."
 msgstr "Este enlace expira en 1 hora. Si no solicitaste un restablecimiento, puedes ignorar este correo sin problema."
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:226
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:256
 #, elixir-autogen, elixir-format
 msgid "Token and password are required"
 msgstr "El token y la contraseña son obligatorios"
@@ -133,7 +133,7 @@ msgstr "El token y la contraseña son obligatorios"
 msgid "Unauthorized."
 msgstr "No autorizado."
 
-#: lib/elixir_react_starter_web/controllers/auth_controller.ex:31
+#: lib/elixir_react_starter_web/controllers/auth_controller.ex:60
 #, elixir-autogen, elixir-format
 msgid "We've sent you a confirmation link. Check your inbox."
 msgstr "Te hemos enviado un enlace de confirmación. Revisa tu bandeja de entrada."
@@ -143,37 +143,43 @@ msgstr "Te hemos enviado un enlace de confirmación. Revisa tu bandeja de entrad
 msgid "Welcome — click the button below to confirm your email address."
 msgstr "Bienvenido — haz clic en el botón de abajo para confirmar tu correo."
 
-#: lib/elixir_react_starter_web/plugs/user_auth.ex:85
+#: lib/elixir_react_starter_web/plugs/user_auth.ex:116
 #, elixir-autogen, elixir-format
 msgid "You must log in to access this page."
 msgstr "Debes iniciar sesión para acceder a esta página."
 
-#: lib/elixir_react_starter_web/controllers/settings_controller.ex:73
+#: lib/elixir_react_starter_web/controllers/settings_controller.ex:51
 #, elixir-autogen, elixir-format
 msgid "Current and new password are required"
 msgstr "La contraseña actual y la nueva son obligatorias"
 
-#: lib/elixir_react_starter_web/controllers/settings_controller.ex:92
+#: lib/elixir_react_starter_web/controllers/settings_controller.ex:70
 #, elixir-autogen, elixir-format
 msgid "Incorrect password"
 msgstr "Contraseña incorrecta"
 
-#: lib/elixir_react_starter_web/controllers/settings_controller.ex:99
+#: lib/elixir_react_starter_web/controllers/settings_controller.ex:77
 #, elixir-autogen, elixir-format
 msgid "Password is required"
 msgstr "La contraseña es obligatoria"
 
-#: lib/elixir_react_starter_web/controllers/settings_controller.ex:61
+#: lib/elixir_react_starter_web/controllers/settings_controller.ex:39
 #, elixir-autogen, elixir-format
 msgid "Password updated."
 msgstr "Contraseña actualizada."
 
-#: lib/elixir_react_starter_web/controllers/settings_controller.ex:87
+#: lib/elixir_react_starter_web/controllers/settings_controller.ex:65
 #, elixir-autogen, elixir-format
 msgid "Your account has been deleted."
 msgstr "Tu cuenta ha sido eliminada."
 
-#: lib/elixir_react_starter_web/controllers/settings_controller.ex:32
+#: lib/elixir_react_starter_web/controllers/locale_controller.ex:39
+#: lib/elixir_react_starter_web/controllers/locale_controller.ex:44
 #, elixir-autogen, elixir-format
 msgid "Unsupported locale"
 msgstr "Locale no compatible"
+
+#: lib/elixir_react_starter_web/plugs/rate_limit.ex:65
+#, elixir-autogen, elixir-format
+msgid "Too many attempts. Please try again in a bit."
+msgstr "Demasiados intentos. Inténtalo de nuevo en un momento."
