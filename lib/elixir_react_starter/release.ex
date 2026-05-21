@@ -6,7 +6,7 @@ defmodule ElixirReactStarter.Release do
   @app :elixir_react_starter
 
   def migrate do
-    load_app()
+    _ = load_app()
 
     for repo <- repos() do
       {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
@@ -14,7 +14,7 @@ defmodule ElixirReactStarter.Release do
   end
 
   def rollback(repo, version) do
-    load_app()
+    _ = load_app()
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
   end
 
@@ -24,7 +24,7 @@ defmodule ElixirReactStarter.Release do
 
   defp load_app do
     # Many platforms require SSL when connecting to the database
-    Application.ensure_all_started(:ssl)
+    _ = Application.ensure_all_started(:ssl)
     Application.ensure_loaded(@app)
   end
 end
