@@ -17,16 +17,13 @@
 
 ## Why this exists
 
-Every new Phoenix app starts by rebuilding the same foundation — authentication,
-internationalization, real-time, theming, email, and the testing/CI/deployment
-plumbing around them — usually under time pressure and rarely the same way twice.
-ElixirReactStarter ships that foundation already built, wired together, and tested,
-with secure and accessible defaults, so you can start on your actual product instead
-of boilerplate. It deliberately pairs [Phoenix][phoenix] with **[Inertia.js][inertia]
-+ [React][react] (with SSR)** rather than [LiveView][liveview]: you get React's
-component ecosystem and rich client-side interactions while keeping Phoenix's
-server-side routing, controllers, and auth — without maintaining a separate API and
-single-page-app build.
+I want to build web apps using [Phoenix][phoenix]. [LiveView][liveview] is great, but I'm familiar with and prefer the rich [React][react] ecosystem.
+In the past, I would have reached for a frontend framework (e.g. Next.js), with an Elixir backend API. This has numerous downsides, including
+having to manage and sync deployments, migrations, versions, additional infrastructure etc. all of which compound complexity exponentially. [Inertia.js][inertia] provides a way of acting as the glue between Phoenix and React (or Vue or Svelte), so you don't have to deal with the complexities of separate repos.
+
+This template project serves as a starting point for a lot of my web applications, so that I don't have to duplicate a lot of the setup work. It's fully featured (see [Features](#features) below). Feel free to use it however you want or submit a PR if you find some way of improving it.
+
+It's provided as-is, with no guarantees or warranties of any kind — use it at your own risk.
 
 ## Features
 
