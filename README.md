@@ -20,66 +20,38 @@
 Every new Phoenix app starts by rebuilding the same foundation — authentication,
 internationalization, real-time, theming, email, and the testing/CI/deployment
 plumbing around them — usually under time pressure and rarely the same way twice.
-ElixirReactStarter ships that foundation already built, wired together, and tested, with
-secure and accessible defaults, so you can start on your actual product instead of
-boilerplate. It deliberately pairs Phoenix with **Inertia.js + React (with SSR)**
-rather than LiveView: you get React's component ecosystem and rich client-side
-interactions while keeping Phoenix's server-side routing, controllers, and auth —
-and without maintaining a separate API and single-page-app build.
+ElixirReactStarter ships that foundation already built, wired together, and tested,
+with secure and accessible defaults, so you can start on your actual product instead
+of boilerplate. It deliberately pairs [Phoenix][phoenix] with **[Inertia.js][inertia]
++ [React][react] (with SSR)** rather than [LiveView][liveview]: you get React's
+component ecosystem and rich client-side interactions while keeping Phoenix's
+server-side routing, controllers, and auth — without maintaining a separate API and
+single-page-app build.
 
 ## Features
 
-**Authentication & accounts**
-- Email + password registration with **link-based** email confirmation (no codes).
-- Password reset via single-use email links — 1-hour expiry, SHA3-256-hashed tokens, raw token only ever in the URL.
-- Argon2 password hashing (with a SHA3-256 prehash); 60-day sliding session window.
-- Account settings: change password (signs out other devices) and delete account, both re-verifying the current password.
-- No account enumeration — confirmation/reset endpoints respond identically for unknown emails.
-
-**Real-time**
-- Token-authenticated Phoenix Channels; a React provider auto-joins a global and a per-user channel and survives Inertia navigation.
-- Connection-status indicator and hooks (`useChannel`, `useGlobalChannel`, `useUserChannel`, `useConnectionStatus`, …).
-
-**Internationalization**
-- gettext on the server, react-i18next on the client; English and Spanish out of the box.
-- Locale precedence: signed-in preference → cookie → `Accept-Language` → default. `mix i18n.check` guards translation coverage.
-
-**Theming**
-- Light / dark / system, persisted in a cookie and applied before first paint (no flash). Class-based dark mode with Tailwind CSS v4.
-
-**Accessibility**
-- Radix UI primitives for every interactive component, the full Biome `a11y` rule set enforced in CI, and axe-core auditing in development.
-
-**Email**
-- Swoosh with paired HTML + plain-text bodies; Mailjet in production and an in-browser mailbox in development.
-
-**Jobs & clustering**
-- Oban configured for background jobs (pruner enabled, manual mode in tests); DNSCluster for multi-node deployments.
-
-**Testing**
-- ExUnit with a 94% coverage gate and ex_machina factories.
-- Playwright end-to-end suite (registration, login, password reset, resend confirmation, locale) under `assets/`.
-
-**Tooling & CI**
-- mise pins the entire toolchain (Erlang / Elixir / Node).
-- Biome, Credo, and Dialyzer; one-command `mix precommit` (and `mix precommit.full` with Dialyzer).
-- GitHub Actions CI (mise-action, Postgres service, coverage gate, SHA-pinned actions).
-
-**Deployment**
-- Multi-stage `Dockerfile` producing a slim release (Debian trixie, bundled Node for SSR, non-root, tini) plus release migration tasks.
-
-**Documentation**
-- ex_doc with developer guides (`docs/`) and the full module reference, served at `/dev/docs` in development.
+- **Authentication** — email + password with link-based confirmation and password reset, [Argon2][argon2] hashing, sliding sessions, account management, and no email enumeration.
+- **Real-time** — token-authenticated [Phoenix Channels][channels] with React hooks that survive [Inertia][inertia] navigation.
+- **Internationalization** — [gettext][gettext] on the server and [react-i18next][react-i18next] on the client; English + Spanish with locale detection.
+- **Theming** — light / dark / system with no flash of the wrong theme.
+- **Accessibility** — [Radix UI][radix] primitives, [Biome][biome] a11y linting in CI, and [axe-core][axe] auditing in dev.
+- **Email** — [Swoosh][swoosh] (HTML + text) via [Mailjet][mailjet] in production, with an in-browser mailbox in dev.
+- **Security** — rate-limited auth endpoints, Secure cookies, CSRF protection, and HTTPS/HSTS in production.
+- **Background jobs** — [Oban][oban], configured and ready.
+- **Testing** — [ExUnit][exunit] with a coverage gate, [ex_machina][exmachina] factories, and a [Playwright][playwright] E2E suite.
+- **Tooling & CI** — [mise][mise]-pinned toolchain, [Biome][biome] / [Credo][credo] / [Dialyzer][dialyxir], and [GitHub Actions][gha].
+- **Deployment** — multi-stage [Docker][docker] release with server-side rendering.
+- **Documentation** — [ex_doc][exdoc] guides and module reference.
 
 ## Tech stack
 
-- **Backend** — Elixir 1.19 · Phoenix 1.8 (Bandit) · Ecto + PostgreSQL · Oban · Swoosh · gettext
-- **Frontend** — Inertia.js 2 · React 19 + SSR · Tailwind CSS v4 · Radix UI · esbuild · TypeScript · Biome
-- **Tooling** — mise · Credo · Dialyzer · ex_doc · ExUnit + ex_machina · Playwright · GitHub Actions · Docker
+- **Backend** — [Elixir][elixir] · [Phoenix][phoenix] ([Bandit][bandit]) · [Ecto][ecto] + [PostgreSQL][postgresql] · [Oban][oban] · [Swoosh][swoosh] · [gettext][gettext]
+- **Frontend** — [Inertia.js][inertia] · [React][react] (SSR) · [Tailwind CSS][tailwind] · [Radix UI][radix] · [esbuild][esbuild] · [TypeScript][typescript] · [Biome][biome]
+- **Tooling** — [mise][mise] · [Credo][credo] · [Dialyzer][dialyxir] · [ex_doc][exdoc] · [ExUnit][exunit] + [ex_machina][exmachina] · [Playwright][playwright] · [GitHub Actions][gha] · [Docker][docker]
 
 ## Getting started
 
-**Prerequisites:** [mise](https://mise.jdx.dev) (pins the toolchain) and a running PostgreSQL.
+**Prerequisites:** [mise][mise] (pins the toolchain) and a running [PostgreSQL][postgresql].
 
 > **Starting a new project from this template?** Rename it to your own name first:
 >
@@ -114,11 +86,11 @@ mix precommit                  # format, credo, biome, i18n, tests — run befor
 npm --prefix assets run e2e    # Playwright E2E (needs a running server; see the guide)
 ```
 
-See the [End-to-End Testing guide](docs/e2e-testing.md) for the Playwright setup.
+See the [End-to-End Testing guide](docs/e2e-testing.md) for the [Playwright][playwright] setup.
 
 ## Documentation
 
-Searchable developer guides and the full module reference are generated with ex_doc:
+Searchable developer guides and the full module reference are generated with [ex_doc][exdoc]:
 
 ```bash
 mix docs
@@ -155,3 +127,34 @@ Project architecture, invariants, and coding conventions are documented in
 ## License
 
 Released under the **WTFPL** (see the `LICENSE` file) — do what the fuck you want.
+
+[phoenix]: https://www.phoenixframework.org/
+[inertia]: https://inertiajs.com/
+[react]: https://react.dev/
+[liveview]: https://hexdocs.pm/phoenix_live_view/
+[argon2]: https://github.com/riverrun/argon2_elixir
+[channels]: https://hexdocs.pm/phoenix/channels.html
+[gettext]: https://hexdocs.pm/gettext/
+[react-i18next]: https://react.i18next.com/
+[tailwind]: https://tailwindcss.com/
+[radix]: https://www.radix-ui.com/primitives
+[biome]: https://biomejs.dev/
+[axe]: https://github.com/dequelabs/axe-core
+[swoosh]: https://hexdocs.pm/swoosh/
+[mailjet]: https://www.mailjet.com/
+[oban]: https://hexdocs.pm/oban/
+[exunit]: https://hexdocs.pm/ex_unit/
+[exmachina]: https://hexdocs.pm/ex_machina/
+[playwright]: https://playwright.dev/
+[mise]: https://mise.jdx.dev
+[credo]: https://hexdocs.pm/credo/
+[dialyxir]: https://github.com/jeremyjh/dialyxir
+[exdoc]: https://hexdocs.pm/ex_doc/
+[gha]: https://docs.github.com/en/actions
+[docker]: https://www.docker.com/
+[elixir]: https://elixir-lang.org/
+[ecto]: https://hexdocs.pm/ecto/
+[postgresql]: https://www.postgresql.org/
+[bandit]: https://hexdocs.pm/bandit/
+[typescript]: https://www.typescriptlang.org/
+[esbuild]: https://esbuild.github.io/
