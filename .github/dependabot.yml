@@ -1,0 +1,25 @@
+version: 2
+updates:
+  # Elixir / Hex dependencies (mix.exs + mix.lock at repo root)
+  - package-ecosystem: mix
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      mix-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  # JavaScript / npm dependencies (assets/package.json)
+  - package-ecosystem: npm
+    directory: "/assets"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      npm-minor-and-patch:
+        update-types:
+          - minor
+          - patch
