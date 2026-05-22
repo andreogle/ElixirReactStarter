@@ -114,3 +114,129 @@ jobs:
 
       - name: Dialyzer
         run: mix dialyzer
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+
+    # The Playwright suite drives a real server, so it runs in :dev (the env
+    # that exposes /dev/e2e/users, the Swoosh mailbox JSON, and port 4000) —
+    # not :test. Override the workflow-level MIX_ENV=test for this job only.
+    env:
+      MIX_ENV: dev
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          # E2E runs against the dev database (see MIX_ENV above).
+          POSTGRES_DB: elixir_react_starter_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Erlang / Elixir / Node (mise)
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          cache: true
+
+      - name: Install hex + rebar
+        run: |
+          mix local.hex --force
+          mix local.rebar --force
+
+      - name: Cache npm
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('assets/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      # Keyed on MIX_ENV so the dev build artefacts don't clobber the build
+      # job's test PLT/_build cache (different env, different compiled output).
+      - name: Cache deps and _build
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-dev-${{ hashFiles('mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-dev-
+
+      - name: Install Elixir deps
+        run: mix deps.get
+
+      - name: Install JS deps
+        run: npm ci
+        working-directory: assets
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('assets/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-playwright-
+
+      - name: Install Playwright browser (chromium + system deps)
+        run: npx playwright install --with-deps chromium
+        working-directory: assets
+
+      - name: Set up database
+        run: |
+          mix ecto.create
+          mix ecto.migrate
+
+      # Build the browser bundle and priv/ssr.js once, up front. The server
+      # then runs with watchers off (see DISABLE_WATCHERS below), so a request
+      # can never land mid-rebuild and trip Inertia's raise_on_ssr_failure.
+      - name: Build assets
+        run: |
+          mix assets.setup
+          mix assets.build
+
+      - name: Start Phoenix server
+        env:
+          DISABLE_WATCHERS: "true"
+        run: |
+          mix phx.server > /tmp/phx-server.log 2>&1 &
+          echo "Waiting for http://localhost:4000 to come up..."
+          for _ in $(seq 1 60); do
+            if curl -sSf http://localhost:4000/login > /dev/null 2>&1; then
+              echo "Server is up."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::Phoenix server did not become ready within 120s"
+          cat /tmp/phx-server.log
+          exit 1
+
+      - name: Run Playwright tests
+        working-directory: assets
+        run: npm run e2e
+
+      - name: Dump server log on failure
+        if: failure()
+        run: cat /tmp/phx-server.log || true
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-report
+          path: |
+            assets/playwright-report/
+            assets/test-results/
+          retention-days: 7

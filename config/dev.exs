@@ -16,6 +16,28 @@ config :elixir_react_starter, ElixirReactStarter.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
+#
+# The CI E2E job builds assets ahead of time and starts this server with
+# DISABLE_WATCHERS=true, so esbuild/tailwind aren't spawned in --watch mode
+# (they'd race the prebuilt bundle and the suite could hit the server before
+# they settle). Leave the env var unset locally for live rebuilds.
+watchers =
+  if System.get_env("DISABLE_WATCHERS") in ~w(1 true) do
+    []
+  else
+    [
+      esbuild:
+        {Esbuild, :install_and_run,
+         [
+           :elixir_react_starter,
+           ~w(--sourcemap=inline --watch --define:process.env.NODE_ENV="development")
+         ]},
+      node: ["build/watch-ssr-pages.js", cd: Path.expand("../assets", __DIR__)],
+      esbuild_ssr: {Esbuild, :install_and_run, [:elixir_react_starter_ssr, ~w(--watch)]},
+      tailwind: {Tailwind, :install_and_run, [:elixir_react_starter, ~w(--watch)]}
+    ]
+  end
+
 config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
@@ -27,17 +49,7 @@ config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
   code_reloader: true,
   debug_errors: true,
   secret_key_base: "cxv85lAQCKdwQQYuRC7eeX4DytlQDl7mBLv283CTNcnpqtcTd2lfYbJmD9oa9DgV",
-  watchers: [
-    esbuild:
-      {Esbuild, :install_and_run,
-       [
-         :elixir_react_starter,
-         ~w(--sourcemap=inline --watch --define:process.env.NODE_ENV="development")
-       ]},
-    node: ["build/watch-ssr-pages.js", cd: Path.expand("../assets", __DIR__)],
-    esbuild_ssr: {Esbuild, :install_and_run, [:elixir_react_starter_ssr, ~w(--watch)]},
-    tailwind: {Tailwind, :install_and_run, [:elixir_react_starter, ~w(--watch)]}
-  ]
+  watchers: watchers
 
 # ## SSL Support
 #

@@ -23,3 +23,17 @@ updates:
         update-types:
           - minor
           - patch
+
+  # GitHub Actions (.github/workflows). Actions are pinned to commit SHAs;
+  # this is what keeps those pins current — bumping the SHA and the
+  # human-readable tag comment together.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      github-actions:
+        update-types:
+          - minor
+          - patch
