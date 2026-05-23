@@ -80,3 +80,5 @@ if (( ${#errors[@]} > 0 )); then
   echo "Update mise.toml or Dockerfile so the Erlang/Elixir/Node versions agree." >&2
   exit 1
 fi
+
+echo "Tool versions in sync (mise.toml ↔ Dockerfile)."
