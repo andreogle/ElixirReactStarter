@@ -20,6 +20,13 @@ ARG NODE_VERSION=26.2.0
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
+# Alias the pinned Node image as a build stage. BuildKit forbids variable
+# expansion in `COPY --from=<image>`, but `FROM <image> AS <name>` supports
+# it — so this is the canonical way to actually pin NODE_VERSION. Without
+# the stage alias, `COPY --from=node:26-trixie-slim` would silently roll
+# forward to whatever the major tag points at.
+FROM node:${NODE_VERSION}-trixie-slim AS node_src
+
 # =============================================================================
 # Build stage
 # =============================================================================
@@ -85,9 +92,12 @@ RUN apt-get update -y \
 # locale — string handling uses Elixir's own Unicode tables, not libc.
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-# Node binary for Inertia SSR (`priv/ssr.js`). Same Debian base as the
-# builder, so the binary's shared-lib deps resolve.
-COPY --from=node:26-trixie-slim /usr/local/bin/node /usr/local/bin/node
+# Node binary for Inertia SSR (`priv/ssr.js`). Sourced from the `node_src`
+# stage above, which is `node:${NODE_VERSION}-trixie-slim` — this is a real
+# pin; without the stage alias the COPY would silently roll forward as new
+# 26.x patches ship under the major tag. Same Debian base as the builder,
+# so the binary's shared-lib deps resolve.
+COPY --from=node_src /usr/local/bin/node /usr/local/bin/node
 
 WORKDIR /app
 
