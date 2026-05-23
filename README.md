@@ -102,19 +102,41 @@ In development they're also served at
 `SECRET_KEY_BASE` must be generated **once** and kept stable across restarts — a
 changing value invalidates every session and signed cookie. Generate it a single
 time with `mix phx.gen.secret` and store it in your secrets manager or host config,
-then build and run the release image (reading the stored value from the environment):
+then build and run the release image (reading the stored values from the environment):
 
 ```bash
 docker build -t elixir_react_starter .
 docker run -p 4000:4000 \
-  -e SECRET_KEY_BASE="$SECRET_KEY_BASE" \
   -e DATABASE_URL="ecto://USER:PASS@HOST/DB" \
+  -e MAILJET_API_KEY="$MAILJET_API_KEY" \
+  -e MAILJET_SECRET="$MAILJET_SECRET" \
   -e PHX_HOST="example.com" \
+  -e SECRET_KEY_BASE="$SECRET_KEY_BASE" \
   elixir_react_starter
 ```
 
+`config/runtime.exs` requires `DATABASE_URL`, `MAILJET_API_KEY`, `MAILJET_SECRET`,
+and `SECRET_KEY_BASE` and will refuse to boot without them. `PHX_HOST` defaults to
+`example.com` but should always be set in production (it's used for absolute URLs
+in emails). `PORT` (default `4000`), `POOL_SIZE`, `ECTO_IPV6`, and
+`DNS_CLUSTER_QUERY` are optional.
+
 Database migrations run via the release: `bin/migrate`. See Phoenix's
 [deployment guides](https://hexdocs.pm/phoenix/deployment.html) for hosting specifics.
+
+### Liveness probe
+
+`GET /health` returns `{"status":"ok"}` — cheap, no database calls, no external
+lookups. The image's `HEALTHCHECK` polls it via the embedded Node binary, and
+it's a sensible target for Kubernetes liveness/readiness probes too.
+
+### Bumping Erlang / Elixir / Node
+
+Runtime versions are pinned in **two** places that must agree: `mise.toml` (dev
+and CI toolchain, via [`mise`](https://mise.jdx.dev)) and the `ARG` declarations
+at the top of the `Dockerfile` (release build). `mix precommit` runs
+`scripts/check-tool-versions.sh` as its first step and will fail if those drift —
+so when bumping a runtime version, update both files in the same commit.
 
 ## Conventions
 
