@@ -210,6 +210,25 @@
           }
         }
       }
+    },
+    {
+      "includes": ["e2e/tests/**/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@playwright/test": {
+                    "message": "Import `test` and `expect` from '../fixtures' so every spec gets the hydration-aware page fixture. See assets/e2e/fixtures.ts."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   ]
 }

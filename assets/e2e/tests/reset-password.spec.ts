@@ -1,10 +1,7 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../fixtures';
 import { fetchEmailLink, loginAs, provisionUser } from '../helpers';
 
-test('a user resets their password via the email link and logs in with the new one', async ({
-  page,
-  request,
-}) => {
+test('a user resets their password via the email link and logs in with the new one', async ({ page, request }) => {
   const user = await provisionUser(request, { label: 'reset' });
   const newPassword = 'brand-new-password-456';
 

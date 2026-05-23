@@ -8,8 +8,8 @@
     "e2e:install": "playwright install chromium",
     "e2e:ui": "playwright test --ui",
     "fmt": "npm run lint:fix && biome format --write",
-    "lint": "biome check build/ css/ js/",
-    "lint:fix": "biome check --write build/ css/ js/"
+    "lint": "biome check build/ css/ e2e/ js/",
+    "lint:fix": "biome check --write build/ css/ e2e/ js/"
   },
   "dependencies": {
     "@api3/promise-utils": "^0.4.0",

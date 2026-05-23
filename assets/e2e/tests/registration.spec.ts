@@ -1,9 +1,7 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../fixtures';
 import { fetchEmailLink, uniqueEmail } from '../helpers';
 
-test('a visitor registers, confirms via the email link, and lands on the dashboard', async ({
-  page,
-}) => {
+test('a visitor registers, confirms via the email link, and lands on the dashboard', async ({ page }) => {
   const email = uniqueEmail('registration');
   const password = 'playwright-password-123';
 

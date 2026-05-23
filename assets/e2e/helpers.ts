@@ -47,10 +47,7 @@ export async function provisionUser(
   if (options.confirmed === false) data.confirmed = false;
 
   const response = await request.post('/dev/e2e/users', { data });
-  expect(
-    response.ok(),
-    `POST /dev/e2e/users failed: ${response.status()} ${await response.text()}`
-  ).toBeTruthy();
+  expect(response.ok(), `POST /dev/e2e/users failed: ${response.status()} ${await response.text()}`).toBeTruthy();
 
   const body = (await response.json()) as { id: string };
   return { id: body.id, email, password };
@@ -62,7 +59,8 @@ export async function provisionUser(
 
 /**
  * Log in via the /login form. Asserts the redirect to /dashboard so callers
- * don't repeat it in every spec.
+ * don't repeat it in every spec. Hydration is handled by the wrapped
+ * `page.goto` in fixtures.ts, so this can drive the form immediately.
  */
 export async function loginAs(page: Page, user: { email: string; password: string }): Promise<void> {
   await page.goto('/login');

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { TooltipProvider } from './components/Tooltip';
 import { RealtimeProvider } from './realtime/provider';
 
@@ -20,6 +20,17 @@ import { RealtimeProvider } from './realtime/provider';
 // =============================================================================
 
 export function AppProviders({ children }: { children: ReactNode }) {
+  // Hydration signal for the Playwright E2E suite. AppProviders mounts once
+  // and stays mounted across Inertia navigations, so this effect fires
+  // exactly when client-side hydration completes. Specs poll for
+  // `html[data-hydrated="true"]` before interacting with forms — pre-hydration,
+  // controlled inputs haven't reconciled with SSR markup and onSubmit
+  // handlers aren't attached, so any fill+click against them is a race.
+  // useEffect doesn't run during SSR, so this is purely a client-side flag.
+  useEffect(() => {
+    document.documentElement.dataset.hydrated = 'true';
+  }, []);
+
   return (
     <RealtimeProvider>
       <TooltipProvider delayDuration={200}>{children}</TooltipProvider>

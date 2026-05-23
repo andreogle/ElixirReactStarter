@@ -1,10 +1,7 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../fixtures';
 import { fetchEmailLink, provisionUser } from '../helpers';
 
-test('an unconfirmed user resends the confirmation email from /login and confirms', async ({
-  page,
-  request,
-}) => {
+test('an unconfirmed user resends the confirmation email from /login and confirms', async ({ page, request }) => {
   const user = await provisionUser(request, { label: 'resend', confirmed: false });
 
   // The resend page is reached from the login page link.
