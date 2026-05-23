@@ -9,6 +9,6 @@ defmodule ElixirReactStarterWeb.HealthController do
   use ElixirReactStarterWeb, :controller
 
   def show(conn, _params) do
-    render(conn, :show)
+    json(conn, %{status: "ok"})
   end
 end
