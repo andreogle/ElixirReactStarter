@@ -73,8 +73,11 @@ FROM ${RUNNER_IMAGE} AS runner
 
 # Runtime libs + tini (PID 1 / signal handling). No build toolchain.
 # `--no-install-recommends` keeps suggested extras (gpm, l10n data) out.
+# `libatomic1` is required by the copied Node binary (used for Inertia SSR
+# and the HEALTHCHECK below) — without it `node` fails on first invocation
+# with "libatomic.so.1: cannot open shared object file".
 RUN apt-get update -y \
-  && apt-get install -y --no-install-recommends libstdc++6 openssl libncurses6 ca-certificates tini \
+  && apt-get install -y --no-install-recommends libstdc++6 openssl libncurses6 ca-certificates libatomic1 tini \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # UTF-8 locale. `C.UTF-8` ships with glibc, so we skip the `locales`
