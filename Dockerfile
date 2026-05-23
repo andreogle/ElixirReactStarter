@@ -13,10 +13,8 @@
 # in the final image.
 
 ARG ELIXIR_VERSION=1.19.5
-# Dev/CI run Erlang 28.5 (via mise); hexpm has no 28.5 image yet, so the
-# release builds on 28.4 — a single OTP patch behind, ABI-compatible.
-ARG OTP_VERSION=28.4
-ARG DEBIAN_VERSION=trixie-20260518-slim
+ARG OTP_VERSION=28.5
+ARG DEBIAN_VERSION=trixie-20260421-slim
 ARG NODE_VERSION=26.2.0
 
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"

@@ -192,6 +192,7 @@ defmodule ElixirReactStarter.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "git.hooks": ["cmd git config core.hooksPath scripts/hooks"],
       precommit: [
+        "cmd ./scripts/check-tool-versions.sh",
         "compile --warnings-as-errors",
         "lint",
         "i18n.check",
