@@ -47,8 +47,10 @@ defmodule ElixirReactStarterWeb.SettingsController do
   end
 
   def update_password(conn, _params) do
+    message = dgettext("app", "Current and new password are required")
+
     conn
-    |> assign_errors(%{password: dgettext("app", "Current and new password are required")})
+    |> assign_errors(%{current_password: message, password: message})
     |> redirect(to: ~p"/settings")
   end
 

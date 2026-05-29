@@ -23,9 +23,7 @@ defmodule ElixirReactStarterWeb.AuthController do
 
   alias ElixirReactStarter.Accounts
   alias ElixirReactStarter.Accounts.User
-  alias ElixirReactStarter.Accounts.UserToken
   alias ElixirReactStarter.Log
-  alias ElixirReactStarter.Repo
   alias ElixirReactStarterWeb.Email
   alias ElixirReactStarterWeb.UserAuth
 
@@ -236,11 +234,6 @@ defmodule ElixirReactStarterWeb.AuthController do
       user ->
         case Accounts.reset_user_password(user, %{password: password}) do
           {:ok, _user} ->
-            # Consume the reset token so the same link can't be reused.
-            Repo.delete_all(
-              UserToken.delete_user_tokens_by_context_query(user.id, "password_reset")
-            )
-
             conn
             |> put_flash(:info, dgettext("app", "Password reset successfully. Please log in."))
             |> redirect(to: ~p"/login")
