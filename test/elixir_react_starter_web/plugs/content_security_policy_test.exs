@@ -24,9 +24,8 @@ defmodule ElixirReactStarterWeb.Plugs.ContentSecurityPolicyTest do
     refute call().assigns.csp_nonce == call().assigns.csp_nonce
   end
 
-  test "always forbids framing, plugins, and base-tag hijacking" do
+  test "always forbids plugins and base-tag hijacking" do
     header = csp(call())
-    assert header =~ "frame-ancestors 'none'"
     assert header =~ "object-src 'none'"
     assert header =~ "base-uri 'self'"
   end
@@ -42,6 +41,10 @@ defmodule ElixirReactStarterWeb.Plugs.ContentSecurityPolicyTest do
       assert header =~ "'strict-dynamic'"
       refute header =~ "'unsafe-eval'"
     end
+
+    test "forbids framing entirely" do
+      assert csp(call()) =~ "frame-ancestors 'none'"
+    end
   end
 
   describe "relaxed profile (default)" do
@@ -49,6 +52,12 @@ defmodule ElixirReactStarterWeb.Plugs.ContentSecurityPolicyTest do
       header = csp(call())
       assert header =~ "'unsafe-eval'"
       assert header =~ "ws:"
+    end
+
+    # Same-origin framing stays open so app pages render inside the Swoosh
+    # dev mailbox's email-preview iframe (link clicks navigate it).
+    test "allows same-origin framing for dev tooling" do
+      assert csp(call()) =~ "frame-ancestors 'self'"
     end
   end
 

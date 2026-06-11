@@ -70,6 +70,25 @@ export async function loginAs(page: Page, user: { email: string; password: strin
   await expect(page).toHaveURL('/dashboard');
 }
 
+/**
+ * Open the authenticated header user menu and visit Settings, the way a
+ * user would. Assumes a signed-in page (the menu only exists in AppLayout).
+ */
+export async function gotoSettingsViaMenu(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'User menu' }).click();
+  await page.getByRole('menuitem', { name: 'Settings' }).click();
+  await expect(page).toHaveURL('/settings');
+}
+
+/**
+ * Sign out through the header user menu and assert the landing on `/`.
+ */
+export async function logoutViaMenu(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'User menu' }).click();
+  await page.getByRole('menuitem', { name: 'Log out' }).click();
+  await expect(page).toHaveURL('/');
+}
+
 // =============================================================================
 // Mailbox — auth here is link-based, so flows fetch a single-click URL from
 // the dev mailbox rather than a code.
@@ -89,7 +108,7 @@ interface MailboxEmail {
 export async function fetchEmailLink(
   request: APIRequestContext,
   email: string,
-  route: '/confirm-email' | '/reset-password',
+  route: '/confirm-email' | '/reset-password' | '/settings/email/apply-change',
   { timeoutMs = 5_000, intervalMs = 250 }: { timeoutMs?: number; intervalMs?: number } = {}
 ): Promise<string> {
   const pattern = new RegExp(`${route}\\?token=[A-Za-z0-9_-]+`);

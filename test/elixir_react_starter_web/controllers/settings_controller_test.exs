@@ -64,13 +64,13 @@ defmodule ElixirReactStarterWeb.SettingsControllerTest do
     end
   end
 
-  describe "GET /settings/email/confirm" do
+  describe "GET /settings/email/apply-change" do
     @tag :authenticated
     test "applies the pending change for a valid token", %{conn: conn, user: user} do
       {:ok, raw_token} =
         Accounts.request_email_change(user, "valid_password123", "new@example.com")
 
-      conn = get(conn, ~p"/settings/email/confirm?token=#{raw_token}")
+      conn = get(conn, ~p"/settings/email/apply-change?token=#{raw_token}")
 
       assert redirected_to(conn) == ~p"/settings"
       assert Accounts.get_user_by_email("new@example.com")
@@ -79,7 +79,7 @@ defmodule ElixirReactStarterWeb.SettingsControllerTest do
 
     @tag :authenticated
     test "rejects an invalid token without changing the email", %{conn: conn, user: user} do
-      conn = get(conn, ~p"/settings/email/confirm?token=bogus")
+      conn = get(conn, ~p"/settings/email/apply-change?token=bogus")
 
       assert redirected_to(conn) == ~p"/settings"
       assert Accounts.get_user_by_email(user.email)
@@ -87,7 +87,7 @@ defmodule ElixirReactStarterWeb.SettingsControllerTest do
 
     @tag :authenticated
     test "rejects a missing token", %{conn: conn, user: user} do
-      conn = get(conn, ~p"/settings/email/confirm")
+      conn = get(conn, ~p"/settings/email/apply-change")
 
       assert redirected_to(conn) == ~p"/settings"
       assert Accounts.get_user_by_email(user.email)

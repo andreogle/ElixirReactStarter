@@ -141,6 +141,15 @@ defmodule ElixirReactStarterWeb.AuthControllerTest do
       conn = get(conn, ~p"/confirm-email")
       assert redirected_to(conn) == ~p"/resend-confirmation"
     end
+
+    @tag :authenticated
+    test "sends an already-confirmed signed-in user to the dashboard on a consumed token",
+         %{conn: conn} do
+      # Clicking the single-use link a second time (token gone) shouldn't
+      # dump an already-confirmed user on the resend page.
+      conn = get(conn, ~p"/confirm-email?token=garbage")
+      assert redirected_to(conn) == ~p"/dashboard"
+    end
   end
 
   # =============================================================================

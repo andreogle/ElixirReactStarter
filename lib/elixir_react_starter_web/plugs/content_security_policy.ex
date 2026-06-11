@@ -137,7 +137,11 @@ defmodule ElixirReactStarterWeb.Plugs.ContentSecurityPolicy do
       {:font_src, ["'self'", "data:"]},
       # ws:/wss: + localhost for LiveReload and the LiveDashboard socket.
       {:connect_src, ["'self'", "ws:", "wss:", "http://localhost:*", "http://127.0.0.1:*"]},
-      {:frame_ancestors, ["'none'"]},
+      # 'self' (not 'none') so app pages can render inside the Swoosh dev
+      # mailbox's email-preview iframe — clicking a confirmation/reset link
+      # there navigates the iframe to an app page, which 'none' would block.
+      # Prod (:strict) keeps 'none' to forbid framing entirely.
+      {:frame_ancestors, ["'self'"]},
       {:object_src, ["'none'"]},
       {:base_uri, ["'self'"]},
       {:form_action, ["'self'"]}

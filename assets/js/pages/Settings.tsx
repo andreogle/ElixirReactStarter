@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -217,11 +216,21 @@ function DeleteAccountSection() {
                   {t('settings.deleteAccount.cancel')}
                 </Button>
               </AlertDialogCancel>
-              <AlertDialogAction asChild>
-                <Button type="submit" variant="danger" disabled={processing}>
-                  {t('settings.deleteAccount.confirm')}
-                </Button>
-              </AlertDialogAction>
+              {/*
+                A plain submit button — NOT AlertDialogAction. Radix's
+                Action closes the dialog the instant it's clicked, and
+                React 18 flushes that unmount synchronously during the
+                click, tearing down this <form> before the browser fires
+                its submit. The result is a confirm button that closes the
+                dialog without ever deleting. Letting the form own
+                submission fixes that: a successful destroy() redirects to
+                "/" (dialog goes with the page); a failed one redirects
+                back to /settings and the dialog stays open to show the
+                error.
+              */}
+              <Button type="submit" variant="danger" disabled={processing}>
+                {t('settings.deleteAccount.confirm')}
+              </Button>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>

@@ -117,13 +117,16 @@ defmodule ElixirReactStarterWeb.AuthController do
 
   # =============================================================================
   # Email confirmation — single GET handler, link from email
+  #
+  # This activates a brand-new account (sets confirmed_at) and logs the
+  # user in. It's public: the visitor isn't signed in yet. Changing the
+  # email on an *existing* signed-in account is a separate flow —
+  # SettingsController.confirm_email via /settings/email/apply-change.
   # =============================================================================
   def confirm_email(conn, %{"token" => raw_token}) do
     case Accounts.verify_user_link_token(raw_token, "email_confirmation") do
       nil ->
-        conn
-        |> put_flash(:error, dgettext("app", "Invalid or expired confirmation link."))
-        |> redirect(to: ~p"/resend-confirmation")
+        confirm_email_failed(conn)
 
       user ->
         case Accounts.confirm_user(user) do
@@ -141,7 +144,19 @@ defmodule ElixirReactStarterWeb.AuthController do
     end
   end
 
-  def confirm_email(conn, _params) do
+  def confirm_email(conn, _params), do: confirm_email_failed(conn)
+
+  # Confirmation links are single-use, so a consumed/expired/missing
+  # token isn't always an error. If the visitor is already signed in and
+  # confirmed, they most likely clicked the link a second time — send
+  # them to the dashboard instead of the confusing "invalid link" +
+  # resend page. Genuinely-stale links (no confirmed session) still land
+  # on resend.
+  defp confirm_email_failed(%{assigns: %{current_user: %User{confirmed_at: %DateTime{}}}} = conn) do
+    redirect(conn, to: ~p"/dashboard")
+  end
+
+  defp confirm_email_failed(conn) do
     conn
     |> put_flash(:error, dgettext("app", "Invalid or expired confirmation link."))
     |> redirect(to: ~p"/resend-confirmation")

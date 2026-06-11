@@ -10,10 +10,17 @@ defmodule ElixirReactStarterWeb.Router do
     plug :put_root_layout, html: {ElixirReactStarterWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug ElixirReactStarterWeb.Plugs.ContentSecurityPolicy
     plug Inertia.Plug
     plug :fetch_current_user
     plug ElixirReactStarterWeb.Plugs.SharedData
+  end
+
+  # CSP lives in its own pipeline so dev tooling (the Swoosh mailbox
+  # preview, which renders email bodies in a nested same-origin iframe)
+  # can run through :browser alone. The mailbox iframe is blocked by
+  # `frame-ancestors 'none'`, so those local-only routes skip :csp.
+  pipeline :csp do
+    plug ElixirReactStarterWeb.Plugs.ContentSecurityPolicy
   end
 
   pipeline :api do
@@ -22,7 +29,7 @@ defmodule ElixirReactStarterWeb.Router do
 
   # Public pages — anyone can hit these.
   scope "/", ElixirReactStarterWeb do
-    pipe_through :browser
+    pipe_through [:browser, :csp]
 
     get "/", PageController, :home
     # Confirmation links: user clicks /confirm-email?token=... from the
@@ -37,7 +44,7 @@ defmodule ElixirReactStarterWeb.Router do
 
   # Guest-only — already-logged-in users get bounced to /dashboard.
   scope "/", ElixirReactStarterWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
+    pipe_through [:browser, :csp, :redirect_if_user_is_authenticated]
 
     get "/login", AuthController, :login_page
     post "/login", AuthController, :login
@@ -51,16 +58,19 @@ defmodule ElixirReactStarterWeb.Router do
 
   # Authenticated — bounced to /login if not.
   scope "/", ElixirReactStarterWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through [:browser, :csp, :require_authenticated_user]
 
     get "/dashboard", DashboardController, :show
     delete "/logout", AuthController, :logout
 
     get "/settings", SettingsController, :show
     put "/settings/email", SettingsController, :update_email
-    # Confirmation link from the new-address email. No matching POST —
-    # opening the link (while signed in) is the action.
-    get "/settings/email/confirm", SettingsController, :confirm_email
+    # Applies a pending email change. Opening the link from the
+    # new-address email (while signed in) is the action — no matching
+    # POST. Distinct from the public /confirm-email route, which activates
+    # a brand-new account and logs the user in; this one swaps the email
+    # on an already-active, signed-in account.
+    get "/settings/email/apply-change", SettingsController, :confirm_email
     put "/settings/password", SettingsController, :update_password
     delete "/settings/account", SettingsController, :delete_account
   end

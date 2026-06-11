@@ -69,6 +69,12 @@ defmodule ElixirReactStarterWeb.SettingsController do
 
   # Opened from the link in the new inbox while signed in. The token is
   # scoped to the current user, so a stale or foreign token just fails.
+  #
+  # This is *not* the same as AuthController.confirm_email (the public
+  # /confirm-email route): that one activates a brand-new account and
+  # starts a session. This applies a pending change to an already-active,
+  # signed-in account — hence the distinct /settings/email/apply-change
+  # route and the user-scoped "email_change" token.
   def confirm_email(conn, %{"token" => raw_token}) do
     case Accounts.apply_email_change(conn.assigns.current_user, raw_token) do
       {:ok, _user} ->

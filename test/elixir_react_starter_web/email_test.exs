@@ -50,8 +50,8 @@ defmodule ElixirReactStarterWeb.EmailTest do
 
       assert {_, "new@example.com"} = hd(email.to)
       assert email.subject =~ "Confirm"
-      assert email.html_body =~ "/settings/email/confirm?token=#{@token}"
-      assert email.text_body =~ "/settings/email/confirm?token=#{@token}"
+      assert email.html_body =~ "/settings/email/apply-change?token=#{@token}"
+      assert email.text_body =~ "/settings/email/apply-change?token=#{@token}"
       refute email.subject =~ @token
     end
   end

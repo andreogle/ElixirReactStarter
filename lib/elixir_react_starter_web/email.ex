@@ -113,7 +113,7 @@ defmodule ElixirReactStarterWeb.Email do
   applies the change once opened (while signed in).
   """
   def email_change_confirmation(new_email, raw_token) do
-    url = Endpoint.url() <> ~p"/settings/email/confirm?token=#{raw_token}"
+    url = Endpoint.url() <> ~p"/settings/email/apply-change?token=#{raw_token}"
 
     assigns = %{
       url: url,
