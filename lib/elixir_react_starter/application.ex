@@ -17,8 +17,10 @@ defmodule ElixirReactStarter.Application do
       # ETS table from growing unbounded.
       {ElixirReactStarter.RateLimit, [clean_period: :timer.minutes(10)]},
       {Inertia.SSR, path: Application.app_dir(:elixir_react_starter, "priv")},
-      # Start a worker by calling: ElixirReactStarter.Worker.start_link(arg)
-      # {ElixirReactStarter.Worker, arg},
+      # Background jobs. Config (queues, plugins) lives under the `Oban`
+      # key in config/config.exs; tests run it in `:manual` mode. Starts
+      # after the Repo so its tables are reachable.
+      {Oban, Application.fetch_env!(:elixir_react_starter, Oban)},
       # Start to serve requests, typically the last entry
       ElixirReactStarterWeb.Endpoint
     ]

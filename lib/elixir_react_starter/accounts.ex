@@ -10,8 +10,9 @@ defmodule ElixirReactStarter.Accounts do
 
   Generated CRUD helpers come from `use ElixirReactStarter.Context`. The custom
   functions here cover registration, the session lifecycle, email
-  confirmation, password reset, authenticated password change, and
-  account deletion (the last two re-verify the current password).
+  confirmation, password reset, the link-confirmed email change, the
+  authenticated password change, and account deletion (the last three
+  re-verify the current password).
 
   The `User` schema is deliberately minimal — email, hashed password,
   locale, confirmed_at. Add profile fields (name, avatar, …) per project.
@@ -158,6 +159,98 @@ defmodule ElixirReactStarter.Accounts do
     |> User.confirm_changeset()
     |> Repo.update()
     |> log_result("Email confirmed for user #{user.id}")
+  end
+
+  # =============================================================================
+  # Email change (authenticated, link-confirmed)
+  # =============================================================================
+  @doc """
+  Starts an email change after re-verifying the current password.
+
+  Validates the new address (format, length, not unchanged, not already
+  taken) and, on success, issues a single-use `email_change` token whose
+  `sent_to` holds the pending address. Returns `{:ok, raw_token}` — the
+  caller mails the confirmation link to the *new* address and notifies
+  the *old* one. The user's email isn't touched until they click the
+  link (`apply_email_change/2`).
+
+  Returns `{:error, :invalid_password}` or `{:error, changeset}`.
+  """
+  def request_email_change(user, current_password, new_email) do
+    if User.valid_password?(user, current_password) do
+      user
+      |> User.email_changeset(%{email: new_email})
+      |> validate_email_change()
+      |> case do
+        %{valid?: true} ->
+          Repo.delete_all(UserToken.delete_user_tokens_by_context_query(user.id, "email_change"))
+          {raw_token, user_token} = UserToken.build_email_change_token(user, new_email)
+          Repo.insert!(user_token)
+          Logger.info("Email change requested for user #{user.id}")
+          {:ok, raw_token}
+
+        changeset ->
+          {:error, %{changeset | action: :update}}
+      end
+    else
+      Logger.warning("Failed email change attempt for user #{user.id}: incorrect password")
+      {:error, :invalid_password}
+    end
+  end
+
+  @doc """
+  Applies a pending email change. Verifies the `email_change` token
+  belongs to `user` and hasn't expired, then swaps in the address it
+  was issued for. The DB unique index is the final guard against the
+  address being claimed between request and click (TOCTOU). Consumes
+  every email-change token for the user on success.
+
+  Returns `{:ok, user}`, `{:error, :invalid_token}`, or
+  `{:error, changeset}`.
+  """
+  def apply_email_change(user, raw_token) do
+    query = UserToken.verify_email_change_token_query(raw_token, user.id)
+
+    case Repo.one(query) do
+      %UserToken{sent_to: new_email} ->
+        user
+        |> User.email_changeset(%{email: new_email})
+        |> Repo.update()
+        |> case do
+          {:ok, updated} ->
+            Repo.delete_all(
+              UserToken.delete_user_tokens_by_context_query(user.id, "email_change")
+            )
+
+            Logger.info("Email changed for user #{user.id}")
+            {:ok, updated}
+
+          {:error, _changeset} = error ->
+            error
+        end
+
+      nil ->
+        {:error, :invalid_token}
+    end
+  end
+
+  # Layers the checks `User.email_changeset/2` can't express on its own:
+  # the address must actually differ and must not already belong to
+  # another account.
+  defp validate_email_change(changeset) do
+    cond do
+      not changeset.valid? ->
+        changeset
+
+      Ecto.Changeset.get_change(changeset, :email) == nil ->
+        Ecto.Changeset.add_error(changeset, :email, "is the same as your current email")
+
+      get_user_by(email: Ecto.Changeset.get_change(changeset, :email)) ->
+        Ecto.Changeset.add_error(changeset, :email, "has already been taken")
+
+      true ->
+        changeset
+    end
   end
 
   # =============================================================================

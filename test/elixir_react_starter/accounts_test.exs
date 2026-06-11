@@ -300,4 +300,104 @@ defmodule ElixirReactStarter.AccountsTest do
       assert Accounts.get_user_by_email_and_password(updated.email, "brand_new_password")
     end
   end
+
+  describe "request_email_change/3" do
+    setup do
+      %{user: :user |> build() |> confirmed() |> insert()}
+    end
+
+    test "issues an email_change token stashing the new address", %{user: user} do
+      assert {:ok, raw_token} =
+               Accounts.request_email_change(user, "valid_password123", "new@example.com")
+
+      assert is_binary(raw_token)
+
+      token =
+        UserToken.verify_email_change_token_query(raw_token, user.id)
+        |> ElixirReactStarter.Repo.one()
+
+      assert token.sent_to == "new@example.com"
+      # The user's actual email is untouched until they confirm.
+      assert ElixirReactStarter.Repo.reload(user).email == user.email
+    end
+
+    test "rejects an incorrect current password", %{user: user} do
+      assert {:error, :invalid_password} =
+               Accounts.request_email_change(user, "wrong", "new@example.com")
+    end
+
+    test "rejects an invalid email", %{user: user} do
+      assert {:error, changeset} =
+               Accounts.request_email_change(user, "valid_password123", "not-an-email")
+
+      assert errors_on(changeset).email != []
+    end
+
+    test "rejects the user's current email", %{user: user} do
+      assert {:error, changeset} =
+               Accounts.request_email_change(user, "valid_password123", user.email)
+
+      assert "is the same as your current email" in errors_on(changeset).email
+    end
+
+    test "rejects an address already taken by another user", %{user: user} do
+      insert(:user, email: "taken@example.com")
+
+      assert {:error, changeset} =
+               Accounts.request_email_change(user, "valid_password123", "taken@example.com")
+
+      assert "has already been taken" in errors_on(changeset).email
+    end
+
+    test "a new request invalidates the previous token", %{user: user} do
+      {:ok, first} = Accounts.request_email_change(user, "valid_password123", "first@example.com")
+
+      {:ok, _second} =
+        Accounts.request_email_change(user, "valid_password123", "second@example.com")
+
+      assert UserToken.verify_email_change_token_query(first, user.id)
+             |> ElixirReactStarter.Repo.one() == nil
+    end
+  end
+
+  describe "apply_email_change/2" do
+    setup do
+      %{user: :user |> build() |> confirmed() |> insert()}
+    end
+
+    test "swaps in the pending address and consumes the token", %{user: user} do
+      {:ok, raw_token} =
+        Accounts.request_email_change(user, "valid_password123", "new@example.com")
+
+      assert {:ok, updated} = Accounts.apply_email_change(user, raw_token)
+      assert updated.email == "new@example.com"
+
+      # Token consumed — a replay fails.
+      assert {:error, :invalid_token} = Accounts.apply_email_change(updated, raw_token)
+    end
+
+    test "rejects a token belonging to another user", %{user: user} do
+      other = :user |> build() |> confirmed() |> insert()
+
+      {:ok, raw_token} =
+        Accounts.request_email_change(user, "valid_password123", "new@example.com")
+
+      assert {:error, :invalid_token} = Accounts.apply_email_change(other, raw_token)
+    end
+
+    test "rejects an unknown token", %{user: user} do
+      assert {:error, :invalid_token} = Accounts.apply_email_change(user, "bogus")
+    end
+
+    test "fails if the address was claimed between request and confirm", %{user: user} do
+      {:ok, raw_token} =
+        Accounts.request_email_change(user, "valid_password123", "race@example.com")
+
+      # Someone else grabs the address before the link is opened.
+      insert(:user, email: "race@example.com")
+
+      assert {:error, changeset} = Accounts.apply_email_change(user, raw_token)
+      assert "has already been taken" in errors_on(changeset).email
+    end
+  end
 end

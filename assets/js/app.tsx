@@ -4,6 +4,7 @@ import { createInertiaApp, router } from '@inertiajs/react';
 import { createElement, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AppProviders } from './app-providers';
+import ErrorBoundary from './components/ErrorBoundary';
 import { syncLocale } from './components/LocaleSync';
 import Toaster from './components/Toaster';
 import { toast } from './components/toast';
@@ -60,7 +61,12 @@ createInertiaApp({
             long-lived (sockets, caches, listeners) survives route changes. */}
         <App {...props}>
           {({ Component, props: pageProps, key }) => (
-            <AppProviders>{createElement(Component, { key: key ?? undefined, ...pageProps })}</AppProviders>
+            <AppProviders>
+              {/* Keyed on the page key so navigation remounts the boundary
+                  and clears any caught error — long-lived providers above
+                  stay mounted. */}
+              <ErrorBoundary key={key ?? undefined}>{createElement(Component, pageProps)}</ErrorBoundary>
+            </AppProviders>
           )}
         </App>
         <Toaster />

@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -22,10 +22,74 @@ export default function Settings() {
     <AppLayout title={t('settings.title')}>
       <div className="max-w-xl space-y-12">
         <h1 className="text-2xl font-semibold">{t('settings.title')}</h1>
+        <ChangeEmailSection />
         <ChangePasswordSection />
         <DeleteAccountSection />
       </div>
     </AppLayout>
+  );
+}
+
+function ChangeEmailSection() {
+  const { t } = useTranslation();
+  const currentEmail = usePage().props.current_user?.email ?? '';
+  const { data, setData, put, processing, errors, reset } = useForm({
+    current_password: '',
+    email: '',
+  });
+
+  return (
+    <section className="space-y-4">
+      <header>
+        <h2 className="text-lg font-medium">{t('settings.changeEmail.title')}</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {t('settings.changeEmail.current', { email: currentEmail })}
+        </p>
+      </header>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          put('/settings/email', { onSuccess: () => reset() });
+        }}
+        className="space-y-4"
+      >
+        <div>
+          <label htmlFor="new_email" className="block text-sm mb-1">
+            {t('settings.changeEmail.newEmail')}
+          </label>
+          <input
+            id="new_email"
+            type="email"
+            autoComplete="email"
+            value={data.email}
+            onChange={(e) => setData('email', e.target.value)}
+            className={inputClass}
+            required
+          />
+          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="email_current_password" className="block text-sm mb-1">
+            {t('settings.changeEmail.currentPassword')}
+          </label>
+          <input
+            id="email_current_password"
+            type="password"
+            autoComplete="current-password"
+            value={data.current_password}
+            onChange={(e) => setData('current_password', e.target.value)}
+            className={inputClass}
+            required
+          />
+          {errors.current_password && <p className="mt-1 text-sm text-red-600">{errors.current_password}</p>}
+        </div>
+
+        <Button type="submit" disabled={processing}>
+          {t('settings.changeEmail.submit')}
+        </Button>
+      </form>
+    </section>
   );
 }
 

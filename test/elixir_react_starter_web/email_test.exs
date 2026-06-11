@@ -43,4 +43,29 @@ defmodule ElixirReactStarterWeb.EmailTest do
       refute email.subject =~ @token
     end
   end
+
+  describe "email_change_confirmation/2" do
+    test "addresses the NEW inbox with the confirm URL and no token in the subject" do
+      email = Email.email_change_confirmation("new@example.com", @token)
+
+      assert {_, "new@example.com"} = hd(email.to)
+      assert email.subject =~ "Confirm"
+      assert email.html_body =~ "/settings/email/confirm?token=#{@token}"
+      assert email.text_body =~ "/settings/email/confirm?token=#{@token}"
+      refute email.subject =~ @token
+    end
+  end
+
+  describe "email_change_notification/2" do
+    test "addresses the OLD inbox, names the new address, and carries no token" do
+      email = Email.email_change_notification("old@example.com", "new@example.com")
+
+      assert {_, "old@example.com"} = hd(email.to)
+      assert email.subject =~ "Email change"
+      assert email.html_body =~ "new@example.com"
+      assert email.text_body =~ "new@example.com"
+      # Informational only — never a link a recipient could act on.
+      refute email.html_body =~ "token="
+    end
+  end
 end

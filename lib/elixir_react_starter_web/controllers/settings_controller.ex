@@ -1,7 +1,12 @@
 defmodule ElixirReactStarterWeb.SettingsController do
   @moduledoc """
-  Authenticated account settings: changing the password and deleting the
-  account. Both re-verify the current password before acting.
+  Authenticated account settings: changing the email, changing the
+  password, and deleting the account. All three re-verify the current
+  password before acting.
+
+  Email changes are link-confirmed: `update_email` mails a single-use
+  link to the *new* address and a heads-up to the *old* one, but doesn't
+  touch the record until the link is opened (`confirm_email`).
 
   Changing the password invalidates every session token for the user
   (signing out other devices), so this controller immediately issues a
@@ -11,12 +16,77 @@ defmodule ElixirReactStarterWeb.SettingsController do
   use ElixirReactStarterWeb, :controller
 
   alias ElixirReactStarter.Accounts
+  alias ElixirReactStarter.Mailer
+  alias ElixirReactStarterWeb.Email
   alias ElixirReactStarterWeb.UserAuth
 
   action_fallback ElixirReactStarterWeb.FallbackController
 
   def show(conn, _params) do
     render_inertia(conn, "Settings")
+  end
+
+  # =============================================================================
+  # Change email (link-confirmed)
+  # =============================================================================
+  def update_email(conn, %{"current_password" => current_password, "email" => new_email}) do
+    user = conn.assigns.current_user
+
+    case Accounts.request_email_change(user, current_password, new_email) do
+      {:ok, raw_token} ->
+        # Confirmation goes to the new address (proves ownership); the
+        # old address gets a heads-up so the owner is alerted to the
+        # change even if they never see the new inbox.
+        _ = Email.email_change_confirmation(new_email, raw_token) |> Mailer.deliver()
+        _ = Email.email_change_notification(user.email, new_email) |> Mailer.deliver()
+
+        conn
+        |> put_flash(
+          :info,
+          dgettext("app", "Check your new inbox — we've sent a link to confirm the change.")
+        )
+        |> redirect(to: ~p"/settings")
+
+      {:error, :invalid_password} ->
+        conn
+        |> assign_errors(%{current_password: dgettext("app", "Incorrect password")})
+        |> redirect(to: ~p"/settings")
+
+      {:error, changeset} ->
+        conn
+        |> assign_errors(changeset)
+        |> redirect(to: ~p"/settings")
+    end
+  end
+
+  def update_email(conn, _params) do
+    message = dgettext("app", "Current password and new email are required")
+
+    conn
+    |> assign_errors(%{current_password: message, email: message})
+    |> redirect(to: ~p"/settings")
+  end
+
+  # Opened from the link in the new inbox while signed in. The token is
+  # scoped to the current user, so a stale or foreign token just fails.
+  def confirm_email(conn, %{"token" => raw_token}) do
+    case Accounts.apply_email_change(conn.assigns.current_user, raw_token) do
+      {:ok, _user} ->
+        conn
+        |> put_flash(:info, dgettext("app", "Your email address has been updated."))
+        |> redirect(to: ~p"/settings")
+
+      {:error, _reason} ->
+        conn
+        |> put_flash(:error, dgettext("app", "That email change link is invalid or has expired."))
+        |> redirect(to: ~p"/settings")
+    end
+  end
+
+  def confirm_email(conn, _params) do
+    conn
+    |> put_flash(:error, dgettext("app", "That email change link is invalid or has expired."))
+    |> redirect(to: ~p"/settings")
   end
 
   # =============================================================================

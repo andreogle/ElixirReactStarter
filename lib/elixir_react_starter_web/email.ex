@@ -107,6 +107,67 @@ defmodule ElixirReactStarterWeb.Email do
     |> text_body(render_to_string(EmailText.password_reset(assigns)))
   end
 
+  @doc """
+  Builds the email-change confirmation message, sent to the *new*
+  address. The `raw_token` is embedded in a single-click URL that
+  applies the change once opened (while signed in).
+  """
+  def email_change_confirmation(new_email, raw_token) do
+    url = Endpoint.url() <> ~p"/settings/email/confirm?token=#{raw_token}"
+
+    assigns = %{
+      url: url,
+      heading: dgettext("app", "Confirm your new email"),
+      greeting:
+        dgettext("app", "Click the button below to confirm this as your new email address."),
+      button_label: dgettext("app", "Confirm new email"),
+      paste_url_label: dgettext("app", "Or copy and paste this URL into your browser:"),
+      expiry: dgettext("app", "This link expires in 1 hour."),
+      ignore:
+        dgettext("app", "If you didn't request this change, you can safely ignore this email.")
+    }
+
+    Logger.info("Sending email-change confirmation to #{Log.redact_email(new_email)}")
+
+    new()
+    |> to(new_email)
+    |> from(@from)
+    |> subject(dgettext("app", "Confirm your new email"))
+    |> html_body(render_to_string(EmailHTML.email_change_confirmation(assigns)))
+    |> text_body(render_to_string(EmailText.email_change_confirmation(assigns)))
+  end
+
+  @doc """
+  Builds the heads-up sent to the *old* address when an email change is
+  requested, so the account owner is alerted even if they never see the
+  confirmation link. Carries no token — purely informational.
+  """
+  def email_change_notification(old_email, new_email) do
+    assigns = %{
+      heading: dgettext("app", "Email change requested"),
+      greeting:
+        dgettext(
+          "app",
+          "We received a request to change your account email to %{new_email}.",
+          new_email: new_email
+        ),
+      action:
+        dgettext(
+          "app",
+          "If this was you, no action is needed — confirm via the link sent to the new address. If it wasn't, change your password immediately."
+        )
+    }
+
+    Logger.info("Sending email-change notification to #{Log.redact_email(old_email)}")
+
+    new()
+    |> to(old_email)
+    |> from(@from)
+    |> subject(dgettext("app", "Email change requested"))
+    |> html_body(render_to_string(EmailHTML.email_change_notification(assigns)))
+    |> text_body(render_to_string(EmailText.email_change_notification(assigns)))
+  end
+
   defp render_to_string(template) do
     template
     |> Safe.to_iodata()

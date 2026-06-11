@@ -16,6 +16,11 @@ export default {
     themeDark: 'Oscuro',
     themeSystem: 'Sistema',
   },
+  error: {
+    title: 'Algo salió mal',
+    body: 'Ocurrió un error inesperado. Intenta recargar la página; si el problema persiste, vuelve a intentarlo más tarde.',
+    reload: 'Recargar',
+  },
   home: {
     welcome: 'Bienvenido a ElixirReactStarter',
     stack: 'Phoenix 1.8 · Inertia.js · React · SSR',
@@ -32,6 +37,13 @@ export default {
   },
   settings: {
     title: 'Ajustes',
+    changeEmail: {
+      title: 'Cambiar correo electrónico',
+      current: 'Tu correo electrónico actual es {{email}}.',
+      newEmail: 'Nuevo correo electrónico',
+      currentPassword: 'Contraseña actual',
+      submit: 'Enviar enlace de confirmación',
+    },
     changePassword: {
       title: 'Cambiar contraseña',
       warning: 'Cambiar tu contraseña cerrará tu sesión en los demás dispositivos.',

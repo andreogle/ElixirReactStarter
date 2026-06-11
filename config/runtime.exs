@@ -32,9 +32,38 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
+  database_url = get_env!.("DATABASE_URL")
+
+  # Encrypt the DB connection by default. Production traffic to a managed
+  # Postgres almost always crosses a network boundary, so TLS is on
+  # unless explicitly disabled with DATABASE_SSL=false (e.g. a sidecar
+  # proxy that already encrypts, or local-socket access).
+  #
+  # We verify the server certificate against the OS trust store and pin
+  # the hostname (SNI) parsed from DATABASE_URL — so a MITM with a valid
+  # cert for some *other* host can't intercept. Providers whose cert
+  # chains aren't in the system store (some managed PG offer a private
+  # CA) need either their CA added to the OS trust store or DATABASE_SSL=false.
+  db_ssl =
+    if System.get_env("DATABASE_SSL", "true") in ~w(true 1) do
+      db_host = URI.parse(database_url).host || ""
+
+      [
+        verify: :verify_peer,
+        cacerts: :public_key.cacerts_get(),
+        server_name_indication: to_charlist(db_host),
+        depth: 3,
+        # Refuse to connect if the chain can't be verified, rather than
+        # silently downgrading to an unauthenticated session.
+        customize_hostname_check: [match_fun: :public_key.pkix_verify_hostname_match_fun(:https)]
+      ]
+    else
+      false
+    end
+
   config :elixir_react_starter, ElixirReactStarter.Repo,
-    # ssl: true,
-    url: get_env!.("DATABASE_URL"),
+    ssl: db_ssl,
+    url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     # For machines with several cores, consider starting multiple pools of `pool_size`
     # pool_count: 4,

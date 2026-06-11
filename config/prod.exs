@@ -13,6 +13,12 @@ config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
 # cookie must never travel over plain HTTP.
 config :elixir_react_starter, session_secure: true
 
+# Strict Content-Security-Policy in production: nonce + strict-dynamic
+# for scripts, no framing, first-party only. Add third-party origins via
+# :csp_extra_sources rather than loosening this. Dev/test default to the
+# relaxed profile so LiveReload / LiveDashboard keep working.
+config :elixir_react_starter, content_security_policy: :strict
+
 # Force using SSL in production. This also sets the "strict-security-transport" header,
 # known as HSTS. If you have a health check endpoint, you may want to exclude it below.
 # Note `:force_ssl` is required to be set at compile-time.

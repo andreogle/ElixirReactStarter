@@ -10,7 +10,9 @@
          loads and applies the `dark` class to <html> so the first
          paint matches the user's choice — no flash of light when
          they prefer dark. Mirrors `assets/js/theme.ts`. --%>
-    <script>
+    <%!-- nonce lets this inline script run under the strict CSP (see
+         ElixirReactStarterWeb.Plugs.ContentSecurityPolicy). --%>
+    <script nonce={@csp_nonce}>
       (function() {
         var m = document.cookie.match(/(?:^|;\s*)theme=(light|dark|system)/);
         var t = (m && m[1]) || 'system';
@@ -19,7 +21,9 @@
       })();
     </script>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
-    <script type="module" defer phx-track-static src={~p"/assets/app.js"} />
+    <%!-- nonce required: under `strict-dynamic` an un-nonced <script src>
+         is blocked, and this bundle bootstraps everything else. --%>
+    <script type="module" defer phx-track-static nonce={@csp_nonce} src={~p"/assets/app.js"} />
   </head>
   <body>
     {@inner_content}

@@ -10,6 +10,7 @@ defmodule ElixirReactStarterWeb.Router do
     plug :put_root_layout, html: {ElixirReactStarterWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug ElixirReactStarterWeb.Plugs.ContentSecurityPolicy
     plug Inertia.Plug
     plug :fetch_current_user
     plug ElixirReactStarterWeb.Plugs.SharedData
@@ -56,6 +57,10 @@ defmodule ElixirReactStarterWeb.Router do
     delete "/logout", AuthController, :logout
 
     get "/settings", SettingsController, :show
+    put "/settings/email", SettingsController, :update_email
+    # Confirmation link from the new-address email. No matching POST —
+    # opening the link (while signed in) is the action.
+    get "/settings/email/confirm", SettingsController, :confirm_email
     put "/settings/password", SettingsController, :update_password
     delete "/settings/account", SettingsController, :delete_account
   end
@@ -66,6 +71,11 @@ defmodule ElixirReactStarterWeb.Router do
     # Liveness probe for load balancers / k8s / uptime monitors. Cheap
     # by design — no DB, no external calls.
     get "/health", HealthController, :show
+
+    # Readiness probe — checks the DB is reachable before declaring the
+    # instance ready to take traffic. Returns 503 when the pool can't
+    # answer, so orchestrators hold traffic until dependencies are up.
+    get "/health/ready", HealthController, :ready
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

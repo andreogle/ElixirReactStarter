@@ -16,6 +16,11 @@ export default {
     themeDark: 'Dark',
     themeSystem: 'System',
   },
+  error: {
+    title: 'Something went wrong',
+    body: 'An unexpected error occurred. Try reloading the page — if it keeps happening, please come back in a little while.',
+    reload: 'Reload',
+  },
   home: {
     welcome: 'Welcome to ElixirReactStarter',
     stack: 'Phoenix 1.8 · Inertia.js · React · SSR',
@@ -32,6 +37,13 @@ export default {
   },
   settings: {
     title: 'Settings',
+    changeEmail: {
+      title: 'Change email',
+      current: 'Your current email is {{email}}.',
+      newEmail: 'New email',
+      currentPassword: 'Current password',
+      submit: 'Send confirmation link',
+    },
     changePassword: {
       title: 'Change password',
       warning: 'Updating your password will log you out of any other devices.',

@@ -8,7 +8,8 @@ defmodule ElixirReactStarter.Accounts.UserToken do
     * Link tokens — 32 random bytes encoded as URL-safe base64; the
       raw string goes in an email link's query param, the SHA3-256
       hash of the raw string is stored in the database. Used for email
-      confirmation and password reset. Expires after 1 hour.
+      confirmation, password reset, and email change (which also stashes
+      the pending new address in `sent_to`). Expires after 1 hour.
 
   Tokens are never stored raw — only their hashes — so a database
   read can't be replayed against the application.
@@ -29,6 +30,9 @@ defmodule ElixirReactStarter.Accounts.UserToken do
   schema "user_tokens" do
     field :token, :binary, redact: true
     field :context, :string
+    # Pending new address for an "email_change" token; nil for every
+    # other context. redact: true keeps it out of logs/inspect.
+    field :sent_to, :string, redact: true
     field :refreshed_at, :utc_datetime
 
     belongs_to :user, ElixirReactStarter.Accounts.User
@@ -125,6 +129,44 @@ defmodule ElixirReactStarter.Accounts.UserToken do
       where: t.inserted_at > ago(^@link_validity_in_hours, "hour"),
       join: u in assoc(t, :user),
       select: u
+  end
+
+  # =============================================================================
+  # Email-change tokens
+  # =============================================================================
+  @doc """
+  Builds an email-change link token. Like a regular link token but
+  stashes the requested new address in `sent_to` so the click handler
+  knows what to change the email to. The link is mailed to the *new*
+  address to prove the user controls it.
+  """
+  def build_email_change_token(user, new_email) do
+    raw_token = @rand_size |> :crypto.strong_rand_bytes() |> Base.url_encode64(padding: false)
+    hashed = :crypto.hash(:sha3_256, raw_token)
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    {raw_token,
+     %__MODULE__{
+       token: hashed,
+       context: "email_change",
+       sent_to: new_email,
+       user_id: user.id,
+       refreshed_at: now
+     }}
+  end
+
+  @doc """
+  Query that finds the email-change token for the given raw token,
+  scoped to a specific `user_id`, provided it's still valid (within
+  #{@link_validity_in_hours} hour). Selects the token itself so the
+  caller can read `sent_to`.
+  """
+  def verify_email_change_token_query(raw_token, user_id) when is_binary(raw_token) do
+    hashed = :crypto.hash(:sha3_256, raw_token)
+
+    from t in __MODULE__,
+      where: t.token == ^hashed and t.context == "email_change" and t.user_id == ^user_id,
+      where: t.inserted_at > ago(^@link_validity_in_hours, "hour")
   end
 
   @doc """

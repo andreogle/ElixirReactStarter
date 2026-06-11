@@ -6,18 +6,15 @@ defmodule ElixirReactStarterWeb.ErrorHTML do
   """
   use ElixirReactStarterWeb, :html
 
-  # If you want to customize your error pages,
-  # uncomment the embed_templates/1 call below
-  # and add pages to the error directory:
-  #
-  #   * lib/elixir_react_starter_web/controllers/error_html/404.html.heex
-  #   * lib/elixir_react_starter_web/controllers/error_html/500.html.heex
-  #
-  # embed_templates "error_html/*"
+  # Branded full-page error documents. `404.html.heex` and `500.html.heex`
+  # are self-contained (inline styles, no external assets) so they render
+  # even when the JS/CSS bundle is what failed. They're served with
+  # `layout: false` (see the endpoint's :render_errors config).
+  embed_templates "error_html/*"
 
-  # The default is to render a plain text page based on
-  # the template name. For example, "404.html" becomes
-  # "Not Found".
+  # Fallback for any status without a dedicated template (403, 422, …):
+  # render the plain status message. For example, "401.html" becomes
+  # "Unauthorized".
   def render(template, _assigns) do
     Phoenix.Controller.status_message_from_template(template)
   end
