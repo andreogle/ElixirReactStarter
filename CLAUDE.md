@@ -14,6 +14,7 @@ These are the rules that must not be forgotten or looked up — they're the ones
 - Never put security codes/tokens in email **subjects** (they show on lock screens). Body only
 - On sensitive account changes (email, password, 2FA), notify the **old** email too
 - Never trust user-controlled redirect targets (e.g. `Referer`) without validating the path starts with `/`
+- Content-Security-Policy ships **strict** in prod (per-request nonce + `strict-dynamic`, via `Plugs.ContentSecurityPolicy` in the `:csp` pipeline). Add third-party origins through the `:csp_extra_sources` config — never by loosening the plug. Inline `<script>` tags must carry `@csp_nonce`. Dev-only routes (`/dev/*`) deliberately skip `:csp` so tooling (the Swoosh mailbox iframe, LiveDashboard) keeps working
 
 **Error handling**
 - Always handle both `{:ok, _}` and `{:error, _}` from context calls — never `{:ok, x} = SomeContext.foo()`
@@ -115,6 +116,7 @@ The template already includes these — extend them, don't rebuild them.
 - Email + password registration, **link-based** email confirmation and password reset (1-hour `UserToken`s; the raw token rides in the email URL, only its SHA3-256 hash is stored). Session tokens use a 60-day sliding window
 - The `User` schema is deliberately minimal: `email`, `hashed_password`, `locale`, `confirmed_at`. Add profile fields (name, avatar, …) per project — there's no `name` column yet
 - Endpoint responses don't leak which emails are registered (resend-confirmation / forgot-password reply identically either way)
+- Account settings (`SettingsController`): link-confirmed **email change** (the link hits `/settings/email/apply-change`; the old address is notified — distinct from the public `/confirm-email` account-activation route), **password change** (invalidates the user's other sessions), and **account deletion**. All three re-verify the current password first
 
 **Realtime** (`ElixirReactStarterWeb.{UserSocket, GlobalChannel, UserChannel}` + `assets/js/realtime/`)
 - Token-authed socket at `/socket`. The provider (mounted in `app-providers.tsx`) auto-joins `global` and `user:<id>` and survives Inertia navigation (keyed on user id, not the rotating token). Hooks: `useConnectionStatus`, `useGlobalChannel`, `useUserChannel`, `useChannel`, `use{Global,User}Event`, `pushChannel`

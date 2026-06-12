@@ -13,8 +13,15 @@ separate project.
 | Spec | Flow |
 | --- | --- |
 | `registration.spec.ts` | Sign up → confirm via the emailed link → land on the dashboard |
-| `login.spec.ts` | Log in to the dashboard; reject bad credentials with a visible error |
+| `login.spec.ts` | Log in; reject bad credentials; an unconfirmed login re-sends the confirmation link instead of starting a session |
+| `logout.spec.ts` | Log out from the header menu → protected pages bounce to `/login` |
+| `resend-confirmation.spec.ts` | Unconfirmed user requests a fresh link from `/login` → confirms |
+| `email-confirmation.spec.ts` | Re-clicking a used link keeps an already-confirmed user on the dashboard; a stale link signed out → resend page |
 | `reset-password.spec.ts` | Request a reset link → set a new password → log in with it |
+| `change-email.spec.ts` | Change email → confirm via the link to the new inbox → log in with it (+ wrong-password rejection) |
+| `change-password.spec.ts` | Change password → old one fails, new one works (+ wrong-password rejection) |
+| `delete-account.spec.ts` | Delete the account behind a password-confirm dialog → can no longer sign in (+ wrong-password rejection) |
+| `auth-guards.spec.ts` | Pipeline redirects: anonymous → `/login`, already signed-in → `/dashboard` |
 | `locale.spec.ts` | Switch the interface language (English → Spanish) |
 
 ## Prerequisites
@@ -79,9 +86,10 @@ they are unreachable in production and cannot affect real data.
 
 ### Link-based flows
 
-Authentication here is link-based, so the registration and reset specs
-read the single-click URL out of the dev mailbox JSON
-(`/dev/mailbox/json`) via `fetchEmailLink/3` and navigate to it.
+Authentication here is link-based, so the link-driven specs (sign-up,
+password reset, email change, resend confirmation) read the single-click
+URL out of the dev mailbox JSON (`/dev/mailbox/json`) via
+`fetchEmailLink/3` and navigate to it.
 
 ## Writing a new test
 
@@ -100,7 +108,7 @@ assets/
   tsconfig.e2e.json         # node-typed TS project for the suite
   e2e/
     global-setup.ts         # runs priv/repo/e2e.exs before the suite
-    helpers.ts              # uniqueEmail, provisionUser, loginAs, fetchEmailLink
+    helpers.ts              # uniqueEmail, provisionUser, loginAs, logoutViaMenu, gotoSettingsViaMenu, fetchEmailLink
     tests/                  # one spec per flow
 priv/repo/e2e.exs           # destructive per-run cleanup (dev/test only)
 lib/elixir_react_starter_web/controllers/dev_e2e_controller.ex  # POST /dev/e2e/users

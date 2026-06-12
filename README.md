@@ -33,7 +33,7 @@ It's provided as-is, with no guarantees or warranties of any kind — use it at 
 - **Theming** — light / dark / system with no flash of the wrong theme.
 - **Accessibility** — [Radix UI][radix] primitives, [Biome][biome] a11y linting in CI, and [axe-core][axe] auditing in dev.
 - **Email** — [Swoosh][swoosh] (HTML + text) via [Mailjet][mailjet] in production, with an in-browser mailbox in dev.
-- **Security** — rate-limited auth endpoints, Secure cookies, CSRF protection, and HTTPS/HSTS in production.
+- **Security** — rate-limited auth endpoints, a strict nonce-based [Content-Security-Policy][csp], Secure cookies, CSRF protection, and HTTPS/HSTS in production.
 - **Background jobs** — [Oban][oban], configured and ready.
 - **Testing** — [ExUnit][exunit] with a coverage gate, [ex_machina][exmachina] factories, and a [Playwright][playwright] E2E suite.
 - **Tooling & CI** — [mise][mise]-pinned toolchain, [Biome][biome] / [Credo][credo] / [Dialyzer][dialyxir], and [GitHub Actions][gha].
@@ -157,6 +157,7 @@ Released under the **WTFPL** (see the `LICENSE` file) — do what the fuck you w
 [react-i18next]: https://react.i18next.com/
 [tailwind]: https://tailwindcss.com/
 [radix]: https://www.radix-ui.com/primitives
+[csp]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP
 [biome]: https://biomejs.dev/
 [axe]: https://github.com/dequelabs/axe-core
 [swoosh]: https://hexdocs.pm/swoosh/
