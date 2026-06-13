@@ -3,6 +3,7 @@ import { go } from '@api3/promise-utils';
 import { createInertiaApp, router } from '@inertiajs/react';
 import { createElement, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import pages from './_pages';
 import { AppProviders } from './app-providers';
 import ErrorBoundary from './components/ErrorBoundary';
 import { syncLocale } from './components/LocaleSync';
@@ -23,12 +24,19 @@ function applyFlash(flash?: Flash) {
 
 createInertiaApp({
   resolve: async (name) => {
-    const result = await go(() => import(`./pages/${name}.tsx`));
+    const loader = pages[name];
+    if (!loader) {
+      const error = new Error(`Page not found: ${name}`);
+      console.error(error);
+      throw error;
+    }
+
+    const result = await go(loader);
     if (!result.success) {
       console.error(`Failed to load page "${name}":`, result.error);
       throw result.error;
     }
-    return result.data;
+    return result.data.default;
   },
   setup({ App, el, props }) {
     syncLocale(props.initialPage.props);

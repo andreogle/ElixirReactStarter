@@ -56,8 +56,9 @@ npm-debug.log
 # TypeScript incremental build info (e.g. from `tsc -p tsconfig.e2e.json`)
 *.tsbuildinfo
 
-# Auto-generated SSR pages registry
+# Auto-generated page registries
 /assets/js/_ssr_pages.ts
+/assets/js/_pages.ts
 
 # LSP
 .elixir_ls

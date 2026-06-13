@@ -1,8 +1,8 @@
 import { useForm } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-import Button from '../../components/Button';
-import { inputClass } from '../../components/ui';
-import AuthLayout from '../../layouts/AuthLayout';
+import Button from '../../../components/Button';
+import { inputClass } from '../../../components/ui';
+import AuthLayout from '../../../layouts/AuthLayout';
 
 interface ResetPasswordProps {
   token: string;

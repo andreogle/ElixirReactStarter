@@ -12,7 +12,9 @@
       "!**/pnpm-lock.yaml",
       "!**/.docusaurus/**",
       "!**/build/",
-      "!**/server/static/**"
+      "!**/server/static/**",
+      "!js/_pages.ts",
+      "!js/_ssr_pages.ts"
     ],
     "indentStyle": "space",
     "indentWidth": 2,

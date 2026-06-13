@@ -1,11 +1,11 @@
 import { useForm } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-import Button from '../../components/Button';
-import Link from '../../components/Link';
-import { inputClass } from '../../components/ui';
-import AuthLayout from '../../layouts/AuthLayout';
+import Button from '../../../components/Button';
+import Link from '../../../components/Link';
+import { inputClass } from '../../../components/ui';
+import AuthLayout from '../../../layouts/AuthLayout';
 
-export default function Login() {
+export default function Register() {
   const { t } = useTranslation();
   const { data, setData, post, processing, errors } = useForm({
     email: '',
@@ -13,11 +13,11 @@ export default function Login() {
   });
 
   return (
-    <AuthLayout title={t('auth.login.title')}>
+    <AuthLayout title={t('auth.register.title')}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          post('/login');
+          post('/register');
         }}
         className="space-y-4"
       >
@@ -44,30 +44,24 @@ export default function Login() {
           <input
             id="password"
             type="password"
-            autoComplete="current-password"
+            autoComplete="new-password"
             value={data.password}
             onChange={(e) => setData('password', e.target.value)}
             className={inputClass}
             required
+            minLength={8}
           />
+          {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
         </div>
 
         <Button type="submit" disabled={processing} className="w-full">
-          {t('auth.login.submit')}
+          {t('auth.register.submit')}
         </Button>
 
-        <div className="flex justify-between text-sm">
-          <Link href="/register" className="text-primary hover:underline">
-            {t('auth.login.createAccount')}
-          </Link>
-          <Link href="/forgot-password" className="text-primary hover:underline">
-            {t('auth.login.forgotPassword')}
-          </Link>
-        </div>
-
-        <p className="text-center text-sm">
-          <Link href="/resend-confirmation" className="text-primary hover:underline">
-            {t('auth.login.resendConfirmation')}
+        <p className="text-sm text-center">
+          {t('auth.register.alreadyHaveAccount')}{' '}
+          <Link href="/login" className="text-primary hover:underline">
+            {t('auth.register.logIn')}
           </Link>
         </p>
       </form>

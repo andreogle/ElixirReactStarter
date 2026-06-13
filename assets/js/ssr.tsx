@@ -2,7 +2,7 @@ import './i18n';
 import { createInertiaApp } from '@inertiajs/react';
 import { createElement } from 'react';
 import ReactDOMServer from 'react-dom/server';
-import pages from './_ssr_pages.ts';
+import pages, { ssrClientOnly } from './_ssr_pages.ts';
 import { AppProviders } from './app-providers';
 import i18n from './i18n';
 
@@ -22,10 +22,12 @@ export function render(page: any) {
     render: ReactDOMServer.renderToString,
     resolve: (name) => {
       const component = pages[name];
-      if (!component) {
-        throw new Error(`SSR page not found: ${name}`);
-      }
-      return component;
+      if (component) return component;
+      // Client-only pages (pages/client/*) aren't in the SSR bundle. Render
+      // nothing server-side and let the client take over, rather than failing
+      // the render. A genuinely unknown name still throws.
+      if (ssrClientOnly.has(name)) return () => null;
+      throw new Error(`SSR page not found: ${name}`);
     },
     // Mirror the client wrapping (see app.tsx): page components are
     // rendered inside AppProviders so context-dependent components

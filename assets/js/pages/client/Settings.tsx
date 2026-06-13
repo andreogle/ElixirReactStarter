@@ -9,10 +9,10 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '../components/AlertDialog';
-import Button from '../components/Button';
-import { inputClass } from '../components/ui';
-import AppLayout from '../layouts/AppLayout';
+} from '../../components/AlertDialog';
+import Button from '../../components/Button';
+import { inputClass } from '../../components/ui';
+import AppLayout from '../../layouts/AppLayout';
 
 export default function Settings() {
   const { t } = useTranslation();

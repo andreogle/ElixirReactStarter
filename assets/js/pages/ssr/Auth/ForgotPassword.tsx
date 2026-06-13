@@ -1,9 +1,9 @@
 import { useForm } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-import Button from '../../components/Button';
-import Link from '../../components/Link';
-import { inputClass } from '../../components/ui';
-import AuthLayout from '../../layouts/AuthLayout';
+import Button from '../../../components/Button';
+import Link from '../../../components/Link';
+import { inputClass } from '../../../components/ui';
+import AuthLayout from '../../../layouts/AuthLayout';
 
 export default function ForgotPassword() {
   const { t } = useTranslation();

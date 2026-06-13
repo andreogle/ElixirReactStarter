@@ -95,7 +95,8 @@ mix docs
 
 In development they're also served at
 [`/dev/docs`](http://localhost:4000/dev/docs/index.html). Topic guides live in
-`docs/` — e.g. the [End-to-End Testing guide](docs/e2e-testing.md).
+`docs/` — e.g. the [End-to-End Testing guide](docs/e2e-testing.md) and
+[Frontend Pages: SSR vs. Client](docs/frontend-pages.md).
 
 ## Deployment
 
@@ -118,8 +119,12 @@ docker run -p 4000:4000 \
 `config/runtime.exs` requires `DATABASE_URL`, `MAILJET_API_KEY`, `MAILJET_SECRET`,
 and `SECRET_KEY_BASE` and will refuse to boot without them. `PHX_HOST` defaults to
 `example.com` but should always be set in production (it's used for absolute URLs
-in emails). `PORT` (default `4000`), `POOL_SIZE`, `ECTO_IPV6`, and
-`DNS_CLUSTER_QUERY` are optional.
+in emails). `PORT` (default `4000`), `POOL_SIZE`, `ECTO_IPV6`,
+`DNS_CLUSTER_QUERY`, `SSR_POOL_SIZE` (number of Inertia SSR Node workers,
+default `2`), and `NODE_OPTIONS` (set in the Dockerfile to
+`--max-old-space-size=160`, caps each SSR worker's V8 heap) are optional. The
+last two are the main levers on the Node-side memory the SSR pool uses — see
+[Frontend Pages: SSR vs. Client](docs/frontend-pages.md).
 
 Database migrations run via the release: `bin/migrate`. See Phoenix's
 [deployment guides](https://hexdocs.pm/phoenix/deployment.html) for hosting specifics.

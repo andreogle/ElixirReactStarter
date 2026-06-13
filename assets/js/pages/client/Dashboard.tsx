@@ -1,7 +1,7 @@
 import { usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-import AppLayout from '../layouts/AppLayout';
-import type { CurrentUser } from '../types';
+import AppLayout from '../../layouts/AppLayout';
+import type { CurrentUser } from '../../types';
 
 export default function Dashboard() {
   const { current_user } = usePage<{ current_user: CurrentUser }>().props;

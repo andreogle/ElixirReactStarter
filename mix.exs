@@ -171,15 +171,20 @@ defmodule ElixirReactStarter.MixProject do
         "compile",
         "tailwind elixir_react_starter",
         "cmd rm -rf priv/static/assets/chunks",
-        ~s(esbuild elixir_react_starter --define:process.env.NODE_ENV='"development"'),
+        # Generate the page registries (_pages.ts + _ssr_pages.ts) before
+        # either esbuild run: the client bundle imports _pages.ts and the
+        # SSR bundle imports _ssr_pages.ts.
         "cmd node assets/build/generate-ssr-pages.js",
+        ~s(esbuild elixir_react_starter --define:process.env.NODE_ENV='"development"'),
         "esbuild elixir_react_starter_ssr"
       ],
       "assets.deploy": [
         "tailwind elixir_react_starter --minify",
         "cmd rm -rf priv/static/assets/chunks",
-        ~s(esbuild elixir_react_starter --minify --define:process.env.NODE_ENV='"production"'),
+        # Generate the page registries before either esbuild run (see
+        # assets.build above).
         "cmd node assets/build/generate-ssr-pages.js",
+        ~s(esbuild elixir_react_starter --minify --define:process.env.NODE_ENV='"production"'),
         "esbuild elixir_react_starter_ssr",
         "phx.digest",
         # phx.digest writes `.gz` next to every asset; this step writes the

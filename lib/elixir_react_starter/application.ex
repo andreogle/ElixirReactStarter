@@ -16,7 +16,8 @@ defmodule ElixirReactStarter.Application do
       # Rate-limit counters (auth throttling). Periodic cleanup keeps the
       # ETS table from growing unbounded.
       {ElixirReactStarter.RateLimit, [clean_period: :timer.minutes(10)]},
-      {Inertia.SSR, path: Application.app_dir(:elixir_react_starter, "priv")},
+      {Inertia.SSR,
+       path: Application.app_dir(:elixir_react_starter, "priv"), pool_size: ssr_pool_size()},
       # Background jobs. Config (queues, plugins) lives under the `Oban`
       # key in config/config.exs; tests run it in `:manual` mode. Starts
       # after the Repo so its tables are reachable.
@@ -29,6 +30,17 @@ defmodule ElixirReactStarter.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: ElixirReactStarter.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  # Number of Node.js workers in the Inertia SSR pool. Each worker loads the
+  # SSR bundle and holds its own V8 heap, so this is the main memory lever on
+  # the Node side. Defaults low (2); raise SSR_POOL_SIZE on bigger instances
+  # that need more concurrent server renders.
+  defp ssr_pool_size do
+    case System.get_env("SSR_POOL_SIZE") do
+      nil -> 2
+      value -> String.to_integer(value)
+    end
   end
 
   # Tell Phoenix to update the endpoint configuration

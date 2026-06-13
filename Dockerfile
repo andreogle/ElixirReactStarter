@@ -109,6 +109,11 @@ ENV MIX_ENV="prod"
 # `bin/server` (from rel/overlays) sets PHX_SERVER=true and boots the
 # endpoint. PORT is read in runtime.exs; default matches EXPOSE.
 ENV PORT=4000
+# Cap each Inertia SSR Node worker's V8 heap. The BEAM spawns these node
+# processes (and the HEALTHCHECK below) and they inherit NODE_OPTIONS, so
+# this bounds the Node side of memory alongside SSR_POOL_SIZE. Override in
+# the deploy env if a heavier SSR page needs more headroom.
+ENV NODE_OPTIONS="--max-old-space-size=160"
 EXPOSE 4000
 
 COPY --from=builder --chown=app:app /app/_build/prod/rel/elixir_react_starter ./
