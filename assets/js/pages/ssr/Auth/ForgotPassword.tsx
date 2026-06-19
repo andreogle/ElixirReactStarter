@@ -4,6 +4,7 @@ import Button from '../../../components/Button';
 import Link from '../../../components/Link';
 import { inputClass } from '../../../components/ui';
 import AuthLayout from '../../../layouts/AuthLayout';
+import { routes } from '../../../routes';
 
 export default function ForgotPassword() {
   const { t } = useTranslation();
@@ -16,7 +17,7 @@ export default function ForgotPassword() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          post('/forgot-password');
+          post(routes.forgotPassword());
         }}
         className="space-y-4"
       >
@@ -40,7 +41,7 @@ export default function ForgotPassword() {
         </Button>
 
         <p className="text-sm text-center">
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href={routes.login()} className="text-primary hover:underline">
             {t('auth.backToLogin')}
           </Link>
         </p>

@@ -4,6 +4,7 @@ import Button from '../../../components/Button';
 import Link from '../../../components/Link';
 import { inputClass } from '../../../components/ui';
 import AuthLayout from '../../../layouts/AuthLayout';
+import { routes } from '../../../routes';
 
 export default function Register() {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ export default function Register() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          post('/register');
+          post(routes.register());
         }}
         className="space-y-4"
       >
@@ -60,7 +61,7 @@ export default function Register() {
 
         <p className="text-sm text-center">
           {t('auth.register.alreadyHaveAccount')}{' '}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href={routes.login()} className="text-primary hover:underline">
             {t('auth.register.logIn')}
           </Link>
         </p>

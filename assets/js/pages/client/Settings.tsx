@@ -13,6 +13,7 @@ import {
 import Button from '../../components/Button';
 import { inputClass } from '../../components/ui';
 import AppLayout from '../../layouts/AppLayout';
+import { routes } from '../../routes';
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -48,7 +49,7 @@ function ChangeEmailSection() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          put('/settings/email', { onSuccess: () => reset() });
+          put(routes.settingsEmail(), { onSuccess: () => reset() });
         }}
         className="space-y-4"
       >
@@ -108,7 +109,7 @@ function ChangePasswordSection() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          put('/settings/password', { onSuccess: () => reset() });
+          put(routes.settingsPassword(), { onSuccess: () => reset() });
         }}
         className="space-y-4"
       >
@@ -194,7 +195,7 @@ function DeleteAccountSection() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              destroy('/settings/account');
+              destroy(routes.settingsAccount());
             }}
             className="mt-4 space-y-3"
           >

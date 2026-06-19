@@ -1,5 +1,6 @@
 import { router, usePage } from '@inertiajs/react';
 import { Check } from 'lucide-react';
+import { routes } from '../routes';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu';
 
 interface LocaleSelectorProps {
@@ -18,7 +19,7 @@ export default function LocaleSelector({ className = '' }: LocaleSelectorProps) 
   function handleSelect(code: string) {
     if (code !== locale) {
       router.put(
-        '/locale',
+        routes.locale(),
         { locale: code },
         {
           preserveScroll: true,

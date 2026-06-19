@@ -175,6 +175,9 @@ defmodule ElixirReactStarter.MixProject do
         # either esbuild run: the client bundle imports _pages.ts and the
         # SSR bundle imports _ssr_pages.ts.
         "cmd node assets/build/generate-ssr-pages.js",
+        # Generate the typed frontend route table (routes.ts) from the router
+        # so the two can't drift. Guarded by `routes.gen --check` in precommit.
+        "routes.gen",
         ~s(esbuild elixir_react_starter --define:process.env.NODE_ENV='"development"'),
         "esbuild elixir_react_starter_ssr"
       ],
@@ -184,6 +187,8 @@ defmodule ElixirReactStarter.MixProject do
         # Generate the page registries before either esbuild run (see
         # assets.build above).
         "cmd node assets/build/generate-ssr-pages.js",
+        # Generate the typed frontend route table (see assets.build above).
+        "routes.gen",
         ~s(esbuild elixir_react_starter --minify --define:process.env.NODE_ENV='"production"'),
         "esbuild elixir_react_starter_ssr",
         "phx.digest",
@@ -201,6 +206,9 @@ defmodule ElixirReactStarter.MixProject do
         "compile --warnings-as-errors",
         "lint",
         "i18n.check",
+        # Fail if assets/js/routes.ts has drifted from the router (someone
+        # changed a route without regenerating the frontend table).
+        "routes.gen --check",
         "deps.unlock --unused",
         "format",
         "test",

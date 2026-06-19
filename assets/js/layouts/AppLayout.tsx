@@ -13,6 +13,7 @@ import {
 import Link from '../components/Link';
 import LocaleSelector from '../components/LocaleSelector';
 import ThemeToggle from '../components/ThemeToggle';
+import { routes } from '../routes';
 import type { CurrentUser } from '../types';
 
 interface AppLayoutProps {
@@ -47,7 +48,7 @@ export default function AppLayout({ title, children }: AppLayoutProps) {
         <header className="border-b border-gray-200 dark:border-gray-800">
           <div className={`${containerClass} py-3 flex items-center justify-between gap-3`}>
             <div className="flex items-center gap-6 min-w-0">
-              <Link href="/dashboard" className="text-base font-semibold shrink-0">
+              <Link href={routes.dashboard()} className="text-base font-semibold shrink-0">
                 ElixirReactStarter
               </Link>
               <nav aria-label={t('common.mainNav')} className="hidden md:flex items-center gap-1">
@@ -138,12 +139,12 @@ function UserMenu({
           <DropdownMenuSeparator className="my-1 h-px bg-gray-200 dark:bg-gray-800" />
         </div>
 
-        <DropdownMenuItem onSelect={() => router.visit('/settings')}>
+        <DropdownMenuItem onSelect={() => router.visit(routes.settings())}>
           <Settings className="w-4 h-4" aria-hidden="true" />
           <span className="flex-1">{t('common.settings')}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="my-1 h-px bg-gray-200 dark:bg-gray-800" />
-        <DropdownMenuItem onSelect={() => router.delete('/logout')}>
+        <DropdownMenuItem onSelect={() => router.delete(routes.logout())}>
           <LogOut className="w-4 h-4" aria-hidden="true" />
           <span className="flex-1">{t('common.logout')}</span>
         </DropdownMenuItem>
