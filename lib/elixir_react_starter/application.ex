@@ -10,8 +10,10 @@ defmodule ElixirReactStarter.Application do
     # Attach the Sentry :logger handler configured under `config
     # :elixir_react_starter, :logger`. Routes OTP crash reports (Bandit
     # request crashes, Oban job failures, GenServer crashes) to Sentry.
-    # Inert until a DSN is set, so this is a no-op in dev/test.
-    Logger.add_handlers(:elixir_react_starter)
+    # Inert until a DSN is set, so this is a no-op in dev/test. The handler
+    # config is static (config/config.exs), so this always returns :ok;
+    # matching it documents that and fails loudly on a genuine misconfig.
+    :ok = Logger.add_handlers(:elixir_react_starter)
 
     children = [
       ElixirReactStarterWeb.Telemetry,
