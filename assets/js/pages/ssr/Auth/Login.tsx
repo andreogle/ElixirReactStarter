@@ -4,6 +4,7 @@ import Button from '../../../components/Button';
 import Link from '../../../components/Link';
 import { inputClass } from '../../../components/ui';
 import AuthLayout from '../../../layouts/AuthLayout';
+import { routes } from '../../../routes';
 
 export default function Login() {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ export default function Login() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          post('/login');
+          post(routes.login());
         }}
         className="space-y-4"
       >
@@ -57,16 +58,16 @@ export default function Login() {
         </Button>
 
         <div className="flex justify-between text-sm">
-          <Link href="/register" className="text-primary hover:underline">
+          <Link href={routes.register()} className="text-primary hover:underline">
             {t('auth.login.createAccount')}
           </Link>
-          <Link href="/forgot-password" className="text-primary hover:underline">
+          <Link href={routes.forgotPassword()} className="text-primary hover:underline">
             {t('auth.login.forgotPassword')}
           </Link>
         </div>
 
         <p className="text-center text-sm">
-          <Link href="/resend-confirmation" className="text-primary hover:underline">
+          <Link href={routes.resendConfirmation()} className="text-primary hover:underline">
             {t('auth.login.resendConfirmation')}
           </Link>
         </p>

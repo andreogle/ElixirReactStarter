@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Button from '../../../components/Button';
 import { inputClass } from '../../../components/ui';
 import AuthLayout from '../../../layouts/AuthLayout';
+import { routes } from '../../../routes';
 
 interface ResetPasswordProps {
   token: string;
@@ -20,7 +21,7 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          post('/reset-password');
+          post(routes.resetPassword());
         }}
         className="space-y-4"
       >
