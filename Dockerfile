@@ -65,8 +65,32 @@ COPY lib lib
 COPY assets assets
 
 # Build browser bundle + SSR bundle + digest, then compile the app.
-RUN mix assets.deploy
+#
+# Source maps: assets.deploy runs build/upload-sourcemaps.js, which ships
+# maps to Sentry only when SENTRY_AUTH_TOKEN/SENTRY_ORG/SENTRY_PROJECT are
+# set in the build env, and otherwise skips (so local/CI builds without
+# Sentry creds still succeed). These are declared as ARGs so Render's build
+# environment populates them, and passed only to this RUN so the auth token
+# is never ENV-persisted into an image layer (the builder stage is
+# discarded in the final image regardless).
+#
+# RENDER_GIT_COMMIT is Render's commit SHA; it tags the upload with the
+# same release runtime events report. Nothing to set by hand.
+ARG RENDER_GIT_COMMIT=""
+ARG SENTRY_ORG=""
+ARG SENTRY_PROJECT=""
+ARG SENTRY_AUTH_TOKEN=""
+RUN RENDER_GIT_COMMIT="${RENDER_GIT_COMMIT}" \
+    SENTRY_ORG="${SENTRY_ORG}" \
+    SENTRY_PROJECT="${SENTRY_PROJECT}" \
+    SENTRY_AUTH_TOKEN="${SENTRY_AUTH_TOKEN}" \
+    mix assets.deploy
 RUN mix compile
+
+# Package the app's source so Sentry can show source context on backend
+# stack traces. Writes into the :sentry dep's priv dir, which the release
+# bundles; loaded when the :sentry app starts. Must run before mix release.
+RUN mix sentry.package_source_code
 
 # Runtime config + release assembly.
 COPY config/runtime.exs config/

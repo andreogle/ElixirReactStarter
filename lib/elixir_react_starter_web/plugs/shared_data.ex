@@ -24,6 +24,13 @@ defmodule ElixirReactStarterWeb.Plugs.SharedData do
     user = conn.assigns[:current_user]
 
     conn
+    # Layout assign (not an Inertia prop): root.html.heex stamps the
+    # frontend Sentry DSN into meta tags that app.tsx reads before booting.
+    # nil when unconfigured, so the tags (and the SDK) are simply absent.
+    |> Plug.Conn.assign(
+      :sentry_client,
+      Application.get_env(:elixir_react_starter, :sentry_client)
+    )
     |> assign_prop(:current_user, serialize_user(user))
     |> assign_prop(:locale, conn.assigns[:locale] || "en")
     |> assign_prop(:flash, conn.assigns[:flash] || %{})

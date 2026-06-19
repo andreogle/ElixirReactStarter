@@ -1,4 +1,8 @@
 defmodule ElixirReactStarterWeb.Endpoint do
+  # Capture exceptions raised in the plug pipeline and report them to
+  # Sentry. Must sit above `use Phoenix.Endpoint`. Inert until a DSN is
+  # configured (see config/runtime.exs).
+  use Sentry.PlugCapture
   use Phoenix.Endpoint, otp_app: :elixir_react_starter
 
   # The session will be stored in the cookie and signed,
@@ -67,6 +71,12 @@ defmodule ElixirReactStarterWeb.Endpoint do
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
     json_decoder: Phoenix.json_library()
+
+  # Attach request context (method, path, scrubbed params/headers) to any
+  # Sentry event captured for this request. Must sit after Plug.Parsers so
+  # the body is available. `scrub_params` extends the default scrubber to
+  # drop the project's PII/secret params.
+  plug Sentry.PlugContext, body_scrubber: {ElixirReactStarter.Sentry, :scrub_params}
 
   plug Plug.MethodOverride
   plug Plug.Head
