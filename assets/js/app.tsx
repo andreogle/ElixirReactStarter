@@ -1,3 +1,6 @@
+// Init Sentry first so its global error handlers are installed before any
+// other module can throw. No-op unless a DSN was stamped into <head>.
+import './sentry';
 import './i18n';
 import { go } from '@api3/promise-utils';
 import { createInertiaApp, router } from '@inertiajs/react';

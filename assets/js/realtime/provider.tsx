@@ -155,9 +155,9 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       channel
         .join()
         .receive('ok', () => updateChannelStatus(topic, 'joined', null))
-        .receive('error', (reply: { reason?: string }) =>
-          updateChannelStatus(topic, 'errored', { reason: reply.reason ?? 'unknown' })
-        );
+        .receive('error', (reply: { reason?: string }) => {
+          return updateChannelStatus(topic, 'errored', { reason: reply.reason ?? 'unknown' });
+        });
     },
     [socket, updateChannelStatus]
   );

@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { captureException } from '../sentry';
 import Button from './Button';
 
 interface Props {
@@ -31,9 +32,10 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    // Surface to the console in every environment. Wire your error
-    // monitoring SDK (Sentry, AppSignal, …) in here.
+    // Surface to the console in every environment, and report to Sentry
+    // (no-op unless configured) with the component stack for context.
     console.error('Unhandled render error:', error, info.componentStack);
+    captureException(error, { componentStack: info.componentStack });
   }
 
   render() {

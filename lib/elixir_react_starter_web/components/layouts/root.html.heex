@@ -4,6 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
+    <%!-- Frontend Sentry config. Present only when SENTRY_DSN_FRONTEND is
+         set (see ElixirReactStarterWeb.Plugs.SharedData / config/runtime.exs);
+         read by assets/js/sentry.ts before the app boots. --%>
+    <%= if config = assigns[:sentry_client] do %>
+      <meta name="sentry-dsn" content={config[:dsn]} />
+      <meta :if={config[:environment]} name="sentry-environment" content={config[:environment]} />
+      <meta :if={config[:release]} name="sentry-release" content={config[:release]} />
+    <% end %>
     <.inertia_title>{assigns[:page_title] || "ElixirReactStarter"}</.inertia_title>
     <.inertia_head content={@inertia_head} />
     <%!-- Theme bootstrap. Reads the `theme` cookie before any CSS/JS

@@ -50,6 +50,7 @@ defmodule ElixirReactStarter.MixProject do
         ElixirReactStarterWeb.Telemetry,
         Mix.Tasks.Lint,
         Mix.Tasks.I18n.Check,
+        Mix.Tasks.Routes.Gen,
         ~r/^Inspect\./,
         ~r/Case$/,
         ~r/Factory$/
@@ -128,6 +129,7 @@ defmodule ElixirReactStarter.MixProject do
       {:ecto_sql, "~> 3.13"},
       {:exflect, "~> 1.0"},
       {:gettext, "~> 1.0"},
+      {:hackney, "~> 1.20"},
       {:hammer, "~> 7.0"},
       {:jason, "~> 1.2"},
       {:oban, "~> 2.19"},
@@ -138,6 +140,7 @@ defmodule ElixirReactStarter.MixProject do
       {:phoenix_live_view, "~> 1.2.0"},
       {:postgrex, ">= 0.0.0"},
       {:req, "~> 0.5"},
+      {:sentry, "~> 13.2"},
       {:swoosh, "~> 1.16"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
@@ -189,8 +192,12 @@ defmodule ElixirReactStarter.MixProject do
         "cmd node assets/build/generate-ssr-pages.js",
         # Generate the typed frontend route table (see assets.build above).
         "routes.gen",
-        ~s(esbuild elixir_react_starter --minify --define:process.env.NODE_ENV='"production"'),
+        # External source maps so Sentry can de-minify production stack
+        # traces. upload-sourcemaps.js ships them to Sentry and deletes the
+        # .map files before phx.digest runs, so they're never served.
+        ~s(esbuild elixir_react_starter --minify --sourcemap=external --define:process.env.NODE_ENV='"production"'),
         "esbuild elixir_react_starter_ssr",
+        "cmd node assets/build/upload-sourcemaps.js",
         "phx.digest",
         # phx.digest writes `.gz` next to every asset; this step writes the
         # brotli sibling so Plug.Static can serve whichever the request

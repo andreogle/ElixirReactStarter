@@ -133,4 +133,33 @@ if config_env() == :prod do
     adapter: Swoosh.Adapters.Mailjet,
     api_key: get_env!.("MAILJET_API_KEY"),
     secret: get_env!.("MAILJET_SECRET")
+
+  # Sentry error monitoring. Both sides are opt-in: the SDK stays inert
+  # unless its DSN env var is set, so a deploy without Sentry configured
+  # simply reports nothing. Backend and frontend use separate Sentry
+  # projects (separate DSNs); the frontend DSN is surfaced to the browser
+  # via meta tags in root.html.heex (see ElixirReactStarterWeb.Plugs.SharedData).
+  #
+  # The Sentry environment is the deploy tier (staging/qa/production), taken
+  # from DEPLOY_ENV — distinct from MIX_ENV, which is :prod for every
+  # deployed tier. Defaults to "production" when unset.
+  sentry_env = System.get_env("DEPLOY_ENV", "production")
+  # Release defaults to the deploy's commit SHA. On Render that's
+  # RENDER_GIT_COMMIT (provided at build and runtime), so neither needs to
+  # be set by hand; SENTRY_RELEASE overrides it if you ever want to.
+  sentry_release = System.get_env("SENTRY_RELEASE") || System.get_env("RENDER_GIT_COMMIT")
+
+  if dsn = System.get_env("SENTRY_DSN") do
+    config :sentry,
+      dsn: dsn,
+      environment_name: sentry_env,
+      release: sentry_release
+  end
+
+  if dsn = System.get_env("SENTRY_DSN_FRONTEND") do
+    config :elixir_react_starter, :sentry_client,
+      dsn: dsn,
+      environment: sentry_env,
+      release: sentry_release
+  end
 end

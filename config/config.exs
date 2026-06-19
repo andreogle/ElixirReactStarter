@@ -103,6 +103,33 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Sentry error monitoring (backend). The DSN is set per-environment in
+# config/runtime.exs — without it the SDK is inert, so dev/test report
+# nothing. Errors only: no tracing/spans are configured. `before_send`
+# enforces the project's no-PII rule on every event (see
+# ElixirReactStarter.Sentry).
+config :sentry,
+  enable_source_code_context: true,
+  root_source_code_paths: [File.cwd!()],
+  before_send: {ElixirReactStarter.Sentry, :before_send},
+  # Report failed Oban jobs (cron check-in monitoring left off — errors only).
+  integrations: [oban: [capture_errors: true]]
+
+# Route OTP/Logger crash reports into Sentry: Bandit request crashes and
+# Oban job failures both surface here. Attached at boot by
+# ElixirReactStarter.Application via `Logger.add_handlers(:elixir_react_starter)`.
+# Keeps the SDK defaults (level: :error, capture_log_messages: false, and
+# the Bandit domain excluded so PlugCapture doesn't double-report) — we only
+# widen the metadata so the correlation IDs we already log ride along.
+config :elixir_react_starter, :logger, [
+  {:handler, :sentry, Sentry.LoggerHandler,
+   %{
+     config: %{
+       metadata: [:request_id, :user_id]
+     }
+   }}
+]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
