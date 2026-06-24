@@ -145,7 +145,6 @@ defmodule ElixirReactStarter.MixProject do
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:tzdata, "~> 1.1"},
-      {:uniq, "~> 0.6"},
 
       # Dev/test
       {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
