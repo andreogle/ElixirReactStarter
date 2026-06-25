@@ -20,8 +20,7 @@ defmodule ElixirReactStarter.Accounts do
 
   use ElixirReactStarter.Context,
     repo: ElixirReactStarter.Repo,
-    schema: ElixirReactStarter.Accounts.User,
-    changeset: :registration_changeset
+    schema: ElixirReactStarter.Accounts.User
 
   require Logger
 

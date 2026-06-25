@@ -9,7 +9,8 @@ defmodule ElixirReactStarter.Context do
   * `:repo` (required) - The Ecto Repo module (e.g., `ElixirReactStarter.Repo`).
   * `:schema` (required) - The Schema module (e.g., `ElixirReactStarter.Accounts.User`).
   * `:preloads` (optional) - A list of associations to preload by default on read operations.
-  * `:changeset` (optional) - The atom name of the changeset function to use for `change_*` helpers. Defaults to `:changeset`.
+  * `:singular` (optional) - Override the singular name used to build function names. Defaults to the underscored, singularized schema name. Set this when the automatic inflection is wrong (e.g. `Class` → `clas`).
+  * `:plural` (optional) - Override the plural name used to build function names. Defaults to the pluralized singular name.
 
   ## Generated Functions
 
@@ -28,7 +29,6 @@ defmodule ElixirReactStarter.Context do
   * `delete_user(struct)` - Deletes the user.
 
   **Helpers:**
-  * `change_user(struct, attrs \\ %{})` - Returns an `Ecto.Changeset`.
   * `count_users(filters \\ [])` - Returns an integer count.
 
   **Overridable Callbacks:**
@@ -64,20 +64,20 @@ defmodule ElixirReactStarter.Context do
     repo = Keyword.fetch!(opts, :repo)
     schema = Keyword.fetch!(opts, :schema)
     default_preloads = Keyword.get(opts, :preloads, [])
-    changeset_fn = Keyword.get(opts, :changeset, :changeset)
 
     # 2. Calculate Names (Run at compile time)
     # We expand the schema alias to get the last part (e.g., ElixirReactStarter.User -> "User")
     schema_module = Macro.expand(schema, __CALLER__)
 
     singular_str =
-      schema_module
-      |> Module.split()
-      |> List.last()
-      |> Macro.underscore()
-      |> Exflect.singularize()
+      Keyword.get(opts, :singular) ||
+        schema_module
+        |> Module.split()
+        |> List.last()
+        |> Macro.underscore()
+        |> Exflect.singularize()
 
-    plural_str = Exflect.pluralize(singular_str)
+    plural_str = Keyword.get(opts, :plural) || Exflect.pluralize(singular_str)
 
     # Pre-calculate function names as atoms
     list_fn = String.to_atom("list_#{plural_str}")
@@ -94,7 +94,6 @@ defmodule ElixirReactStarter.Context do
     get_by_fn = String.to_atom("get_#{singular_str}_by")
 
     delete_fn = String.to_atom("delete_#{singular_str}")
-    change_fn = String.to_atom("change_#{singular_str}")
 
     quote do
       require Ecto.Query
@@ -163,10 +162,6 @@ defmodule ElixirReactStarter.Context do
       # ========================================================================
       # 3. HELPER Operations
       # ========================================================================
-      def unquote(change_fn)(%unquote(schema){} = struct, attrs \\ %{}) do
-        unquote(schema).unquote(changeset_fn)(struct, attrs)
-      end
-
       def unquote(count_fn)(filters \\ []) do
         unquote(schema)
         |> unquote(filter_fn)(filters)

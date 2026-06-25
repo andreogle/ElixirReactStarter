@@ -63,13 +63,12 @@ These are the rules that must not be forgotten or looked up — they're the ones
 
 ### `ElixirReactStarter.Context` macro
 
-Use it in every context module to get generated CRUD helpers (`list_*`, `get_*`, `get_*!`, `delete_*`, `change_*`, `count_*`, `filter_*`). Custom functions live alongside.
+Use it in every context module to get generated CRUD helpers (`list_*`, `get_*`, `get_*!`, `delete_*`, `count_*`, `filter_*`). Custom functions live alongside.
 
 ```elixir
 use ElixirReactStarter.Context,
   repo: ElixirReactStarter.Repo,
-  schema: ElixirReactStarter.Accounts.User,
-  changeset: :registration_changeset
+  schema: ElixirReactStarter.Accounts.User
 ```
 
 ### `ElixirReactStarter.Log.redact_email/1`
