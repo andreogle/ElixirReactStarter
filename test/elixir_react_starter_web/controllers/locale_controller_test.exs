@@ -39,6 +39,14 @@ defmodule ElixirReactStarterWeb.LocaleControllerTest do
       assert Accounts.get_user_by_email(user.email).locale == "es"
     end
 
+    test "the resolved locale reaches the <html lang> attribute", %{conn: conn} do
+      assert get(conn, ~p"/").resp_body =~ ~s(<html lang="en">)
+
+      conn = put(conn, ~p"/locale", %{locale: "es"})
+
+      assert get(conn, ~p"/").resp_body =~ ~s(<html lang="es">)
+    end
+
     test "rejects an unsupported locale", %{conn: conn} do
       conn = put(conn, ~p"/locale", %{locale: "fr"})
 
