@@ -103,11 +103,24 @@ jobs:
       - name: Check for unused deps
         run: mix deps.unlock --check-unused
 
-      - name: Lint (credo + biome)
+      - name: Lint (credo + biome + tsc)
         run: mix lint
+
+      # Fails on a known high/critical advisory in the npm tree. Hex
+      # advisories are covered by Dependabot alerts + the dependency-review
+      # job below, so there's no equivalent mix step here.
+      - name: Audit npm dependencies
+        run: npm audit --audit-level=high
+        working-directory: assets
 
       - name: i18n check
         run: mix i18n.check
+
+      # Fails if assets/js/routes.ts has drifted from the router. `mix
+      # precommit` runs this too, but only via the local git hook — which a
+      # `--no-verify` commit skips, so CI is where the check has teeth.
+      - name: Check generated routes are up to date
+        run: mix routes.gen --check
 
       - name: Test
         run: mix test --cover
@@ -240,3 +253,28 @@ jobs:
             assets/playwright-report/
             assets/test-results/
           retention-days: 7
+
+  # Blocks pull requests that introduce a dependency with a known
+  # vulnerability — Hex and npm alike, read from GitHub's dependency graph
+  # (mix.lock and package-lock.json are both supported). PR-only by nature:
+  # the action diffs the base and head manifests, so a push has nothing to
+  # compare against.
+  #
+  # Requires the dependency graph to be enabled on the repository
+  # (Settings → Advanced Security). Pair it with Dependabot alerts, which
+  # cover the same advisories for code already on main rather than at PR time.
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high

@@ -1,0 +1,56 @@
+name: CodeQL
+
+# Static security analysis of the frontend. CodeQL has no Elixir support, so
+# this covers `assets/` (TypeScript/JavaScript) only — the backend's static
+# analysis is credo + dialyzer in ci.yml.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly re-scan (Mondays, 04:17 UTC). CodeQL ships new queries
+    # regularly, so unchanged code is worth re-analysing on a schedule.
+    - cron: "17 4 * * 1"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (javascript-typescript)
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Uploading results to the Security tab needs write access to code
+      # scanning alerts; everything else stays read-only.
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      # Actions are pinned to commit SHAs (see ci.yml); the trailing comment
+      # is the human-readable tag, and Dependabot bumps both together.
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      # No build step: CodeQL analyses JS/TS straight from source, so the
+      # gitignored page registries (_pages.ts / _ssr_pages.ts) not existing
+      # here costs a little import resolution, nothing more.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4
+        with:
+          languages: javascript-typescript
+          # `security-extended` adds lower-severity security queries on top
+          # of the default set. Drop back to `security` if it gets noisy.
+          queries: security-extended
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4
+        with:
+          category: "/language:javascript-typescript"
