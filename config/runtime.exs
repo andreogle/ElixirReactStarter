@@ -69,6 +69,25 @@ if config_env() == :prod do
     # pool_count: 4,
     socket_options: maybe_ipv6
 
+  # Trust forwarding headers for the client IP. Only turn this on when a
+  # proxy in front of the app sets them on every request (Render, Fly, an
+  # ALB, a k8s ingress) — on a directly-exposed server it would let callers
+  # spoof their IP and slip the auth rate limits. See
+  # `ElixirReactStarterWeb.Plugs.ClientIp`.
+  #
+  # TRUSTED_PROXIES is an optional comma-separated CIDR list, needed only for
+  # proxies that reach the app from a *public* address; private and reserved
+  # ranges are always treated as proxies.
+  trusted_proxies =
+    "TRUSTED_PROXIES"
+    |> System.get_env("")
+    |> String.split(",", trim: true)
+    |> Enum.map(&String.trim/1)
+
+  config :elixir_react_starter,
+    trust_proxy_headers: System.get_env("TRUST_PROXY_HEADERS", "false") in ~w(true 1),
+    trusted_proxies: trusted_proxies
+
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
   # want to use a different value for prod and you most likely don't want

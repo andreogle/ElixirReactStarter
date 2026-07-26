@@ -129,7 +129,6 @@ defmodule ElixirReactStarter.MixProject do
       {:ecto_sql, "~> 3.13"},
       {:exflect, "~> 1.0"},
       {:gettext, "~> 1.0"},
-      {:hackney, "~> 1.20"},
       {:hammer, "~> 7.0"},
       {:jason, "~> 1.2"},
       {:oban, "~> 2.19"},
@@ -139,6 +138,7 @@ defmodule ElixirReactStarter.MixProject do
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:phoenix_live_view, "~> 1.2.0"},
       {:postgrex, ">= 0.0.0"},
+      {:remote_ip, "~> 1.2"},
       {:req, "~> 0.5"},
       {:sentry, "~> 13.2"},
       {:swoosh, "~> 1.16"},
@@ -152,7 +152,6 @@ defmodule ElixirReactStarter.MixProject do
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:ex_doc, "~> 0.34", only: [:dev, :test], runtime: false},
       {:ex_machina, "~> 2.8.0", only: :test},
-      {:lazy_html, ">= 0.1.0", only: :test},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev}
     ]

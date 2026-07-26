@@ -64,6 +64,12 @@ defmodule ElixirReactStarterWeb.Endpoint do
     param_key: "request_logger",
     cookie_key: "request_logger"
 
+  # Resolve the real client IP from forwarding headers before anything reads
+  # `conn.remote_ip` — request logs, telemetry, Sentry context, and the auth
+  # rate limiter all sit downstream. Inert unless the app is configured as
+  # running behind a trusted proxy.
+  plug ElixirReactStarterWeb.Plugs.ClientIp
+
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 

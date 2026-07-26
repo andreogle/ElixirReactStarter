@@ -24,9 +24,11 @@ defmodule ElixirReactStarterWeb.Plugs.RateLimit do
   test (so the Playwright suite isn't throttled), on in prod.
 
   > #### Behind a proxy {: .warning}
-  > `:ip` keying uses `conn.remote_ip`. Behind a load balancer, populate
-  > it from the forwarded header (e.g. the `remote_ip` plug) — otherwise
-  > every client shares one bucket. The `:email` limits are unaffected.
+  > `:ip` keying uses `conn.remote_ip`. Behind a load balancer that means
+  > the balancer's address — every client sharing one bucket — unless
+  > `ElixirReactStarterWeb.Plugs.ClientIp` is enabled to resolve the real
+  > caller from the forwarding headers (`TRUST_PROXY_HEADERS=true`). The
+  > `:email` limits are unaffected either way.
   """
 
   @behaviour Plug

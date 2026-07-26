@@ -120,11 +120,31 @@ docker run -p 4000:4000 \
 and `SECRET_KEY_BASE` and will refuse to boot without them. `PHX_HOST` defaults to
 `example.com` but should always be set in production (it's used for absolute URLs
 in emails). `PORT` (default `4000`), `POOL_SIZE`, `ECTO_IPV6`,
-`DNS_CLUSTER_QUERY`, `SSR_POOL_SIZE` (number of Inertia SSR Node workers,
-default `2`), and `NODE_OPTIONS` (set in the Dockerfile to
-`--max-old-space-size=160`, caps each SSR worker's V8 heap) are optional. The
-last two are the main levers on the Node-side memory the SSR pool uses — see
-[Frontend Pages: SSR vs. Client](docs/frontend-pages.md).
+`DNS_CLUSTER_QUERY`, `TRUST_PROXY_HEADERS`, `TRUSTED_PROXIES`, `SSR_POOL_SIZE`
+(number of Inertia SSR Node workers, default `2`), and `NODE_OPTIONS` (set in the
+Dockerfile to `--max-old-space-size=160`, caps each SSR worker's V8 heap) are
+optional. The last two are the main levers on the Node-side memory the SSR pool
+uses — see [Frontend Pages: SSR vs. Client](docs/frontend-pages.md).
+
+### Behind a proxy
+
+If traffic reaches the app through a load balancer or CDN — Render, Fly, an ALB,
+a Kubernetes ingress, Cloudflare — set `TRUST_PROXY_HEADERS=true`. Without it
+`conn.remote_ip` is the *balancer's* address, so the IP-keyed auth rate limits
+collapse into a single shared bucket for every client (the email-keyed limits
+still work).
+
+It's off by default on purpose: forwarding headers are only trustworthy when
+something in front of the app rewrites them on every request. Honouring them on
+a directly-exposed server would let any caller spoof `X-Forwarded-For` and get a
+fresh rate-limit bucket per request.
+
+Proxies that reach the app from a private address need nothing further — private
+and reserved ranges are always treated as proxies. For a proxy on a *public*
+address, list its ranges in `TRUSTED_PROXIES` (comma-separated CIDRs), or it will
+be mistaken for the client. Cloudflare deployments should also read
+`cf-connecting-ip` instead of `x-forwarded-for`; see
+`ElixirReactStarterWeb.Plugs.ClientIp` for that setting.
 
 Database migrations run via the release: `bin/migrate`. See Phoenix's
 [deployment guides](https://hexdocs.pm/phoenix/deployment.html) for hosting specifics.
