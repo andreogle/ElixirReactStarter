@@ -20,6 +20,5 @@
     "esModuleInterop": true
   },
   "include": ["js/**/*.ts", "js/**/*.tsx", "js/**/*.js", "js/**/*.jsx"],
-  "exclude": ["node_modules", "e2e", "playwright.config.ts"],
-  "references": [{ "path": "./tsconfig.e2e.json" }]
+  "exclude": ["node_modules", "e2e", "playwright.config.ts"]
 }

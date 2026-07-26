@@ -9,7 +9,8 @@
     "e2e:ui": "playwright test --ui",
     "fmt": "npm run lint:fix && biome format --write",
     "lint": "biome check build/ css/ e2e/ js/",
-    "lint:fix": "biome check --write build/ css/ e2e/ js/"
+    "lint:fix": "biome check --write build/ css/ e2e/ js/",
+    "typecheck": "node build/generate-ssr-pages.js && tsc -p tsconfig.json && tsc -p tsconfig.e2e.json"
   },
   "dependencies": {
     "@api3/promise-utils": "^0.4.0",
@@ -37,6 +38,7 @@
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
-    "axe-core": "^4.12.1"
+    "axe-core": "^4.12.1",
+    "typescript": "^6.0.3"
   }
 }
