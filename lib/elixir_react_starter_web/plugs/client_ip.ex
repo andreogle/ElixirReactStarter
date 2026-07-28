@@ -36,10 +36,17 @@ defmodule ElixirReactStarterWeb.Plugs.ClientIp do
       ranges only — e.g. Cloudflare's published egress blocks.
 
     * `:client_ip_headers` — headers to read, lowercase (default
-      `#{inspect(["x-forwarded-for"])}`). A single header is the safe choice:
-      with several enabled, a caller can add one the proxy doesn't overwrite
-      and interfere with parsing. Cloudflare deployments typically want
-      `["cf-connecting-ip"]` instead.
+      `#{inspect(["x-forwarded-for"])}`). Set from `CLIENT_IP_HEADERS`. A
+      single header is the safe choice: with several enabled, a caller can
+      add one the proxy doesn't overwrite and interfere with parsing.
+
+      Behind Cloudflare, set this to `cf-connecting-ip`. Cloudflare's edge
+      terminates on a *public* address, so the default `x-forwarded-for`
+      walk stops there and reports the edge as the caller — every visitor
+      arriving through the same edge then shares one rate-limit bucket.
+      `cf-connecting-ip` holds the address Cloudflare already resolved, so
+      there is no chain to walk. Listing Cloudflare's published ranges in
+      `:trusted_proxies` also works, but that list has to be kept current.
   """
 
   @behaviour Plug

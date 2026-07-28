@@ -4,9 +4,9 @@ import './sentry';
 import './i18n';
 import { go } from '@api3/promise-utils';
 import { createInertiaApp, router } from '@inertiajs/react';
-import { createElement, StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import pages from './_pages';
+import { createElement, StrictMode, useEffect } from 'react';
+import { createRoot, hydrateRoot } from 'react-dom/client';
+import pages, { serverRenderedPages } from './_pages';
 import { AppProviders } from './app-providers';
 import ErrorBoundary from './components/ErrorBoundary';
 import { syncLocale } from './components/LocaleSync';
@@ -23,6 +23,31 @@ function applyFlash(flash?: Flash) {
   if (!flash) return;
   if (flash.info) toast.success(flash.info);
   if (flash.error) toast.error(flash.error);
+}
+
+// Guards against StrictMode's deliberate double-invocation of effects in
+// dev, which would otherwise raise the same flash twice.
+let initialFlashApplied = false;
+
+/**
+ * Raises the flash from the *initial* page load, from an effect.
+ *
+ * Toasts live in a store outside React, so queueing one before the first
+ * render would put a toast in the client's tree that the server never
+ * rendered — a hydration mismatch, and React would discard the
+ * server-rendered DOM it was meant to adopt. Effects run after the
+ * hydration commit, so the toast arrives in a follow-up render instead.
+ *
+ * Renders nothing, so it costs no DOM on either side.
+ */
+function InitialFlash({ flash }: { flash?: Flash }) {
+  useEffect(() => {
+    if (initialFlashApplied) return;
+    initialFlashApplied = true;
+    applyFlash(flash);
+  }, [flash]);
+
+  return null;
 }
 
 createInertiaApp({
@@ -53,9 +78,6 @@ createInertiaApp({
       });
     }
 
-    // Initial page load: the server embeds flash directly in initialPage props.
-    applyFlash(props.initialPage.props.flash as Flash | undefined);
-
     // Client-initiated visits: `success` fires for every successful visit,
     // including same-URL POST → redirect flows (where `navigate` is skipped
     // because Inertia treats same-URL responses as history replace).
@@ -63,7 +85,7 @@ createInertiaApp({
       applyFlash(event.detail.page.props.flash as Flash | undefined);
     });
 
-    createRoot(el).render(
+    const tree = (
       <StrictMode>
         {/* AppProviders lives INSIDE Inertia's <App> because the providers
             it wraps consume page context (usePage). Using App's children
@@ -80,9 +102,32 @@ createInertiaApp({
             </AppProviders>
           )}
         </App>
+        <InitialFlash flash={props.initialPage.props.flash as Flash | undefined} />
         <Toaster />
       </StrictMode>
     );
+
+    // Match the mount to how the page was actually produced.
+    //
+    // For a `pages/ssr/` page the server sent real markup, which the browser
+    // has already parsed and painted; `hydrateRoot` adopts it, where
+    // `createRoot` clears the container and builds the whole tree again. It
+    // also surfaces divergence between the two renders, which the silent
+    // rebuild never did.
+    //
+    // A `pages/client/` page is deliberately absent from the SSR bundle and
+    // renders as a server-side no-op, so there is nothing to adopt. Hydrating
+    // one fails the match on every load and pushes React through its recovery
+    // path to reach the same result `createRoot` reaches directly.
+    //
+    // Both branches render the identical tree — only the mount differs. This
+    // is also why `ssr.tsx` renders `<Toaster />`: anything at the root on one
+    // side but not the other is a mismatch.
+    if (serverRenderedPages.has(props.initialPage.component)) {
+      hydrateRoot(el, tree);
+    } else {
+      createRoot(el).render(tree);
+    }
   },
   http: {
     xsrfHeaderName: 'x-csrf-token',

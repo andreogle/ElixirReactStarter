@@ -6,6 +6,7 @@ import { createElement } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import pages, { ssrClientOnly } from './_ssr_pages.ts';
 import { AppProviders } from './app-providers';
+import Toaster from './components/Toaster';
 import i18n from './i18n';
 
 // Sentry for the SSR Node workers (errors only — no tracing). The DSN is
@@ -48,12 +49,22 @@ export async function render(page: any) {
       // rendered inside AppProviders so context-dependent components
       // (Tooltip, etc.) work during SSR. Side-effect providers like
       // RealtimeProvider are safe — their useEffect doesn't run server-side.
+      //
+      // `Toaster` is here for hydration, not for output: it renders an empty
+      // Radix viewport element, and the client hydrates rather than rebuilds,
+      // so anything the client renders at the root must exist here too or
+      // React finds unexpected DOM and discards the subtree. Toasts are
+      // always client-side — the store is empty server-side, so this emits
+      // the viewport and nothing else.
       setup: ({ App, props }) => (
-        <App {...props}>
-          {({ Component, props: pageProps, key }) => (
-            <AppProviders>{createElement(Component, { key: key ?? undefined, ...pageProps })}</AppProviders>
-          )}
-        </App>
+        <>
+          <App {...props}>
+            {({ Component, props: pageProps, key }) => (
+              <AppProviders>{createElement(Component, { key: key ?? undefined, ...pageProps })}</AppProviders>
+            )}
+          </App>
+          <Toaster />
+        </>
       ),
     });
   };
