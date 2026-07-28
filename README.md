@@ -120,7 +120,8 @@ docker run -p 4000:4000 \
 and `SECRET_KEY_BASE` and will refuse to boot without them. `PHX_HOST` defaults to
 `example.com` but should always be set in production (it's used for absolute URLs
 in emails). `PORT` (default `4000`), `POOL_SIZE`, `ECTO_IPV6`,
-`DNS_CLUSTER_QUERY`, `TRUST_PROXY_HEADERS`, `TRUSTED_PROXIES`, `SSR_POOL_SIZE`
+`DNS_CLUSTER_QUERY`, `TRUST_PROXY_HEADERS`, `TRUSTED_PROXIES`,
+`CLIENT_IP_HEADERS`, `SSR_POOL_SIZE`
 (number of Inertia SSR Node workers, default `2`), and `NODE_OPTIONS` (set in the
 Dockerfile to `--max-old-space-size=160`, caps each SSR worker's V8 heap) are
 optional. The last two are the main levers on the Node-side memory the SSR pool
@@ -142,9 +143,21 @@ fresh rate-limit bucket per request.
 Proxies that reach the app from a private address need nothing further — private
 and reserved ranges are always treated as proxies. For a proxy on a *public*
 address, list its ranges in `TRUSTED_PROXIES` (comma-separated CIDRs), or it will
-be mistaken for the client. Cloudflare deployments should also read
-`cf-connecting-ip` instead of `x-forwarded-for`; see
-`ElixirReactStarterWeb.Plugs.ClientIp` for that setting.
+be mistaken for the client.
+
+**Behind Cloudflare, also set `CLIENT_IP_HEADERS=cf-connecting-ip`.** Cloudflare's
+edge terminates on a public address, so the default `x-forwarded-for` walk stops
+there and reports the edge as the caller — every visitor arriving through the
+same edge shares one rate-limit bucket. That is better than the single global
+bucket, and still not per-caller. `cf-connecting-ip` holds the address Cloudflare
+already resolved, so there is no chain to walk. Listing Cloudflare's published
+ranges in `TRUSTED_PROXIES` works too, but that list has to be kept current.
+
+Whichever header is trusted, a request that reaches the origin *directly* —
+bypassing the proxy — can forge it and pick its own rate-limit bucket. Closing
+that off means restricting origin access to the proxy (IP allowlisting, a tunnel,
+or authenticated origin pulls). The exposure is limited to rate limiting, not
+authorization, but it is worth deciding deliberately rather than by default.
 
 Database migrations run via the release: `bin/migrate`. See Phoenix's
 [deployment guides](https://hexdocs.pm/phoenix/deployment.html) for hosting specifics.

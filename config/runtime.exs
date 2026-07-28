@@ -84,9 +84,31 @@ if config_env() == :prod do
     |> String.split(",", trim: true)
     |> Enum.map(&String.trim/1)
 
+  # CLIENT_IP_HEADERS overrides which header the caller's address is read
+  # from. Behind a CDN that terminates on a *public* address — Cloudflare
+  # being the common case — the default `x-forwarded-for` walk stops on the
+  # CDN's edge and mistakes it for the caller, because only private and
+  # reserved ranges are skipped automatically. Setting this to
+  # `cf-connecting-ip` reads the address Cloudflare resolved instead, with
+  # no chain to walk.
+  # Set-but-empty falls back to the default rather than parsing to `[]`:
+  # an empty header list is how the plug switches itself off, so honouring
+  # it here would silently disable client-IP resolution instead of
+  # configuring it.
+  client_ip_headers =
+    case "CLIENT_IP_HEADERS"
+         |> System.get_env("")
+         |> String.split(",", trim: true)
+         |> Enum.map(&(&1 |> String.trim() |> String.downcase()))
+         |> Enum.reject(&(&1 == "")) do
+      [] -> ["x-forwarded-for"]
+      headers -> headers
+    end
+
   config :elixir_react_starter,
     trust_proxy_headers: System.get_env("TRUST_PROXY_HEADERS", "false") in ~w(true 1),
-    trusted_proxies: trusted_proxies
+    trusted_proxies: trusted_proxies,
+    client_ip_headers: client_ip_headers
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
