@@ -50,90 +50,96 @@ function InitialFlash({ flash }: { flash?: Flash }) {
   return null;
 }
 
-createInertiaApp({
-  resolve: async (name) => {
-    const loader = pages[name];
-    if (!loader) {
-      const error = new Error(`Page not found: ${name}`);
-      console.error(error);
-      throw error;
-    }
+const startApp = () => {
+  return createInertiaApp({
+    resolve: async (name) => {
+      const loader = pages[name];
+      if (!loader) {
+        const error = new Error(`Page not found: ${name}`);
+        console.error(error);
+        throw error;
+      }
 
-    const [error, page] = await go(loader);
-    if (error) {
-      console.error(`Failed to load page "${name}":`, error);
-      throw error;
-    }
-    return page.default;
-  },
-  setup({ App, el, props }) {
-    syncLocale(props.initialPage.props);
-    startThemeWatcher();
+      const [error, page] = await go(loader);
+      if (error) {
+        console.error(`Failed to load page "${name}":`, error);
+        throw error;
+      }
+      return page.default;
+    },
+    setup({ App, el, props }) {
+      syncLocale(props.initialPage.props);
+      startThemeWatcher();
 
-    // Dev-only accessibility auditing. The whole branch — and axe-core —
-    // is tree-shaken from the production bundle via the NODE_ENV define.
-    if (process.env.NODE_ENV !== 'production') {
-      void go(() => import('./a11y-audit')).then(([error, audit]) => {
-        if (error) {
-          console.error('Failed to load the accessibility audit:', error);
-          return;
-        }
-        audit.startA11yAudit();
+      // Dev-only accessibility auditing. The whole branch — and axe-core —
+      // is tree-shaken from the production bundle via the NODE_ENV define.
+      if (process.env.NODE_ENV !== 'production') {
+        void go(() => import('./a11y-audit')).then(([error, audit]) => {
+          if (error) {
+            console.error('Failed to load the accessibility audit:', error);
+            return;
+          }
+          audit.startA11yAudit();
+        });
+      }
+
+      // Client-initiated visits: `success` fires for every successful visit,
+      // including same-URL POST → redirect flows (where `navigate` is skipped
+      // because Inertia treats same-URL responses as history replace).
+      router.on('success', (event) => {
+        applyFlash(event.detail.page.props.flash as Flash | undefined);
       });
-    }
 
-    // Client-initiated visits: `success` fires for every successful visit,
-    // including same-URL POST → redirect flows (where `navigate` is skipped
-    // because Inertia treats same-URL responses as history replace).
-    router.on('success', (event) => {
-      applyFlash(event.detail.page.props.flash as Flash | undefined);
-    });
-
-    const tree = (
-      <StrictMode>
-        {/* AppProviders lives INSIDE Inertia's <App> because the providers
+      const tree = (
+        <StrictMode>
+          {/* AppProviders lives INSIDE Inertia's <App> because the providers
             it wraps consume page context (usePage). Using App's children
             render prop keeps the provider tree mounted across page
             navigations — only the inner <Component> swaps — so anything
             long-lived (sockets, caches, listeners) survives route changes. */}
-        <App {...props}>
-          {({ Component, props: pageProps, key }) => (
-            <AppProviders>
-              {/* Keyed on the page key so navigation remounts the boundary
+          <App {...props}>
+            {({ Component, props: pageProps, key }) => (
+              <AppProviders>
+                {/* Keyed on the page key so navigation remounts the boundary
                   and clears any caught error — long-lived providers above
                   stay mounted. */}
-              <ErrorBoundary key={key ?? undefined}>{createElement(Component, pageProps)}</ErrorBoundary>
-            </AppProviders>
-          )}
-        </App>
-        <InitialFlash flash={props.initialPage.props.flash as Flash | undefined} />
-        <Toaster />
-      </StrictMode>
-    );
+                <ErrorBoundary key={key ?? undefined}>{createElement(Component, pageProps)}</ErrorBoundary>
+              </AppProviders>
+            )}
+          </App>
+          <InitialFlash flash={props.initialPage.props.flash as Flash | undefined} />
+          <Toaster />
+        </StrictMode>
+      );
 
-    // Match the mount to how the page was actually produced.
-    //
-    // For a `pages/ssr/` page the server sent real markup, which the browser
-    // has already parsed and painted; `hydrateRoot` adopts it, where
-    // `createRoot` clears the container and builds the whole tree again. It
-    // also surfaces divergence between the two renders, which the silent
-    // rebuild never did.
-    //
-    // A `pages/client/` page is deliberately absent from the SSR bundle and
-    // renders as a server-side no-op, so there is nothing to adopt. Hydrating
-    // one fails the match on every load and pushes React through its recovery
-    // path to reach the same result `createRoot` reaches directly.
-    //
-    // Both branches render the identical tree — only the mount differs. This
-    // is also why `ssr.tsx` renders `<Toaster />`: anything at the root on one
-    // side but not the other is a mismatch.
-    if (serverRenderedPages.has(props.initialPage.component)) {
-      hydrateRoot(el, tree);
-    } else {
-      createRoot(el).render(tree);
-    }
-  },
-  http: {
-    xsrfHeaderName: 'x-csrf-token',
-  },
+      // Match the mount to how the page was actually produced.
+      //
+      // For a `pages/ssr/` page the server sent real markup, which the browser
+      // has already parsed and painted; `hydrateRoot` adopts it, where
+      // `createRoot` clears the container and builds the whole tree again. It
+      // also surfaces divergence between the two renders, which the silent
+      // rebuild never did.
+      //
+      // A `pages/client/` page is deliberately absent from the SSR bundle and
+      // renders as a server-side no-op, so there is nothing to adopt. Hydrating
+      // one fails the match on every load and pushes React through its recovery
+      // path to reach the same result `createRoot` reaches directly.
+      //
+      // Both branches render the identical tree — only the mount differs. This
+      // is also why `ssr.tsx` renders `<Toaster />`: anything at the root on one
+      // side but not the other is a mismatch.
+      if (serverRenderedPages.has(props.initialPage.component)) {
+        hydrateRoot(el, tree);
+      } else {
+        createRoot(el).render(tree);
+      }
+    },
+    http: {
+      xsrfHeaderName: 'x-csrf-token',
+    },
+  });
+};
+
+void go(startApp).then(([error]) => {
+  if (error) console.error('Failed to start the application:', error);
 });
