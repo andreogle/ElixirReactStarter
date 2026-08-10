@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "ES2021.Intl", "DOM", "DOM.Iterable"],
+    "lib": ["ES2020", "ES2021.Intl", "ES2022.Error", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
@@ -20,5 +20,5 @@
     "esModuleInterop": true
   },
   "include": ["js/**/*.ts", "js/**/*.tsx", "js/**/*.js", "js/**/*.jsx"],
-  "exclude": ["node_modules", "e2e", "playwright.config.ts"]
+  "exclude": ["node_modules", "e2e", "js/**/*.test.ts", "playwright.config.ts"]
 }

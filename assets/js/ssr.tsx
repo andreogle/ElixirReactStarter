@@ -1,5 +1,4 @@
 import './i18n';
-import { go } from '@api3/promise-utils';
 import { createInertiaApp } from '@inertiajs/react';
 import * as Sentry from '@sentry/node';
 import { createElement } from 'react';
@@ -7,6 +6,7 @@ import ReactDOMServer from 'react-dom/server';
 import pages, { ssrClientOnly } from './_ssr_pages.ts';
 import { AppProviders } from './app-providers';
 import Toaster from './components/Toaster';
+import { go } from './errgo';
 import i18n from './i18n';
 
 // Sentry for the SSR Node workers (errors only — no tracing). The DSN is
@@ -29,7 +29,11 @@ export async function render(page: any) {
   // Sync locale before rendering so SSR output matches
   const locale = page.props?.locale as string | undefined;
   if (locale && locale !== i18n.language) {
-    void go(() => i18n.changeLanguage(locale));
+    const [localeError] = await go(() => i18n.changeLanguage(locale));
+    if (localeError) {
+      if (sentryDsn) Sentry.captureException(localeError);
+      throw localeError;
+    }
   }
 
   const renderApp = () => {
@@ -69,15 +73,15 @@ export async function render(page: any) {
     });
   };
 
-  const result = await go(renderApp);
+  const [error, result] = await go(renderApp);
 
   // Report the failure, then re-raise so Inertia's own SSR-failure handling
   // runs unchanged (graceful client-side fallback in prod, raise in dev per
   // `raise_on_ssr_failure`).
-  if (!result.success) {
-    if (sentryDsn) Sentry.captureException(result.error);
-    throw result.error;
+  if (error) {
+    if (sentryDsn) Sentry.captureException(error);
+    throw error;
   }
 
-  return result.data;
+  return result;
 }

@@ -1,4 +1,5 @@
 import { router } from '@inertiajs/react';
+import { go } from '../errgo';
 import i18n from '../i18n';
 
 /**
@@ -22,7 +23,9 @@ function applyLocale(props: Record<string, unknown>) {
   if (!locale) return;
 
   if (locale !== i18n.language) {
-    i18n.changeLanguage(locale);
+    void go(() => i18n.changeLanguage(locale)).then(([error]) => {
+      if (error) console.error(`Failed to change language to "${locale}":`, error);
+    });
   }
 
   if (locale !== document.documentElement.lang) {

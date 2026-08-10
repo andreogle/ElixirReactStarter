@@ -10,10 +10,10 @@
     "fmt": "npm run lint:fix && biome format --write",
     "lint": "biome check build/ css/ e2e/ js/",
     "lint:fix": "biome check --write build/ css/ e2e/ js/",
+    "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test js/errgo.test.ts",
     "typecheck": "node build/generate-ssr-pages.js && tsc -p tsconfig.json && tsc -p tsconfig.e2e.json"
   },
   "dependencies": {
-    "@api3/promise-utils": "^0.4.0",
     "@inertiajs/react": "^3.6.1",
     "@radix-ui/react-alert-dialog": "^1.1.23",
     "@radix-ui/react-dropdown-menu": "^2.1.24",
