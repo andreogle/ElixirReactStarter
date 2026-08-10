@@ -1,6 +1,6 @@
-import { go } from '@api3/promise-utils';
 import { router } from '@inertiajs/react';
 import axe from 'axe-core';
+import { go } from './errgo';
 
 /**
  * Development-only accessibility auditing with axe-core.
@@ -18,13 +18,13 @@ import axe from 'axe-core';
  */
 export function startA11yAudit() {
   const scan = async () => {
-    const result = await go(() => axe.run(document));
-    if (!result.success) {
-      console.error('[a11y] axe scan failed:', result.error);
+    const [error, result] = await go(() => axe.run(document));
+    if (error) {
+      console.error('[a11y] axe scan failed:', error);
       return;
     }
 
-    const { violations } = result.data;
+    const { violations } = result;
     if (violations.length === 0) return;
 
     console.warn(`[a11y] ${violations.length} issue(s) on ${window.location.pathname}`);

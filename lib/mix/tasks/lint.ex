@@ -8,6 +8,7 @@ defmodule Mix.Tasks.Lint do
   This runs:
   - `mix credo` for Elixir static analysis
   - `npm run lint` (biome) for TypeScript/CSS linting
+  - `npm run test:unit` for frontend utility contract tests
   - `npm run typecheck` (tsc) for TypeScript type checking, covering both
     the app (`tsconfig.json`) and the Playwright suite (`tsconfig.e2e.json`)
 
@@ -24,6 +25,7 @@ defmodule Mix.Tasks.Lint do
     Mix.Task.run("credo")
 
     npm("run lint")
+    npm("run test:unit")
     npm("run typecheck")
   end
 

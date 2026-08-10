@@ -2,7 +2,6 @@
 // other module can throw. No-op unless a DSN was stamped into <head>.
 import './sentry';
 import './i18n';
-import { go } from '@api3/promise-utils';
 import { createInertiaApp, router } from '@inertiajs/react';
 import { createElement, StrictMode, useEffect } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
@@ -12,6 +11,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { syncLocale } from './components/LocaleSync';
 import Toaster from './components/Toaster';
 import { toast } from './components/toast';
+import { go } from './errgo';
 import { startThemeWatcher } from './theme';
 
 interface Flash {
@@ -59,12 +59,12 @@ createInertiaApp({
       throw error;
     }
 
-    const result = await go(loader);
-    if (!result.success) {
-      console.error(`Failed to load page "${name}":`, result.error);
-      throw result.error;
+    const [error, page] = await go(loader);
+    if (error) {
+      console.error(`Failed to load page "${name}":`, error);
+      throw error;
     }
-    return result.data.default;
+    return page.default;
   },
   setup({ App, el, props }) {
     syncLocale(props.initialPage.props);
@@ -73,8 +73,12 @@ createInertiaApp({
     // Dev-only accessibility auditing. The whole branch — and axe-core —
     // is tree-shaken from the production bundle via the NODE_ENV define.
     if (process.env.NODE_ENV !== 'production') {
-      void go(() => import('./a11y-audit')).then((result) => {
-        if (result.success) result.data.startA11yAudit();
+      void go(() => import('./a11y-audit')).then(([error, audit]) => {
+        if (error) {
+          console.error('Failed to load the accessibility audit:', error);
+          return;
+        }
+        audit.startA11yAudit();
       });
     }
 
