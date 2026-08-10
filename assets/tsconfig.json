@@ -20,5 +20,5 @@
     "esModuleInterop": true
   },
   "include": ["js/**/*.ts", "js/**/*.tsx", "js/**/*.js", "js/**/*.jsx"],
-  "exclude": ["node_modules", "e2e", "playwright.config.ts"]
+  "exclude": ["node_modules", "e2e", "js/**/*.test.ts", "playwright.config.ts"]
 }
