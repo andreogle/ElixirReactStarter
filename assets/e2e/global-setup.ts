@@ -13,6 +13,6 @@ import path from 'node:path';
  * (assets/e2e -> repo root).
  */
 export default function globalSetup() {
-  const projectRoot = path.resolve(__dirname, '..', '..');
+  const projectRoot = path.resolve(import.meta.dirname, '..', '..');
   execSync('mix run priv/repo/e2e.exs', { cwd: projectRoot, stdio: 'inherit' });
 }

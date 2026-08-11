@@ -6,7 +6,7 @@ const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
 const PAGES_DIR = path.join(__dirname, '..', 'js', 'pages');
-const GENERATE = path.join(__dirname, 'generate-ssr-pages.js');
+const GENERATE = path.join(__dirname, 'generate-ssr-pages.cjs');
 
 function regenerate() {
   try {

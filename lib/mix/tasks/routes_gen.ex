@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Routes.Gen do
 
   `--check` is wired into `mix precommit`; plain generation is wired into
   `mix assets.build` / `mix assets.deploy` and the dev watcher
-  (`assets/build/watch-routes.js`), so the file stays in sync automatically.
+  (`assets/build/watch-routes.cjs`), so the file stays in sync automatically.
 
   ## Scope
 

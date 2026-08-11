@@ -66,7 +66,7 @@ COPY assets assets
 
 # Build browser bundle + SSR bundle + digest, then compile the app.
 #
-# Source maps: assets.deploy runs build/upload-sourcemaps.js, which ships
+# Source maps: assets.deploy runs build/upload-sourcemaps.cjs, which ships
 # maps to Sentry only when SENTRY_AUTH_TOKEN/SENTRY_ORG/SENTRY_PROJECT are
 # set in the build env, and otherwise skips (so local/CI builds without
 # Sentry creds still succeed). These are declared as ARGs so Render's build

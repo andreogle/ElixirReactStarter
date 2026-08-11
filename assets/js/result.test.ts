@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { go, goSync } from './errgo.ts';
+import { go, goSync } from './result.ts';
 
 test('go returns an error-first tuple for resolved and rejected operations', async () => {
   const success = await go(() => Promise.resolve('ready'));
