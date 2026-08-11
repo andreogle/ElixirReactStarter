@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
 import axe from 'axe-core';
-import { go } from './errgo';
+import { go } from './result';
 
 /**
  * Development-only accessibility auditing with axe-core.

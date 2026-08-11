@@ -40,7 +40,7 @@ Dockerfile).
 
 ## How it works under the hood
 
-`build/generate-ssr-pages.js` scans both directories and emits two registries
+`build/generate-ssr-pages.cjs` scans both directories and emits two registries
 (both gitignored — never edit them by hand):
 
 - **`_pages.ts`** — the **client** manifest. Every page (ssr *and* client) as a
@@ -56,7 +56,7 @@ Dockerfile).
 
 The generator runs before both esbuild bundles in `mix assets.build` /
 `assets.deploy` (the client bundle imports `_pages.ts`, the SSR bundle imports
-`_ssr_pages.ts`), and a dev watcher (`build/watch-ssr-pages.js`) regenerates
+`_ssr_pages.ts`), and a dev watcher (`build/watch-ssr-pages.cjs`) regenerates
 them whenever a page file is added or removed.
 
 ## Adding a page

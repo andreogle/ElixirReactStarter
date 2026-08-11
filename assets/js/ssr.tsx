@@ -6,8 +6,8 @@ import ReactDOMServer from 'react-dom/server';
 import pages, { ssrClientOnly } from './_ssr_pages.ts';
 import { AppProviders } from './app-providers';
 import Toaster from './components/Toaster';
-import { go } from './errgo';
 import i18n from './i18n';
+import { go } from './result';
 
 // Sentry for the SSR Node workers (errors only — no tracing). The DSN is
 // inherited from the BEAM's environment; falls back to the frontend DSN

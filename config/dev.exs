@@ -37,8 +37,8 @@ watchers =
       # (Enum.map) and gives each watcher a unique child id (make_ref), so
       # both node processes start independently. One regenerates the page
       # registries, the other the typed route table.
-      node: ["build/watch-ssr-pages.js", cd: Path.expand("../assets", __DIR__)],
-      node: ["build/watch-routes.js", cd: Path.expand("../assets", __DIR__)],
+      node: ["build/watch-ssr-pages.cjs", cd: Path.expand("../assets", __DIR__)],
+      node: ["build/watch-routes.cjs", cd: Path.expand("../assets", __DIR__)],
       esbuild_ssr: {Esbuild, :install_and_run, [:elixir_react_starter_ssr, ~w(--watch)]},
       tailwind: {Tailwind, :install_and_run, [:elixir_react_starter, ~w(--watch)]}
     ]

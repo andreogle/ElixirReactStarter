@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "engines": {
     "npm": ">=11.10.0"
   },
@@ -10,8 +11,8 @@
     "fmt": "npm run lint:fix && biome format --write",
     "lint": "biome check build/ css/ e2e/ js/",
     "lint:fix": "biome check --write build/ css/ e2e/ js/",
-    "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test js/errgo.test.ts",
-    "typecheck": "node build/generate-ssr-pages.js && tsc -p tsconfig.json && tsc -p tsconfig.e2e.json"
+    "test:unit": "node --test 'js/**/*.test.ts'",
+    "typecheck": "node build/generate-ssr-pages.cjs && tsc -p tsconfig.json && tsc -p tsconfig.e2e.json"
   },
   "dependencies": {
     "@inertiajs/react": "^3.6.1",

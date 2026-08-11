@@ -11,7 +11,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { syncLocale } from './components/LocaleSync';
 import Toaster from './components/Toaster';
 import { toast } from './components/toast';
-import { go } from './errgo';
+import { go } from './result';
 import { startThemeWatcher } from './theme';
 
 interface Flash {

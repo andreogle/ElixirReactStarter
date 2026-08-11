@@ -1,6 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { go } from '../errgo';
+import { go } from '../result';
 import en from './locales/en';
 import es from './locales/es';
 

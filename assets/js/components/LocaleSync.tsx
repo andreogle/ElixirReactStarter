@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
-import { go } from '../errgo';
 import i18n from '../i18n';
+import { go } from '../result';
 
 /**
  * Sets i18next language and `<html lang>` from initial page props, and keeps

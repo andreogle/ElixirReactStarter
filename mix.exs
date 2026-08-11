@@ -175,7 +175,7 @@ defmodule ElixirReactStarter.MixProject do
         # Generate the page registries (_pages.ts + _ssr_pages.ts) before
         # either esbuild run: the client bundle imports _pages.ts and the
         # SSR bundle imports _ssr_pages.ts.
-        "cmd node assets/build/generate-ssr-pages.js",
+        "cmd node assets/build/generate-ssr-pages.cjs",
         # Generate the typed frontend route table (routes.ts) from the router
         # so the two can't drift. Guarded by `routes.gen --check` in precommit.
         "routes.gen",
@@ -187,20 +187,20 @@ defmodule ElixirReactStarter.MixProject do
         "cmd rm -rf priv/static/assets/chunks",
         # Generate the page registries before either esbuild run (see
         # assets.build above).
-        "cmd node assets/build/generate-ssr-pages.js",
+        "cmd node assets/build/generate-ssr-pages.cjs",
         # Generate the typed frontend route table (see assets.build above).
         "routes.gen",
         # External source maps so Sentry can de-minify production stack
-        # traces. upload-sourcemaps.js ships them to Sentry and deletes the
+        # traces. upload-sourcemaps.cjs ships them to Sentry and deletes the
         # .map files before phx.digest runs, so they're never served.
         ~s(esbuild elixir_react_starter --minify --sourcemap=external --define:process.env.NODE_ENV='"production"'),
         "esbuild elixir_react_starter_ssr",
-        "cmd node assets/build/upload-sourcemaps.js",
+        "cmd node assets/build/upload-sourcemaps.cjs",
         "phx.digest",
         # phx.digest writes `.gz` next to every asset; this step writes the
         # brotli sibling so Plug.Static can serve whichever the request
         # accepts. Keep it last so it sees both the hashed and plain files.
-        "cmd node assets/build/compress-assets.js"
+        "cmd node assets/build/compress-assets.cjs"
       ],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
