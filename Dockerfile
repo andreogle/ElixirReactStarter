@@ -12,9 +12,9 @@
 # binary from the official Node image — no npm/build toolchain ships
 # in the final image.
 
-ARG ELIXIR_VERSION=1.20.0
-ARG OTP_VERSION=29.0.1
-ARG DEBIAN_VERSION=trixie-20260518-slim
+ARG ELIXIR_VERSION=1.20.4
+ARG OTP_VERSION=29.0.5
+ARG DEBIAN_VERSION=trixie-20260824-slim
 ARG NODE_VERSION=26.2.0
 
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"

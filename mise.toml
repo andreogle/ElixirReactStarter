@@ -6,5 +6,5 @@
 erlang = "29"
 # OTP-tagged so the precompiled Elixir build is guaranteed to match the
 # Erlang/OTP 29 above.
-elixir = "1.20.0-otp-29"
+elixir = "1.20.4-otp-29"
 node = "26"
