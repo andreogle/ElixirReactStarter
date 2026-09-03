@@ -125,7 +125,7 @@ defmodule ElixirReactStarter.MixProject do
       {:argon2_elixir, "~> 4.1"},
       {:inertia, "~> 2.0"},
       {:bandit, "~> 1.5"},
-      {:dns_cluster, "~> 0.2.0"},
+      {:dns_cluster, "~> 0.3.0"},
       {:ecto_sql, "~> 3.13"},
       {:exflect, "~> 1.0"},
       {:gettext, "~> 1.0"},
