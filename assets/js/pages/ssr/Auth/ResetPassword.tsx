@@ -1,9 +1,10 @@
 import { useForm } from '@inertiajs/react';
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import Button from '../../../components/Button';
-import { inputClass } from '../../../components/ui';
-import AuthLayout from '../../../layouts/AuthLayout';
-import { routes } from '../../../routes';
+import Button from '../../../components/Button.tsx';
+import { inputClass } from '../../../components/ui.ts';
+import AuthLayout from '../../../layouts/AuthLayout.tsx';
+import { routes } from '../../../routes.ts';
 
 interface ResetPasswordProps {
   token: string;
@@ -11,6 +12,7 @@ interface ResetPasswordProps {
 
 export default function ResetPassword({ token }: ResetPasswordProps) {
   const { t } = useTranslation();
+  const id = useId();
   const { data, setData, post, processing, errors } = useForm({
     token,
     password: '',
@@ -26,11 +28,11 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
         className="space-y-4"
       >
         <div>
-          <label htmlFor="password" className="block text-sm mb-1">
+          <label htmlFor={`${id}-password`} className="mb-1 block text-sm">
             {t('auth.resetPassword.newPassword')}
           </label>
           <input
-            id="password"
+            id={`${id}-password`}
             type="password"
             autoComplete="new-password"
             value={data.password}
@@ -39,7 +41,7 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
             required
             minLength={8}
           />
-          {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+          {errors.password ? <p className="mt-1 text-red-600 text-sm">{errors.password}</p> : null}
         </div>
 
         <Button type="submit" disabled={processing} className="w-full">

@@ -1,11 +1,11 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { go } from '../result';
-import en from './locales/en';
-import es from './locales/es';
+import { go } from '../result.ts';
+import en from './locales/en.ts';
+import es from './locales/es.ts';
 
-const initializeI18n = () => {
-  return i18n.use(initReactI18next).init({
+const initializeI18n = () =>
+  i18n.use(initReactI18next).init({
     resources: {
       en: { translation: en },
       es: { translation: es },
@@ -16,10 +16,9 @@ const initializeI18n = () => {
       escapeValue: false,
     },
   });
-};
 
 void go(initializeI18n).then(([error]) => {
-  if (error) console.error('Failed to initialize translations:', error);
+  if (error) {
+    console.error('Failed to initialize translations:', error);
+  }
 });
-
-export default i18n;

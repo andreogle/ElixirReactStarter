@@ -115,6 +115,7 @@ const isAbortSignal = (value: unknown): value is AbortSignal => {
 
 /** Validates fixed options before any work starts and returns the attempt count. */
 const validateOptions = (options: GoOptions): number => {
+  // biome-ignore lint/suspicious/noUnnecessaryConditions: runtime guard for untyped callers.
   if (typeof options !== 'object' || options === null || Array.isArray(options)) {
     throw new TypeError('options must be an object');
   }
@@ -266,6 +267,32 @@ const executeAttempt = async <T>(
   }
 };
 
+/** Asks the retry policy and waits out the delay. Resolves `false` when the policy declines. */
+const approveRetry = async (
+  context: RetryContext,
+  shouldRetry: NonNullable<GoOptions['shouldRetry']>,
+  delayMs: GoOptions['delayMs'],
+  signal: AbortSignal | undefined
+): Promise<Result<boolean>> => {
+  const [policyError, approved] = await capture(async () => {
+    if (!(await abortable(shouldRetry(context), signal))) {
+      return false;
+    }
+
+    const delay = typeof delayMs === 'function' ? delayMs(context) : (delayMs ?? 0);
+
+    validateTimerMs('delayMs', delay, 0);
+    await wait(delay, signal);
+    return true;
+  });
+
+  // Caller cancellation is terminal, so it outranks any policy failure.
+  if (policyError !== undefined) {
+    return err(signal?.aborted ? abortReason(signal) : policyError);
+  }
+  return ok(approved);
+};
+
 /**
  * Converts synchronous throws and Promise rejections into a tuple result.
  *
@@ -291,6 +318,7 @@ export const go = async <T>(
       return err(abortReason(signal));
     }
 
+    // biome-ignore lint/performance/noAwaitInLoops: attempts are sequential by design.
     const [error, value] = await capture(() => executeAttempt(operation, attempt, timeoutMs, signal));
 
     if (error === undefined) {
@@ -304,21 +332,10 @@ export const go = async <T>(
     }
 
     const context: RetryContext = { attempt, attempts, error };
-    const [policyError, approved] = await capture(async () => {
-      if (!(await abortable(shouldRetry(context), signal))) {
-        return false;
-      }
+    const [policyError, approved] = await approveRetry(context, shouldRetry, delayMs, signal);
 
-      const delay = typeof delayMs === 'function' ? delayMs(context) : (delayMs ?? 0);
-
-      validateTimerMs('delayMs', delay, 0);
-      await wait(delay, signal);
-      return true;
-    });
-
-    // Caller cancellation is terminal, so it outranks any policy failure.
     if (policyError !== undefined) {
-      return err(signal?.aborted ? abortReason(signal) : policyError);
+      return err(policyError);
     }
     if (!approved) {
       return err(error);

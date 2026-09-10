@@ -1,7 +1,7 @@
 import { router, usePage } from '@inertiajs/react';
 import { Check } from 'lucide-react';
-import { routes } from '../routes';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu';
+import { routes } from '../routes.ts';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu.tsx';
 
 interface LocaleSelectorProps {
   className?: string;
@@ -23,7 +23,7 @@ export default function LocaleSelector({ className = '' }: LocaleSelectorProps) 
         { locale: code },
         {
           preserveScroll: true,
-          onSuccess: () => window.location.reload(),
+          onSuccess: () => globalThis.location.reload(),
         }
       );
     }
@@ -33,21 +33,21 @@ export default function LocaleSelector({ className = '' }: LocaleSelectorProps) 
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Change language"
-        className={`flex items-center gap-1.5 rounded px-1.5 py-1 text-sm cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${className}`}
+        className={`flex cursor-pointer items-center gap-1.5 rounded px-1.5 py-1 text-sm focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${className}`}
       >
-        <current.flag className="w-5 h-4 rounded-sm" />
-        <ChevronDown className="w-3.5 h-3.5" />
+        <current.flag className="h-4 w-5 rounded-sm" />
+        <ChevronDown className="size-3.5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40">
         {locales.map(({ code, label, flag: Flag }) => (
           <DropdownMenuItem
             key={code}
             onSelect={() => handleSelect(code)}
-            className={code === locale ? 'text-primary font-medium' : ''}
+            className={code === locale ? 'font-medium text-primary' : ''}
           >
-            <Flag className="w-5 h-4 rounded-sm shrink-0" />
+            <Flag className="h-4 w-5 shrink-0 rounded-sm" />
             <span className="flex-1">{label}</span>
-            {code === locale && <Check className="w-4 h-4 text-primary" aria-hidden="true" />}
+            {code === locale && <Check className="size-4 text-primary" aria-hidden="true" />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

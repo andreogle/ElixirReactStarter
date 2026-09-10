@@ -49,22 +49,6 @@ defmodule ElixirReactStarterWeb do
     end
   end
 
-  def live_view do
-    quote do
-      use Phoenix.LiveView
-
-      unquote(html_helpers())
-    end
-  end
-
-  def live_component do
-    quote do
-      use Phoenix.LiveComponent
-
-      unquote(html_helpers())
-    end
-  end
-
   def html do
     quote do
       use Phoenix.Component
@@ -90,7 +74,6 @@ defmodule ElixirReactStarterWeb do
 
       # Common modules used in templates
       alias ElixirReactStarterWeb.Layouts
-      alias Phoenix.LiveView.JS
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())

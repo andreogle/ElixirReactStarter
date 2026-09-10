@@ -1,13 +1,15 @@
 import { useForm } from '@inertiajs/react';
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import Button from '../../../components/Button';
-import Link from '../../../components/Link';
-import { inputClass } from '../../../components/ui';
-import AuthLayout from '../../../layouts/AuthLayout';
-import { routes } from '../../../routes';
+import Button from '../../../components/Button.tsx';
+import Link from '../../../components/Link.tsx';
+import { inputClass } from '../../../components/ui.ts';
+import AuthLayout from '../../../layouts/AuthLayout.tsx';
+import { routes } from '../../../routes.ts';
 
 export default function Register() {
   const { t } = useTranslation();
+  const id = useId();
   const { data, setData, post, processing, errors } = useForm({
     email: '',
     password: '',
@@ -23,11 +25,11 @@ export default function Register() {
         className="space-y-4"
       >
         <div>
-          <label htmlFor="email" className="block text-sm mb-1">
+          <label htmlFor={`${id}-email`} className="mb-1 block text-sm">
             {t('auth.email')}
           </label>
           <input
-            id="email"
+            id={`${id}-email`}
             type="email"
             autoComplete="email"
             value={data.email}
@@ -35,15 +37,15 @@ export default function Register() {
             className={inputClass}
             required
           />
-          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+          {errors.email ? <p className="mt-1 text-red-600 text-sm">{errors.email}</p> : null}
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm mb-1">
+          <label htmlFor={`${id}-password`} className="mb-1 block text-sm">
             {t('auth.password')}
           </label>
           <input
-            id="password"
+            id={`${id}-password`}
             type="password"
             autoComplete="new-password"
             value={data.password}
@@ -52,14 +54,14 @@ export default function Register() {
             required
             minLength={8}
           />
-          {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+          {errors.password ? <p className="mt-1 text-red-600 text-sm">{errors.password}</p> : null}
         </div>
 
         <Button type="submit" disabled={processing} className="w-full">
           {t('auth.register.submit')}
         </Button>
 
-        <p className="text-sm text-center">
+        <p className="text-center text-sm">
           {t('auth.register.alreadyHaveAccount')}{' '}
           <Link href={routes.login()} className="text-primary hover:underline">
             {t('auth.register.logIn')}

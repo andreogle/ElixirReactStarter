@@ -1,13 +1,13 @@
-import './i18n';
+import './i18n/index.ts';
 import { createInertiaApp } from '@inertiajs/react';
 import * as Sentry from '@sentry/node';
+import i18n from 'i18next';
 import { createElement } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import pages, { ssrClientOnly } from './_ssr_pages.ts';
-import { AppProviders } from './app-providers';
-import Toaster from './components/Toaster';
-import i18n from './i18n';
-import { go } from './result';
+import { AppProviders } from './app-providers.tsx';
+import Toaster from './components/Toaster.tsx';
+import { go } from './result.ts';
 
 // Sentry for the SSR Node workers (errors only — no tracing). The DSN is
 // inherited from the BEAM's environment; falls back to the frontend DSN
@@ -31,7 +31,9 @@ export async function render(page: any) {
   if (locale && locale !== i18n.language) {
     const [localeError] = await go(() => i18n.changeLanguage(locale));
     if (localeError) {
-      if (sentryDsn) Sentry.captureException(localeError);
+      if (sentryDsn) {
+        Sentry.captureException(localeError);
+      }
       throw localeError;
     }
   }
@@ -42,11 +44,15 @@ export async function render(page: any) {
       render: ReactDOMServer.renderToString,
       resolve: (name) => {
         const component = pages[name];
-        if (component) return component;
+        if (component) {
+          return component;
+        }
         // Client-only pages (pages/client/*) aren't in the SSR bundle. Render
         // nothing server-side and let the client take over, rather than failing
         // the render. A genuinely unknown name still throws.
-        if (ssrClientOnly.has(name)) return () => null;
+        if (ssrClientOnly.has(name)) {
+          return () => null;
+        }
         throw new Error(`SSR page not found: ${name}`);
       },
       // Mirror the client wrapping (see app.tsx): page components are
@@ -79,7 +85,9 @@ export async function render(page: any) {
   // runs unchanged (graceful client-side fallback in prod, raise in dev per
   // `raise_on_ssr_failure`).
   if (error) {
-    if (sentryDsn) Sentry.captureException(error);
+    if (sentryDsn) {
+      Sentry.captureException(error);
+    }
     throw error;
   }
 

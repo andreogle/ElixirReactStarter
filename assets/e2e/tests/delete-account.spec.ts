@@ -1,5 +1,5 @@
-import { expect, test } from '../fixtures';
-import { gotoSettingsViaMenu, loginAs, logoutViaMenu, provisionUser } from '../helpers';
+import { expect, test } from '../fixtures.ts';
+import { gotoSettingsViaMenu, loginAs, logoutViaMenu, provisionUser } from '../helpers.ts';
 
 test('a user deletes their account and can no longer sign in', async ({ page, request }) => {
   const user = await provisionUser(request, { label: 'delete-account' });

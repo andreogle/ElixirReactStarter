@@ -100,7 +100,9 @@ export default function TimezoneSelect({
     } else if (e.key === 'Enter') {
       e.preventDefault();
       const option = filtered[activeIndex];
-      if (option) commit(option);
+      if (option) {
+        commit(option);
+      }
     } else if (e.key === 'Escape') {
       e.preventDefault();
       setOpen(false);
@@ -119,22 +121,23 @@ export default function TimezoneSelect({
         aria-haspopup="listbox"
         aria-controls={open ? listboxId : undefined}
         disabled={disabled}
-        className={`w-full flex items-center justify-between gap-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50 disabled:cursor-not-allowed ${selected ? '' : 'text-gray-400'} ${className}`}
+        className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 ${selected ? '' : 'text-gray-400'} ${className}`}
         {...ariaProps}
       >
         <span className="truncate">{triggerLabel}</span>
-        <ChevronDown className="w-4 h-4 text-gray-500 shrink-0" aria-hidden="true" />
+        <ChevronDown className="size-4 shrink-0 text-gray-500" aria-hidden="true" />
       </RadixPopover.Trigger>
       <RadixPopover.Portal>
         <RadixPopover.Content
           align="start"
           sideOffset={4}
           collisionPadding={8}
-          className="z-50 w-[var(--radix-popover-trigger-width)] max-h-[min(24rem,var(--radix-popover-content-available-height))] overflow-hidden rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+          // biome-ignore lint/nursery/noTailwindArbitraryValue: min() of a fixed cap and Radix's available-height var has no utility form.
+          className="z-50 max-h-[min(24rem,var(--radix-popover-content-available-height))] w-(--radix-popover-trigger-width) overflow-hidden rounded border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 px-3 py-2">
-            <Search className="w-4 h-4 text-gray-500 shrink-0" aria-hidden="true" />
+          <div className="flex items-center gap-2 border-gray-200 border-b px-3 py-2 dark:border-gray-800">
+            <Search className="size-4 shrink-0 text-gray-500" aria-hidden="true" />
             <input
               ref={inputRef}
               type="text"
@@ -167,7 +170,7 @@ export default function TimezoneSelect({
             className="max-h-80 overflow-y-auto p-1"
           >
             {filtered.length === 0 ? (
-              <div className="px-3 py-2 text-sm italic text-gray-500">{t('common.noResults')}</div>
+              <div className="px-3 py-2 text-gray-500 text-sm italic">{t('common.noResults')}</div>
             ) : (
               filtered.map((opt, i) => {
                 const isActive = i === activeIndex;
@@ -184,10 +187,10 @@ export default function TimezoneSelect({
                     onMouseEnter={() => setActiveIndex(i)}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => commit(opt)}
-                    className={`flex items-center justify-between gap-2 px-3 py-2 rounded text-sm cursor-pointer select-none ${isActive ? 'bg-gray-100 dark:bg-gray-800' : ''} ${isSelected ? 'font-medium' : ''}`}
+                    className={`flex cursor-pointer select-none items-center justify-between gap-2 rounded px-3 py-2 text-sm ${isActive ? 'bg-gray-100 dark:bg-gray-800' : ''} ${isSelected ? 'font-medium' : ''}`}
                   >
                     <span className="truncate">{opt.label}</span>
-                    {isSelected && <Check className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />}
+                    {isSelected && <Check className="size-4 shrink-0 text-primary" aria-hidden="true" />}
                   </div>
                 );
               })
@@ -200,7 +203,9 @@ export default function TimezoneSelect({
 }
 
 function filterOptions(options: TimezoneOption[], query: string): TimezoneOption[] {
-  if (!query.trim()) return options;
+  if (!query.trim()) {
+    return options;
+  }
   const q = query.toLowerCase();
   return options.filter((o) => o.label.toLowerCase().includes(q));
 }

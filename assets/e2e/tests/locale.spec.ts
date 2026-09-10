@@ -1,4 +1,4 @@
-import { expect, test } from '../fixtures';
+import { expect, test } from '../fixtures.ts';
 
 test('a visitor can switch the interface language to Spanish', async ({ page }) => {
   await page.goto('/login');

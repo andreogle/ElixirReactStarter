@@ -2,19 +2,19 @@ import { Head, router, usePage } from '@inertiajs/react';
 import type { TFunction } from 'i18next';
 import { ChevronDown, CircleUserRound, LogOut, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import ConnectionIndicator from '../components/ConnectionIndicator';
+import ConnectionIndicator from '../components/ConnectionIndicator.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../components/DropdownMenu';
-import Link from '../components/Link';
-import LocaleSelector from '../components/LocaleSelector';
-import ThemeToggle from '../components/ThemeToggle';
-import { routes } from '../routes';
-import type { CurrentUser } from '../types';
+} from '../components/DropdownMenu.tsx';
+import Link from '../components/Link.tsx';
+import LocaleSelector from '../components/LocaleSelector.tsx';
+import ThemeToggle from '../components/ThemeToggle.tsx';
+import { routes } from '../routes.ts';
+import type { CurrentUser } from '../types.ts';
 
 interface AppLayoutProps {
   title: string;
@@ -32,6 +32,8 @@ interface NavItem {
 // content can constrain their own inner sections.
 const containerClass = 'max-w-6xl mx-auto px-4 sm:px-6 lg:px-8';
 
+const BRAND = 'ElixirReactStarter';
+
 export default function AppLayout({ title, children }: AppLayoutProps) {
   const { current_user } = usePage<{ current_user: CurrentUser }>().props;
   const { url } = usePage();
@@ -39,19 +41,19 @@ export default function AppLayout({ title, children }: AppLayoutProps) {
 
   const displayName = current_user.email;
   const items = navItemsFor(t);
-  const currentPath = url.split('?')[0];
+  const [currentPath] = url.split('?');
 
   return (
     <>
       <Head title={title} />
       <div className="min-h-screen">
-        <header className="border-b border-gray-200 dark:border-gray-800">
-          <div className={`${containerClass} py-3 flex items-center justify-between gap-3`}>
-            <div className="flex items-center gap-6 min-w-0">
-              <Link href={routes.dashboard()} className="text-base font-semibold shrink-0">
-                ElixirReactStarter
+        <header className="border-gray-200 border-b dark:border-gray-800">
+          <div className={`${containerClass} flex items-center justify-between gap-3 py-3`}>
+            <div className="flex min-w-0 items-center gap-6">
+              <Link href={routes.dashboard()} className="shrink-0 font-semibold text-base">
+                {BRAND}
               </Link>
-              <nav aria-label={t('common.mainNav')} className="hidden md:flex items-center gap-1">
+              <nav aria-label={t('common.mainNav')} className="hidden items-center gap-1 md:flex">
                 {items.map((item) => (
                   <PrimaryNavLink key={item.href} item={item} active={isActive(currentPath, item.href)} />
                 ))}
@@ -91,11 +93,11 @@ function PrimaryNavLink({ item, active }: { item: NavItem; active: boolean }) {
     <Link
       href={item.href}
       aria-current={active ? 'page' : undefined}
-      className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
-        active ? 'bg-gray-100 dark:bg-gray-800 font-medium' : 'hover:bg-gray-50 dark:hover:bg-gray-900'
+      className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+        active ? 'bg-gray-100 font-medium dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-gray-900'
       }`}
     >
-      <Icon className="w-4 h-4" aria-hidden="true" />
+      <Icon className="size-4" aria-hidden="true" />
       <span>{item.label}</span>
     </Link>
   );
@@ -114,15 +116,15 @@ function UserMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={t('common.userMenu')}
-        className="flex items-center gap-1.5 rounded px-2 py-1.5 text-sm cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        className="flex cursor-pointer items-center gap-1.5 rounded px-2 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
       >
-        <CircleUserRound className="w-5 h-5" aria-hidden="true" />
-        <span className="sr-only sm:not-sr-only truncate max-w-[10rem]">{displayName}</span>
-        <ChevronDown className="w-4 h-4" aria-hidden="true" />
+        <CircleUserRound className="size-5" aria-hidden="true" />
+        <span className="sr-only max-w-40 truncate sm:not-sr-only">{displayName}</span>
+        <ChevronDown className="size-4" aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-800">
-          <p className="text-sm font-medium truncate">{displayName}</p>
+        <div className="border-gray-200 border-b px-3 py-2 dark:border-gray-800">
+          <p className="truncate font-medium text-sm">{displayName}</p>
         </div>
 
         {/* Primary nav fallback — only visible when the desktop nav is hidden. */}
@@ -131,7 +133,7 @@ function UserMenu({
             const Icon = item.icon;
             return (
               <DropdownMenuItem key={item.href} onSelect={() => router.visit(item.href)}>
-                <Icon className="w-4 h-4" aria-hidden="true" />
+                <Icon className="size-4" aria-hidden="true" />
                 <span className="flex-1">{item.label}</span>
               </DropdownMenuItem>
             );
@@ -140,12 +142,12 @@ function UserMenu({
         </div>
 
         <DropdownMenuItem onSelect={() => router.visit(routes.settings())}>
-          <Settings className="w-4 h-4" aria-hidden="true" />
+          <Settings className="size-4" aria-hidden="true" />
           <span className="flex-1">{t('common.settings')}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="my-1 h-px bg-gray-200 dark:bg-gray-800" />
         <DropdownMenuItem onSelect={() => router.delete(routes.logout())}>
-          <LogOut className="w-4 h-4" aria-hidden="true" />
+          <LogOut className="size-4" aria-hidden="true" />
           <span className="flex-1">{t('common.logout')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

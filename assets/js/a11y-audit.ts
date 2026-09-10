@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
 import axe from 'axe-core';
-import { go } from './result';
+import { go } from './result.ts';
 
 /**
  * Development-only accessibility auditing with axe-core.
@@ -25,9 +25,11 @@ export function startA11yAudit() {
     }
 
     const { violations } = result;
-    if (violations.length === 0) return;
+    if (violations.length === 0) {
+      return;
+    }
 
-    console.warn(`[a11y] ${violations.length} issue(s) on ${window.location.pathname}`);
+    console.warn(`[a11y] ${violations.length} issue(s) on ${globalThis.location.pathname}`);
     for (const v of violations) {
       console.warn(
         `  [${v.impact ?? 'n/a'}] ${v.id}: ${v.help}\n  ${v.helpUrl}`,
@@ -39,7 +41,9 @@ export function startA11yAudit() {
   // Debounce: a burst of DOM updates after navigation triggers one scan.
   let timer: ReturnType<typeof setTimeout> | undefined;
   const schedule = () => {
-    if (timer) clearTimeout(timer);
+    if (timer) {
+      clearTimeout(timer);
+    }
     timer = setTimeout(() => void scan(), 500);
   };
 

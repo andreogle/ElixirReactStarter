@@ -44,7 +44,9 @@ export async function provisionUser(
   const password = options.password ?? 'playwright-secret-1234';
   const data: Record<string, unknown> = { email, password };
   // Confirmed by default; pass `confirmed: false` for the resend flow.
-  if (options.confirmed === false) data.confirmed = false;
+  if (options.confirmed === false) {
+    data.confirmed = false;
+  }
 
   const response = await request.post('/dev/e2e/users', { data });
   expect(response.ok(), `POST /dev/e2e/users failed: ${response.status()} ${await response.text()}`).toBeTruthy();
@@ -109,12 +111,13 @@ export async function fetchEmailLink(
   request: APIRequestContext,
   email: string,
   route: '/confirm-email' | '/reset-password' | '/settings/email/apply-change',
-  { timeoutMs = 5_000, intervalMs = 250 }: { timeoutMs?: number; intervalMs?: number } = {}
+  { timeoutMs = 5000, intervalMs = 250 }: { timeoutMs?: number; intervalMs?: number } = {}
 ): Promise<string> {
   const pattern = new RegExp(`${route}\\?token=[A-Za-z0-9_-]+`);
   const deadline = Date.now() + timeoutMs;
 
   while (Date.now() < deadline) {
+    // biome-ignore lint/performance/noAwaitInLoops: sequential polling is the point.
     const resp = await request.get('/dev/mailbox/json');
     expect(resp.ok(), 'dev mailbox JSON endpoint must be reachable').toBeTruthy();
 
@@ -127,7 +130,10 @@ export async function fetchEmailLink(
       .filter((link): link is string => Boolean(link));
 
     // Newest link last — return the most recent.
-    if (links.length > 0) return links[links.length - 1];
+    const newest = links.at(-1);
+    if (newest !== undefined) {
+      return newest;
+    }
     await sleep(intervalMs);
   }
 

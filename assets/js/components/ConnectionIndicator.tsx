@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { useConnectionStatus } from '../realtime/hooks';
-import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip';
+import { useConnectionStatus } from '../realtime/hooks.ts';
+import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip.tsx';
 
 /**
  * Status dot for the realtime socket. Slow-pulsing green when
@@ -20,8 +20,8 @@ export default function ConnectionIndicator() {
         <span
           role="status"
           aria-label={label}
-          className={`inline-block w-2.5 h-2.5 rounded-full ${
-            connected ? 'bg-green-500 animate-slow-pulse' : 'bg-red-500'
+          className={`inline-block size-2.5 rounded-full ${
+            connected ? 'animate-slow-pulse bg-green-500' : 'bg-red-500'
           }`}
         />
       </TooltipTrigger>

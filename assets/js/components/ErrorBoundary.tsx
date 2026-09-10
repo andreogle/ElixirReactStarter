@@ -1,7 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { captureException } from '../sentry';
-import Button from './Button';
+import { captureException } from '../sentry.ts';
+import Button from './Button.tsx';
 
 interface Props {
   children: ReactNode;
@@ -39,7 +39,9 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   render() {
-    if (this.state.hasError) return <ErrorFallback />;
+    if (this.state.hasError) {
+      return <ErrorFallback />;
+    }
     return this.props.children;
   }
 }
@@ -49,9 +51,9 @@ function ErrorFallback() {
 
   return (
     <div role="alert" className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
-      <h1 className="text-2xl font-semibold">{t('error.title')}</h1>
-      <p className="max-w-md text-sm text-gray-600 dark:text-gray-400">{t('error.body')}</p>
-      <Button type="button" onClick={() => window.location.reload()}>
+      <h1 className="font-semibold text-2xl">{t('error.title')}</h1>
+      <p className="max-w-md text-gray-600 text-sm dark:text-gray-400">{t('error.body')}</p>
+      <Button type="button" onClick={() => globalThis.location.reload()}>
         {t('error.reload')}
       </Button>
     </div>

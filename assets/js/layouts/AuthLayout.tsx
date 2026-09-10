@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import GuestTopBar from '../components/GuestTopBar';
+import GuestTopBar from '../components/GuestTopBar.tsx';
 
 interface AuthLayoutProps {
   title: string;
@@ -11,13 +11,13 @@ export default function AuthLayout({ title, subtitle, children }: AuthLayoutProp
   return (
     <>
       <Head title={title} />
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-screen flex-col">
         <GuestTopBar />
 
-        <div className="flex-1 flex items-center justify-center px-4 pb-16">
+        <div className="flex flex-1 items-center justify-center px-4 pb-16">
           <div className="w-full max-w-sm">
-            <h1 className="text-2xl font-semibold text-center mb-3">{title}</h1>
-            {subtitle && <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-8">{subtitle}</p>}
+            <h1 className="mb-3 text-center font-semibold text-2xl">{title}</h1>
+            {subtitle ? <p className="mb-8 text-center text-gray-600 text-sm dark:text-gray-400">{subtitle}</p> : null}
             {children}
           </div>
         </div>

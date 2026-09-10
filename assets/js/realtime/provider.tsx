@@ -1,8 +1,8 @@
 import { usePage } from '@inertiajs/react';
 import type { Channel, Socket } from 'phoenix';
 import { createContext, type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { createSocket } from './socket';
-import type { ChannelEntry, ChannelStatus, ConnectionStatus } from './types';
+import { createSocket } from './socket.ts';
+import type { ChannelEntry, ChannelStatus, ConnectionStatus } from './types.ts';
 
 export interface RealtimeContextValue {
   socket: Socket | null;
@@ -60,9 +60,8 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   // back in, userId flips through null and the socket is re-created
   // with the fresh token at that point.
   // ===========================================================================
-  // biome-ignore lint/correctness/useExhaustiveDependencies: token intentionally excluded — see comment above
   useEffect(() => {
-    if (!token || !userId) {
+    if (!(token && userId)) {
       setStatus('idle');
       return;
     }
@@ -111,7 +110,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   // Auto-join `user:<id>`
   // ===========================================================================
   useEffect(() => {
-    if (!socket || !userId) {
+    if (!(socket && userId)) {
       setUserChannel(null);
       return;
     }
@@ -133,18 +132,24 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const updateChannelStatus = useCallback((topic: string, nextStatus: ChannelStatus, error: ChannelEntry['error']) => {
     setChannels((prev) => {
       const entry = prev[topic];
-      if (!entry) return prev;
+      if (!entry) {
+        return prev;
+      }
       return { ...prev, [topic]: { ...entry, status: nextStatus, error } };
     });
   }, []);
 
   const joinChannel = useCallback(
     (topic: string) => {
-      if (!socket) return;
+      if (!socket) {
+        return;
+      }
 
       const current = refCountsRef.current[topic] ?? 0;
       refCountsRef.current[topic] = current + 1;
-      if (current > 0) return;
+      if (current > 0) {
+        return;
+      }
 
       const channel = socket.channel(topic);
       setChannels((prev) => ({
@@ -155,20 +160,24 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       channel
         .join()
         .receive('ok', () => updateChannelStatus(topic, 'joined', null))
-        .receive('error', (reply: { reason?: string }) => {
-          return updateChannelStatus(topic, 'errored', { reason: reply.reason ?? 'unknown' });
-        });
+        .receive('error', (reply: { reason?: string }) =>
+          updateChannelStatus(topic, 'errored', { reason: reply.reason ?? 'unknown' })
+        );
     },
     [socket, updateChannelStatus]
   );
 
   const leaveChannel = useCallback((topic: string) => {
     const current = refCountsRef.current[topic] ?? 0;
-    if (current <= 0) return;
+    if (current <= 0) {
+      return;
+    }
 
     const next = current - 1;
     refCountsRef.current[topic] = next;
-    if (next > 0) return;
+    if (next > 0) {
+      return;
+    }
 
     delete refCountsRef.current[topic];
 

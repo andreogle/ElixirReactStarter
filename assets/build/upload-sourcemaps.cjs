@@ -1,3 +1,4 @@
+'use strict';
 // Uploads the built browser source maps to Sentry, then deletes every
 // `.map` file so they're never digested by `phx.digest` or served by
 // Plug.Static (publishing them would leak source). `sourcemaps inject`
@@ -35,7 +36,9 @@ async function uploadSourceMaps() {
   await cli.execute(['sourcemaps', 'inject', ASSETS_DIR], true);
 
   const uploadArgs = ['sourcemaps', 'upload', '--org', org, '--project', project];
-  if (release) uploadArgs.push('--release', release);
+  if (release) {
+    uploadArgs.push('--release', release);
+  }
   uploadArgs.push(ASSETS_DIR);
   await cli.execute(uploadArgs, true);
 }
@@ -48,7 +51,7 @@ function deleteSourceMaps(dir) {
       deleted += deleteSourceMaps(full);
     } else if (entry.name.endsWith('.map')) {
       fs.rmSync(full);
-      deleted++;
+      deleted += 1;
     }
   }
   return deleted;
@@ -62,7 +65,9 @@ async function main() {
       await uploadSourceMaps();
       process.stdout.write('sentry: uploaded source maps\n');
     } catch (error) {
-      process.stderr.write(`sentry: source map upload failed (continuing): ${error?.message || error}\n`);
+      process.stderr.write(
+        `sentry: source map upload failed (continuing): ${error instanceof Error ? error.message : String(error)}\n`
+      );
     }
   } else {
     process.stdout.write('sentry: SENTRY_AUTH_TOKEN/ORG/PROJECT not set — skipping source map upload\n');

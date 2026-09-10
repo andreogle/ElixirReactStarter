@@ -1,3 +1,4 @@
+'use strict';
 // Walks priv/static and writes a `.br` (Brotli) sibling next to every
 // compressible text asset. `phx.digest` already writes the `.gz` siblings;
 // this script adds the brotli half so `Plug.Static` can pick whichever the
@@ -24,7 +25,9 @@ let skipped = 0;
 let savedBytes = 0;
 
 function walk(dir) {
-  if (!fs.existsSync(dir)) return;
+  if (!fs.existsSync(dir)) {
+    return;
+  }
 
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
@@ -37,14 +40,18 @@ function walk(dir) {
 }
 
 function maybeCompress(file) {
-  if (file.endsWith('.gz') || file.endsWith('.br')) return;
+  if (file.endsWith('.gz') || file.endsWith('.br')) {
+    return;
+  }
 
   const ext = path.extname(file);
-  if (!COMPRESSIBLE.has(ext)) return;
+  if (!COMPRESSIBLE.has(ext)) {
+    return;
+  }
 
   const stat = fs.statSync(file);
   if (stat.size < MIN_SIZE) {
-    skipped++;
+    skipped += 1;
     return;
   }
 
@@ -54,7 +61,7 @@ function maybeCompress(file) {
   if (fs.existsSync(outPath)) {
     const outStat = fs.statSync(outPath);
     if (outStat.mtimeMs >= stat.mtimeMs) {
-      skipped++;
+      skipped += 1;
       return;
     }
   }
@@ -68,7 +75,7 @@ function maybeCompress(file) {
   });
 
   fs.writeFileSync(outPath, br);
-  compressed++;
+  compressed += 1;
   savedBytes += input.length - br.length;
 }
 

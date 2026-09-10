@@ -1,5 +1,5 @@
-import LocaleSelector from './LocaleSelector';
-import ThemeToggle from './ThemeToggle';
+import LocaleSelector from './LocaleSelector.tsx';
+import ThemeToggle from './ThemeToggle.tsx';
 
 /**
  * Borderless top bar for the public/guest pages (Home + the auth

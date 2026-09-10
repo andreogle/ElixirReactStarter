@@ -13,6 +13,7 @@ test('go returns an error-first tuple for resolved and rejected operations', asy
 
 test('goSync normalizes thrown non-Error values', () => {
   const [error, value] = goSync(() => {
+    // biome-ignore lint/style/useThrowOnlyError: non-Error throw is what's under test.
     throw 'broken';
   });
 

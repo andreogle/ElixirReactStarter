@@ -1,7 +1,7 @@
 import type { Channel, Socket } from 'phoenix';
 import { useContext, useEffect, useRef } from 'react';
-import { RealtimeContext } from './provider';
-import type { ChannelEntry, ChannelStatus, ConnectionStatus } from './types';
+import { RealtimeContext } from './provider.tsx';
+import type { ChannelEntry, ChannelStatus, ConnectionStatus } from './types.ts';
 
 function useRealtime() {
   return useContext(RealtimeContext);
@@ -45,14 +45,20 @@ export function useChannel(topic: string | null): {
   const leaveChannel = ctx?.leaveChannel;
 
   useEffect(() => {
-    if (!joinChannel || !leaveChannel || !topic) return;
+    if (!(joinChannel && leaveChannel && topic)) {
+      return;
+    }
     joinChannel(topic);
     return () => leaveChannel(topic);
   }, [joinChannel, leaveChannel, topic]);
 
-  if (!ctx || !topic) return { channel: null, status: 'left', error: null };
+  if (!(ctx && topic)) {
+    return { channel: null, status: 'left', error: null };
+  }
   const entry = ctx.channels[topic];
-  if (!entry) return { channel: null, status: 'joining', error: null };
+  if (!entry) {
+    return { channel: null, status: 'joining', error: null };
+  }
   return { channel: entry.channel, status: entry.status, error: entry.error };
 }
 
@@ -73,7 +79,9 @@ export function useChannelEvent<T = unknown>(
   });
 
   useEffect(() => {
-    if (!channel) return;
+    if (!channel) {
+      return;
+    }
     const ref = channel.on(event, (payload: T) => handlerRef.current(payload));
     return () => channel.off(event, ref);
   }, [channel, event]);

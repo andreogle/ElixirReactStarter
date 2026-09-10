@@ -1,3 +1,4 @@
+'use strict';
 // Watches the Phoenix router for changes and regenerates the typed frontend
 // route table (assets/js/routes.ts) via `mix routes.gen`. Used as a Phoenix
 // dev watcher so routes.ts can't go stale while the dev server is running.
@@ -15,7 +16,7 @@ const ROUTER = path.join(ROOT, 'lib', 'elixir_react_starter_web', 'router.ex');
 function regenerate() {
   try {
     execFileSync('mix', ['routes.gen'], { cwd: ROOT, stdio: 'inherit' });
-  } catch (_) {
+  } catch {
     // errors already printed by the child process
   }
 }

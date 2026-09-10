@@ -1,13 +1,15 @@
 import { useForm } from '@inertiajs/react';
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import Button from '../../../components/Button';
-import Link from '../../../components/Link';
-import { inputClass } from '../../../components/ui';
-import AuthLayout from '../../../layouts/AuthLayout';
-import { routes } from '../../../routes';
+import Button from '../../../components/Button.tsx';
+import Link from '../../../components/Link.tsx';
+import { inputClass } from '../../../components/ui.ts';
+import AuthLayout from '../../../layouts/AuthLayout.tsx';
+import { routes } from '../../../routes.ts';
 
 export default function ResendConfirmation() {
   const { t } = useTranslation();
+  const id = useId();
   const { data, setData, post, processing } = useForm({
     email: '',
   });
@@ -22,11 +24,11 @@ export default function ResendConfirmation() {
         className="space-y-4"
       >
         <div>
-          <label htmlFor="email" className="block text-sm mb-1">
+          <label htmlFor={`${id}-email`} className="mb-1 block text-sm">
             {t('auth.email')}
           </label>
           <input
-            id="email"
+            id={`${id}-email`}
             type="email"
             autoComplete="email"
             value={data.email}
@@ -40,7 +42,7 @@ export default function ResendConfirmation() {
           {t('auth.resendConfirmation.submit')}
         </Button>
 
-        <p className="text-sm text-center">
+        <p className="text-center text-sm">
           <Link href={routes.login()} className="text-primary hover:underline">
             {t('auth.backToLogin')}
           </Link>

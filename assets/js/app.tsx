@@ -1,18 +1,18 @@
 // Init Sentry first so its global error handlers are installed before any
 // other module can throw. No-op unless a DSN was stamped into <head>.
-import './sentry';
-import './i18n';
+import './sentry.ts';
+import './i18n/index.ts';
 import { createInertiaApp, router } from '@inertiajs/react';
 import { createElement, StrictMode, useEffect } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
-import pages, { serverRenderedPages } from './_pages';
-import { AppProviders } from './app-providers';
-import ErrorBoundary from './components/ErrorBoundary';
-import { syncLocale } from './components/LocaleSync';
-import Toaster from './components/Toaster';
-import { toast } from './components/toast';
-import { go } from './result';
-import { startThemeWatcher } from './theme';
+import pages, { serverRenderedPages } from './_pages.ts';
+import { AppProviders } from './app-providers.tsx';
+import ErrorBoundary from './components/ErrorBoundary.tsx';
+import { syncLocale } from './components/syncLocale.ts';
+import Toaster from './components/Toaster.tsx';
+import { toast } from './components/toast.ts';
+import { go } from './result.ts';
+import { startThemeWatcher } from './theme.ts';
 
 interface Flash {
   info?: string;
@@ -20,9 +20,15 @@ interface Flash {
 }
 
 function applyFlash(flash?: Flash) {
-  if (!flash) return;
-  if (flash.info) toast.success(flash.info);
-  if (flash.error) toast.error(flash.error);
+  if (!flash) {
+    return;
+  }
+  if (flash.info) {
+    toast.success(flash.info);
+  }
+  if (flash.error) {
+    toast.error(flash.error);
+  }
 }
 
 // Guards against StrictMode's deliberate double-invocation of effects in
@@ -42,7 +48,9 @@ let initialFlashApplied = false;
  */
 function InitialFlash({ flash }: { flash?: Flash }) {
   useEffect(() => {
-    if (initialFlashApplied) return;
+    if (initialFlashApplied) {
+      return;
+    }
     initialFlashApplied = true;
     applyFlash(flash);
   }, [flash]);
@@ -73,8 +81,10 @@ const startApp = () => {
 
       // Dev-only accessibility auditing. The whole branch — and axe-core —
       // is tree-shaken from the production bundle via the NODE_ENV define.
+      // biome-ignore lint/correctness/noProcessGlobal: esbuild define, not a runtime global.
+      // biome-ignore lint/style/noProcessEnv: esbuild define, not a runtime global.
       if (process.env.NODE_ENV !== 'production') {
-        void go(() => import('./a11y-audit')).then(([error, audit]) => {
+        void go(() => import('./a11y-audit.ts')).then(([error, audit]) => {
           if (error) {
             console.error('Failed to load the accessibility audit:', error);
             return;
@@ -141,5 +151,7 @@ const startApp = () => {
 };
 
 void go(startApp).then(([error]) => {
-  if (error) console.error('Failed to start the application:', error);
+  if (error) {
+    console.error('Failed to start the application:', error);
+  }
 });

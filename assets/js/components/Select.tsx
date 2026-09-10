@@ -33,39 +33,39 @@ export default function Select({
     <RadixSelect.Root value={value} onValueChange={onValueChange} disabled={disabled}>
       <RadixSelect.Trigger
         id={id}
-        className={`w-full flex items-center justify-between gap-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-left data-[placeholder]:text-gray-400 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-gray-400 dark:border-gray-700 dark:bg-gray-900 ${className}`}
         {...ariaProps}
       >
         <RadixSelect.Value placeholder={placeholder} />
         <RadixSelect.Icon asChild>
-          <ChevronDown className="w-4 h-4 text-gray-500 shrink-0" />
+          <ChevronDown className="size-4 shrink-0 text-gray-500" />
         </RadixSelect.Icon>
       </RadixSelect.Trigger>
       <RadixSelect.Portal>
         <RadixSelect.Content
           position="popper"
           sideOffset={4}
-          className="z-50 overflow-hidden rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 min-w-[var(--radix-select-trigger-width)] max-h-[var(--radix-select-content-available-height)]"
+          className="z-50 max-h-(--radix-select-content-available-height) min-w-(--radix-select-trigger-width) overflow-hidden rounded border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
         >
           <RadixSelect.ScrollUpButton className="flex items-center justify-center py-1 text-gray-500">
-            <ChevronUp className="w-4 h-4" />
+            <ChevronUp className="size-4" />
           </RadixSelect.ScrollUpButton>
           <RadixSelect.Viewport className="p-1">
             {options.map((opt) => (
               <RadixSelect.Item
                 key={opt.value}
                 value={opt.value}
-                className="flex items-center justify-between gap-2 px-3 py-2 rounded text-sm outline-none cursor-pointer select-none data-[highlighted]:bg-gray-100 dark:data-[highlighted]:bg-gray-800 data-[state=checked]:font-medium"
+                className="flex cursor-pointer select-none items-center justify-between gap-2 rounded px-3 py-2 text-sm outline-none data-[highlighted]:bg-gray-100 data-[state=checked]:font-medium dark:data-[highlighted]:bg-gray-800"
               >
                 <RadixSelect.ItemText>{opt.label}</RadixSelect.ItemText>
                 <RadixSelect.ItemIndicator>
-                  <Check className="w-4 h-4 text-primary" />
+                  <Check className="size-4 text-primary" />
                 </RadixSelect.ItemIndicator>
               </RadixSelect.Item>
             ))}
           </RadixSelect.Viewport>
           <RadixSelect.ScrollDownButton className="flex items-center justify-center py-1 text-gray-500">
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="size-4" />
           </RadixSelect.ScrollDownButton>
         </RadixSelect.Content>
       </RadixSelect.Portal>

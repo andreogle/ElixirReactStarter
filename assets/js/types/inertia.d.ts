@@ -1,5 +1,5 @@
 import '@inertiajs/core';
-import type { CurrentUser, Flash } from '../types';
+import type { CurrentUser, Flash } from '../types.ts';
 
 declare module '@inertiajs/core' {
   interface InertiaConfig {

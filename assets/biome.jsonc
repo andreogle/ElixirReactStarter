@@ -1,0 +1,184 @@
+// Strict by default: `preset: "all"` + every stable group at "error", so rules
+// added by Biome upgrades are enforced automatically. Nursery rules are opt-in.
+// Group-level "error" is a string, so per-rule opt-outs/options live in the
+// `**` override below — each opt-out carries its reason.
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "includes": ["**", "!**/node_modules/", "!js/_pages.ts", "!js/_ssr_pages.ts", "!js/routes.ts"]
+  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 120
+  },
+  "javascript": {
+    "formatter": {
+      "arrowParentheses": "always",
+      "bracketSameLine": false,
+      "bracketSpacing": true,
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "es5"
+    }
+  },
+  "css": {
+    "parser": { "tailwindDirectives": true }
+  },
+  "linter": {
+    "domains": {
+      "project": "all",
+      "react": "all",
+      "tailwind": "all",
+      "test": "all",
+      "playwright": "all",
+      "types": "all",
+      "astro": "none",
+      "drizzle": "none",
+      "next": "none",
+      "qwik": "none",
+      "reactNative": "none",
+      "solid": "none",
+      "svelte": "none",
+      "turborepo": "none",
+      "vue": "none"
+    },
+    "rules": {
+      "preset": "all",
+      "a11y": "error",
+      "complexity": "error",
+      "correctness": "error",
+      "performance": "error",
+      "security": "error",
+      "style": "error",
+      "suspicious": "error",
+      "nursery": {
+        "noReactStringRefs": "error",
+        "useTestHooksInOrder": "error",
+        "useTestHooksOnTop": "error",
+        "noTailwindArbitraryValue": "error",
+        "noUndeclaredClasses": "error",
+        "noUnusedClasses": "error",
+        "noExcessiveSelectorClasses": "error",
+        "useSortedClasses": "error",
+        "useTailwindShorthandClasses": "error"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveLinesPerFunction": {
+              "level": "error",
+              "options": { "maxLines": 150, "skipBlankLines": true }
+            },
+            // `void promise` is the fire-and-forget marker noFloatingPromises expects.
+            "noVoid": "off"
+          },
+          "correctness": {
+            // False positives on type-only exports; tsc covers this.
+            "noUnresolvedImports": "off"
+          },
+          "performance": {
+            // Inline JSX handlers are idiomatic React.
+            "noJsxPropsBind": "off",
+            // Radix is namespace-imported by design; esbuild tree-shakes it.
+            "noNamespaceImport": "off"
+          },
+          "style": {
+            "noExcessiveLinesPerFile": {
+              "level": "error",
+              "options": { "skipBlankLines": true }
+            },
+            // Inertia pages and layouts must default-export.
+            "noDefaultExport": "off",
+            "noImplicitBoolean": "off",
+            "noMagicNumbers": "off",
+            "noTernary": "off",
+            // Fast-refresh rule; no HMR here.
+            "useComponentExportOnlyModules": "off",
+            "useExportsLast": "off",
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@inertiajs/react": {
+                    "importNames": ["Link"],
+                    "message": "Import Link from components/Link.tsx so prefetch is enabled by default."
+                  }
+                }
+              }
+            },
+            "useNamingConvention": {
+              "level": "error",
+              "options": {
+                "strictCase": false,
+                "conventions": [
+                  // Inertia props / JSON from Phoenix are snake_case; env vars are CONSTANT_CASE.
+                  {
+                    "selector": { "kind": "objectLiteralProperty" },
+                    "formats": ["camelCase", "snake_case", "CONSTANT_CASE"]
+                  },
+                  { "selector": { "kind": "typeProperty" }, "formats": ["camelCase", "snake_case", "CONSTANT_CASE"] }
+                ]
+              }
+            }
+          },
+          "suspicious": {
+            "noConsole": {
+              "level": "error",
+              "options": { "allow": ["warn", "error"] }
+            }
+          }
+        }
+      }
+    },
+    {
+      // Node-side code.
+      "includes": ["build/**", "e2e/**", "playwright.config.ts", "js/ssr.tsx", "js/result.test.ts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noNodejsModules": "off",
+            "noProcessGlobal": "off"
+          },
+          "performance": {
+            "useTopLevelRegex": "off"
+          },
+          "style": {
+            "noProcessEnv": "off"
+          },
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["e2e/tests/**/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@playwright/test": {
+                    "message": "Import `test` and `expect` from '../fixtures' so every spec gets the hydration-aware page fixture. See assets/e2e/fixtures.ts."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

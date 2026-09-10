@@ -5,6 +5,7 @@
 @source "../../lib/elixir_react_starter_web";
 
 /* Dark mode via class on <html> or prefers-color-scheme */
+/* biome-ignore lint/nursery/noUnusedClasses: `dark` is set on <html> by the root.html.heex theme bootstrap. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Single accent token. Components reference it as `bg-primary`,

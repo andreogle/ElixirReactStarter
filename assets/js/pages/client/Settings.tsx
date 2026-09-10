@@ -1,5 +1,5 @@
 import { useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
@@ -9,11 +9,11 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '../../components/AlertDialog';
-import Button from '../../components/Button';
-import { inputClass } from '../../components/ui';
-import AppLayout from '../../layouts/AppLayout';
-import { routes } from '../../routes';
+} from '../../components/AlertDialog.tsx';
+import Button from '../../components/Button.tsx';
+import { inputClass } from '../../components/ui.ts';
+import AppLayout from '../../layouts/AppLayout.tsx';
+import { routes } from '../../routes.ts';
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -21,7 +21,7 @@ export default function Settings() {
   return (
     <AppLayout title={t('settings.title')}>
       <div className="max-w-xl space-y-12">
-        <h1 className="text-2xl font-semibold">{t('settings.title')}</h1>
+        <h1 className="font-semibold text-2xl">{t('settings.title')}</h1>
         <ChangeEmailSection />
         <ChangePasswordSection />
         <DeleteAccountSection />
@@ -32,6 +32,7 @@ export default function Settings() {
 
 function ChangeEmailSection() {
   const { t } = useTranslation();
+  const id = useId();
   const currentEmail = usePage().props.current_user?.email ?? '';
   const { data, setData, put, processing, errors, reset } = useForm({
     current_password: '',
@@ -41,8 +42,8 @@ function ChangeEmailSection() {
   return (
     <section className="space-y-4">
       <header>
-        <h2 className="text-lg font-medium">{t('settings.changeEmail.title')}</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <h2 className="font-medium text-lg">{t('settings.changeEmail.title')}</h2>
+        <p className="text-gray-600 text-sm dark:text-gray-400">
           {t('settings.changeEmail.current', { email: currentEmail })}
         </p>
       </header>
@@ -54,11 +55,11 @@ function ChangeEmailSection() {
         className="space-y-4"
       >
         <div>
-          <label htmlFor="new_email" className="block text-sm mb-1">
+          <label htmlFor={`${id}-new_email`} className="mb-1 block text-sm">
             {t('settings.changeEmail.newEmail')}
           </label>
           <input
-            id="new_email"
+            id={`${id}-new_email`}
             type="email"
             autoComplete="email"
             value={data.email}
@@ -66,15 +67,15 @@ function ChangeEmailSection() {
             className={inputClass}
             required
           />
-          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+          {errors.email ? <p className="mt-1 text-red-600 text-sm">{errors.email}</p> : null}
         </div>
 
         <div>
-          <label htmlFor="email_current_password" className="block text-sm mb-1">
+          <label htmlFor={`${id}-email_current_password`} className="mb-1 block text-sm">
             {t('settings.changeEmail.currentPassword')}
           </label>
           <input
-            id="email_current_password"
+            id={`${id}-email_current_password`}
             type="password"
             autoComplete="current-password"
             value={data.current_password}
@@ -82,7 +83,7 @@ function ChangeEmailSection() {
             className={inputClass}
             required
           />
-          {errors.current_password && <p className="mt-1 text-sm text-red-600">{errors.current_password}</p>}
+          {errors.current_password ? <p className="mt-1 text-red-600 text-sm">{errors.current_password}</p> : null}
         </div>
 
         <Button type="submit" disabled={processing}>
@@ -95,6 +96,7 @@ function ChangeEmailSection() {
 
 function ChangePasswordSection() {
   const { t } = useTranslation();
+  const id = useId();
   const { data, setData, put, processing, errors, reset } = useForm({
     current_password: '',
     password: '',
@@ -103,8 +105,8 @@ function ChangePasswordSection() {
   return (
     <section className="space-y-4">
       <header>
-        <h2 className="text-lg font-medium">{t('settings.changePassword.title')}</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.changePassword.warning')}</p>
+        <h2 className="font-medium text-lg">{t('settings.changePassword.title')}</h2>
+        <p className="text-gray-600 text-sm dark:text-gray-400">{t('settings.changePassword.warning')}</p>
       </header>
       <form
         onSubmit={(e) => {
@@ -114,11 +116,11 @@ function ChangePasswordSection() {
         className="space-y-4"
       >
         <div>
-          <label htmlFor="current_password" className="block text-sm mb-1">
+          <label htmlFor={`${id}-current_password`} className="mb-1 block text-sm">
             {t('settings.changePassword.currentPassword')}
           </label>
           <input
-            id="current_password"
+            id={`${id}-current_password`}
             type="password"
             autoComplete="current-password"
             value={data.current_password}
@@ -126,15 +128,15 @@ function ChangePasswordSection() {
             className={inputClass}
             required
           />
-          {errors.current_password && <p className="mt-1 text-sm text-red-600">{errors.current_password}</p>}
+          {errors.current_password ? <p className="mt-1 text-red-600 text-sm">{errors.current_password}</p> : null}
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm mb-1">
+          <label htmlFor={`${id}-password`} className="mb-1 block text-sm">
             {t('settings.changePassword.newPassword')}
           </label>
           <input
-            id="password"
+            id={`${id}-password`}
             type="password"
             autoComplete="new-password"
             value={data.password}
@@ -143,7 +145,7 @@ function ChangePasswordSection() {
             required
             minLength={8}
           />
-          {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+          {errors.password ? <p className="mt-1 text-red-600 text-sm">{errors.password}</p> : null}
         </div>
 
         <Button type="submit" disabled={processing}>
@@ -171,15 +173,17 @@ function DeleteAccountSection() {
   return (
     <section className="space-y-4">
       <header>
-        <h2 className="text-lg font-medium">{t('settings.deleteAccount.title')}</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.deleteAccount.warning')}</p>
+        <h2 className="font-medium text-lg">{t('settings.deleteAccount.title')}</h2>
+        <p className="text-gray-600 text-sm dark:text-gray-400">{t('settings.deleteAccount.warning')}</p>
       </header>
 
       <AlertDialog
         open={open}
         onOpenChange={(next) => {
           setOpen(next);
-          if (!next) reset();
+          if (!next) {
+            reset();
+          }
         }}
       >
         <AlertDialogTrigger asChild>
@@ -209,7 +213,7 @@ function DeleteAccountSection() {
               required
               aria-label={t('settings.deleteAccount.passwordPlaceholder')}
             />
-            {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
+            {errors.password ? <p className="text-red-600 text-sm">{errors.password}</p> : null}
 
             <AlertDialogFooter>
               <AlertDialogCancel asChild>

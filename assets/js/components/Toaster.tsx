@@ -1,7 +1,7 @@
 import * as RadixToast from '@radix-ui/react-toast';
 import { CircleAlert, CircleCheck, Info, X } from 'lucide-react';
 import type { ComponentType, SVGProps } from 'react';
-import { dismissToast, type ToastVariant, useToasts } from './toast';
+import { dismissToast, type ToastVariant, useToasts } from './toast.ts';
 
 const iconFor: Record<ToastVariant, ComponentType<SVGProps<SVGSVGElement>>> = {
   info: Info,
@@ -26,22 +26,25 @@ export default function Toaster() {
           <RadixToast.Root
             key={id}
             onOpenChange={(open) => {
-              if (!open) dismissToast(id);
+              if (!open) {
+                dismissToast(id);
+              }
             }}
-            className="pointer-events-auto flex items-start gap-3 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4"
+            className="pointer-events-auto flex items-start gap-3 rounded border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900"
           >
-            <Icon className={`w-5 h-5 shrink-0 mt-0.5 ${iconColor[variant]}`} aria-hidden="true" />
+            <Icon className={`mt-0.5 size-5 shrink-0 ${iconColor[variant]}`} aria-hidden="true" />
             <RadixToast.Description className="flex-1 text-sm">{description}</RadixToast.Description>
             <RadixToast.Close
               aria-label="Dismiss"
-              className="shrink-0 rounded p-0.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+              className="shrink-0 cursor-pointer rounded p-0.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <X className="w-4 h-4" aria-hidden="true" />
+              <X className="size-4" aria-hidden="true" />
             </RadixToast.Close>
           </RadixToast.Root>
         );
       })}
-      <RadixToast.Viewport className="fixed bottom-4 right-4 z-50 flex w-96 max-w-[calc(100vw-2rem)] flex-col gap-2 outline-none" />
+      {/* biome-ignore lint/nursery/noTailwindArbitraryValue: viewport-relative cap has no utility form. */}
+      <RadixToast.Viewport className="fixed right-4 bottom-4 z-50 flex w-96 max-w-[calc(100vw-2rem)] flex-col gap-2 outline-none" />
     </RadixToast.Provider>
   );
 }

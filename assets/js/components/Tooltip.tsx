@@ -15,7 +15,7 @@ export function TooltipContent({
     <RadixTooltip.Portal>
       <RadixTooltip.Content
         sideOffset={sideOffset}
-        className={`z-50 rounded bg-gray-900 dark:bg-gray-100 px-2 py-1 text-xs text-white dark:text-gray-900 ${className}`}
+        className={`z-50 rounded bg-gray-900 px-2 py-1 text-white text-xs dark:bg-gray-100 dark:text-gray-900 ${className}`}
         {...props}
       >
         {children}

@@ -15,7 +15,7 @@ export function AlertDialogContent({
     <RadixAlertDialog.Portal>
       <RadixAlertDialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
       <RadixAlertDialog.Content
-        className={`fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 focus:outline-none ${className}`}
+        className={`-translate-1/2 fixed top-1/2 left-1/2 z-50 w-full max-w-sm rounded border border-gray-200 bg-white p-6 focus:outline-none dark:border-gray-800 dark:bg-gray-900 ${className}`}
         {...props}
       >
         {children}
@@ -28,7 +28,7 @@ export function AlertDialogTitle({
   className = '',
   ...props
 }: ComponentPropsWithoutRef<typeof RadixAlertDialog.Title>) {
-  return <RadixAlertDialog.Title className={`text-lg font-medium ${className}`} {...props} />;
+  return <RadixAlertDialog.Title className={`font-medium text-lg ${className}`} {...props} />;
 }
 
 export function AlertDialogDescription({
@@ -36,7 +36,7 @@ export function AlertDialogDescription({
   ...props
 }: ComponentPropsWithoutRef<typeof RadixAlertDialog.Description>) {
   return (
-    <RadixAlertDialog.Description className={`mt-2 text-sm text-gray-600 dark:text-gray-400 ${className}`} {...props} />
+    <RadixAlertDialog.Description className={`mt-2 text-gray-600 text-sm dark:text-gray-400 ${className}`} {...props} />
   );
 }
 

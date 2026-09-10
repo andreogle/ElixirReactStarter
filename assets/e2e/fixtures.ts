@@ -1,4 +1,4 @@
-import { test as base, expect, type Page } from '@playwright/test';
+import { test as base, expect as baseExpect, type Page } from '@playwright/test';
 
 /**
  * Suite-wide Playwright fixtures.
@@ -38,4 +38,4 @@ export const test = base.extend({
   },
 });
 
-export { expect };
+export const expect = baseExpect;

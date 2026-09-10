@@ -2,8 +2,8 @@ import type { TFunction } from 'i18next';
 import { Check, Monitor, Moon, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getTheme, setTheme, type Theme } from '../theme';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu';
+import { getTheme, setTheme, type Theme } from '../theme.ts';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu.tsx';
 
 const ICONS: Record<Theme, typeof Sun> = {
   light: Sun,
@@ -19,7 +19,7 @@ function labelFor(theme: Theme, t: TFunction): string {
       return t('common.themeLight');
     case 'dark':
       return t('common.themeDark');
-    case 'system':
+    default:
       return t('common.themeSystem');
   }
 }
@@ -46,18 +46,18 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={t('common.theme')}
-        className={`flex items-center justify-center rounded p-1.5 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${className}`}
+        className={`flex cursor-pointer items-center justify-center rounded p-1.5 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${className}`}
       >
-        <Current className="w-4 h-4" aria-hidden="true" />
+        <Current className="size-4" aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40">
         {options.map((value) => {
           const Icon = ICONS[value];
           return (
             <DropdownMenuItem key={value} onSelect={() => handleSelect(value)}>
-              <Icon className="w-4 h-4" aria-hidden="true" />
+              <Icon className="size-4" aria-hidden="true" />
               <span className="flex-1">{labelFor(value, t)}</span>
-              {theme === value && <Check className="w-4 h-4 text-primary" aria-hidden="true" />}
+              {theme === value && <Check className="size-4 text-primary" aria-hidden="true" />}
             </DropdownMenuItem>
           );
         })}

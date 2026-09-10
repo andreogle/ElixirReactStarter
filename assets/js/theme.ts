@@ -16,8 +16,10 @@ export type Theme = 'light' | 'dark' | 'system';
 const COOKIE_NAME = 'theme';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
+const THEME_COOKIE_RE = /(?:^|;\s*)theme=(light|dark|system)/;
+
 export function getTheme(): Theme {
-  const match = document.cookie.match(/(?:^|;\s*)theme=(light|dark|system)/);
+  const match = document.cookie.match(THEME_COOKIE_RE);
   return (match?.[1] as Theme | undefined) ?? 'system';
 }
 
@@ -39,7 +41,7 @@ export function applyTheme(theme: Theme) {
 }
 
 function prefersDark(): boolean {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return globalThis.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
 /**
@@ -47,8 +49,10 @@ function prefersDark(): boolean {
  * while the user has the `system` mode chosen.
  */
 export function startThemeWatcher() {
-  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  const mq = globalThis.matchMedia('(prefers-color-scheme: dark)');
   mq.addEventListener('change', () => {
-    if (getTheme() === 'system') applyTheme('system');
+    if (getTheme() === 'system') {
+      applyTheme('system');
+    }
   });
 }

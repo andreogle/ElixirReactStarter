@@ -1,3 +1,4 @@
+'use strict';
 // Watches assets/js/pages/ for added/removed .tsx files and regenerates the
 // SSR pages registry. Used as a Phoenix dev watcher.
 
@@ -11,7 +12,7 @@ const GENERATE = path.join(__dirname, 'generate-ssr-pages.cjs');
 function regenerate() {
   try {
     execFileSync(process.execPath, [GENERATE], { stdio: 'inherit' });
-  } catch (_) {
+  } catch {
     // errors already printed by the child process
   }
 }

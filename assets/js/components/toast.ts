@@ -13,7 +13,9 @@ let items: ToastItem[] = [];
 
 function emit() {
   items = [...items];
-  for (const fn of listeners) fn();
+  for (const fn of listeners) {
+    fn();
+  }
 }
 
 function subscribe(fn: () => void) {

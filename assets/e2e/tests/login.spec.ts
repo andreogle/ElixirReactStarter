@@ -1,5 +1,5 @@
-import { expect, test } from '../fixtures';
-import { fetchEmailLink, loginAs, provisionUser } from '../helpers';
+import { expect, test } from '../fixtures.ts';
+import { fetchEmailLink, loginAs, provisionUser } from '../helpers.ts';
 
 test('a confirmed user logs in and reaches the dashboard', async ({ page, request }) => {
   const user = await provisionUser(request, { label: 'login' });

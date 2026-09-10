@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect } from 'react';
-import { TooltipProvider } from './components/Tooltip';
-import { RealtimeProvider } from './realtime/provider';
+import { TooltipProvider } from './components/Tooltip.tsx';
+import { RealtimeProvider } from './realtime/provider.tsx';
 
 // =============================================================================
 // App-wide React context providers.

@@ -23,7 +23,7 @@ export function DropdownMenuContent({
           event.preventDefault();
           onCloseAutoFocus?.(event);
         }}
-        className={`z-50 min-w-[10rem] overflow-hidden rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-1 ${className}`}
+        className={`z-50 min-w-40 overflow-hidden rounded border border-gray-200 bg-white py-1 dark:border-gray-800 dark:bg-gray-900 ${className}`}
         {...props}
       />
     </RadixDropdownMenu.Portal>
@@ -36,7 +36,7 @@ export function DropdownMenuItem({
 }: ComponentPropsWithoutRef<typeof RadixDropdownMenu.Item>) {
   return (
     <RadixDropdownMenu.Item
-      className={`flex items-center gap-2 px-3 py-2 text-sm outline-none cursor-pointer select-none data-[highlighted]:bg-gray-100 dark:data-[highlighted]:bg-gray-800 data-[disabled]:opacity-50 data-[disabled]:pointer-events-none ${className}`}
+      className={`flex cursor-pointer select-none items-center gap-2 px-3 py-2 text-sm outline-none data-[disabled]:pointer-events-none data-[highlighted]:bg-gray-100 data-[disabled]:opacity-50 dark:data-[highlighted]:bg-gray-800 ${className}`}
       {...props}
     />
   );

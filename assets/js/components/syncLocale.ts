@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
-import i18n from '../i18n';
-import { go } from '../result';
+import i18n from 'i18next';
+import { go } from '../result.ts';
 
 /**
  * Sets i18next language and `<html lang>` from initial page props, and keeps
@@ -20,11 +20,15 @@ export function syncLocale(initialProps: Record<string, unknown>) {
 
 function applyLocale(props: Record<string, unknown>) {
   const locale = props.locale as string | undefined;
-  if (!locale) return;
+  if (!locale) {
+    return;
+  }
 
   if (locale !== i18n.language) {
     void go(() => i18n.changeLanguage(locale)).then(([error]) => {
-      if (error) console.error(`Failed to change language to "${locale}":`, error);
+      if (error) {
+        console.error(`Failed to change language to "${locale}":`, error);
+      }
     });
   }
 
