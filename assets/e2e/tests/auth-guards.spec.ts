@@ -1,5 +1,5 @@
-import { expect, test } from '../fixtures.ts';
-import { loginAs, provisionUser } from '../helpers.ts';
+import { expect, test } from '../fixtures';
+import { loginAs, provisionUser } from '../helpers';
 
 // The router splits routes into public, guest-only
 // (redirect_if_user_is_authenticated), and authenticated

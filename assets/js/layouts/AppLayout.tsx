@@ -2,19 +2,19 @@ import { Head, router, usePage } from '@inertiajs/react';
 import type { TFunction } from 'i18next';
 import { ChevronDown, CircleUserRound, LogOut, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import ConnectionIndicator from '../components/ConnectionIndicator.tsx';
+import ConnectionIndicator from '../components/ConnectionIndicator';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../components/DropdownMenu.tsx';
-import Link from '../components/Link.tsx';
-import LocaleSelector from '../components/LocaleSelector.tsx';
-import ThemeToggle from '../components/ThemeToggle.tsx';
-import { routes } from '../routes.ts';
-import type { CurrentUser } from '../types.ts';
+} from '../components/DropdownMenu';
+import Link from '../components/Link';
+import LocaleSelector from '../components/LocaleSelector';
+import ThemeToggle from '../components/ThemeToggle';
+import { routes } from '../routes';
+import type { CurrentUser } from '../types';
 
 interface AppLayoutProps {
   title: string;

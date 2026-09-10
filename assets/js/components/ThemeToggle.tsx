@@ -2,8 +2,8 @@ import type { TFunction } from 'i18next';
 import { Check, Monitor, Moon, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getTheme, setTheme, type Theme } from '../theme.ts';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu.tsx';
+import { getTheme, setTheme, type Theme } from '../theme';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu';
 
 const ICONS: Record<Theme, typeof Sun> = {
   light: Sun,

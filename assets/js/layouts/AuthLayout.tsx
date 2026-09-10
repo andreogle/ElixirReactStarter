@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import GuestTopBar from '../components/GuestTopBar.tsx';
+import GuestTopBar from '../components/GuestTopBar';
 
 interface AuthLayoutProps {
   title: string;

@@ -1,5 +1,5 @@
-import { expect, test } from '../fixtures.ts';
-import { fetchEmailLink, provisionUser } from '../helpers.ts';
+import { expect, test } from '../fixtures';
+import { fetchEmailLink, provisionUser } from '../helpers';
 
 test('clicking a confirmation link a second time keeps an already-confirmed user on the dashboard', async ({
   page,

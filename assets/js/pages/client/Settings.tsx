@@ -9,11 +9,11 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '../../components/AlertDialog.tsx';
-import Button from '../../components/Button.tsx';
-import { inputClass } from '../../components/ui.ts';
-import AppLayout from '../../layouts/AppLayout.tsx';
-import { routes } from '../../routes.ts';
+} from '../../components/AlertDialog';
+import Button from '../../components/Button';
+import { inputClass } from '../../components/ui';
+import AppLayout from '../../layouts/AppLayout';
+import { routes } from '../../routes';
 
 export default function Settings() {
   const { t } = useTranslation();

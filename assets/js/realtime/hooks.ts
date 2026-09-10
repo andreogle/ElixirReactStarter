@@ -1,7 +1,7 @@
 import type { Channel, Socket } from 'phoenix';
 import { useContext, useEffect, useRef } from 'react';
-import { RealtimeContext } from './provider.tsx';
-import type { ChannelEntry, ChannelStatus, ConnectionStatus } from './types.ts';
+import { RealtimeContext } from './provider';
+import type { ChannelEntry, ChannelStatus, ConnectionStatus } from './types';
 
 function useRealtime() {
   return useContext(RealtimeContext);

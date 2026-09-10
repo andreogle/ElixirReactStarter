@@ -1,7 +1,7 @@
 import * as RadixToast from '@radix-ui/react-toast';
 import { CircleAlert, CircleCheck, Info, X } from 'lucide-react';
 import type { ComponentType, SVGProps } from 'react';
-import { dismissToast, type ToastVariant, useToasts } from './toast.ts';
+import { dismissToast, type ToastVariant, useToasts } from './toast';
 
 const iconFor: Record<ToastVariant, ComponentType<SVGProps<SVGSVGElement>>> = {
   info: Info,

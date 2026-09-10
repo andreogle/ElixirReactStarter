@@ -1,5 +1,5 @@
-import { expect, test } from '../fixtures.ts';
-import { fetchEmailLink, gotoSettingsViaMenu, loginAs, logoutViaMenu, provisionUser, uniqueEmail } from '../helpers.ts';
+import { expect, test } from '../fixtures';
+import { fetchEmailLink, gotoSettingsViaMenu, loginAs, logoutViaMenu, provisionUser, uniqueEmail } from '../helpers';
 
 test('a user changes their email, confirms via the link to the new inbox, and logs in with it', async ({
   page,

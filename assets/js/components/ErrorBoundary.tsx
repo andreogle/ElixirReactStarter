@@ -1,7 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { captureException } from '../sentry.ts';
-import Button from './Button.tsx';
+import { captureException } from '../sentry';
+import Button from './Button';
 
 interface Props {
   children: ReactNode;

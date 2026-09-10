@@ -1,11 +1,11 @@
 import { useForm } from '@inertiajs/react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import Button from '../../../components/Button.tsx';
-import Link from '../../../components/Link.tsx';
-import { inputClass } from '../../../components/ui.ts';
-import AuthLayout from '../../../layouts/AuthLayout.tsx';
-import { routes } from '../../../routes.ts';
+import Button from '../../../components/Button';
+import Link from '../../../components/Link';
+import { inputClass } from '../../../components/ui';
+import AuthLayout from '../../../layouts/AuthLayout';
+import { routes } from '../../../routes';
 
 export default function Login() {
   const { t } = useTranslation();

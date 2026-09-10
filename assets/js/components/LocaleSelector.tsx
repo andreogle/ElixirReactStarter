@@ -1,7 +1,7 @@
 import { router, usePage } from '@inertiajs/react';
 import { Check } from 'lucide-react';
-import { routes } from '../routes.ts';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu.tsx';
+import { routes } from '../routes';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu';
 
 interface LocaleSelectorProps {
   className?: string;

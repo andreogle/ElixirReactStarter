@@ -1,5 +1,5 @@
-import { expect, test } from '../fixtures.ts';
-import { fetchEmailLink, uniqueEmail } from '../helpers.ts';
+import { expect, test } from '../fixtures';
+import { fetchEmailLink, uniqueEmail } from '../helpers';
 
 test('a visitor registers, confirms via the email link, and lands on the dashboard', async ({ page }) => {
   const email = uniqueEmail('registration');

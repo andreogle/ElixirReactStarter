@@ -84,7 +84,9 @@
           },
           "correctness": {
             // False positives on type-only exports; tsc covers this.
-            "noUnresolvedImports": "off"
+            "noUnresolvedImports": "off",
+            // Bundler resolution; extensionless relative imports.
+            "useImportExtensions": "off"
           },
           "performance": {
             // Inline JSX handlers are idiomatic React.
@@ -111,7 +113,7 @@
                 "paths": {
                   "@inertiajs/react": {
                     "importNames": ["Link"],
-                    "message": "Import Link from components/Link.tsx so prefetch is enabled by default."
+                    "message": "Import Link from components/Link so prefetch is enabled by default."
                   }
                 }
               }

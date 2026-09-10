@@ -1,13 +1,13 @@
-import './i18n/index.ts';
+import './i18n/index';
 import { createInertiaApp } from '@inertiajs/react';
 import * as Sentry from '@sentry/node';
 import i18n from 'i18next';
 import { createElement } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import pages, { ssrClientOnly } from './_ssr_pages.ts';
-import { AppProviders } from './app-providers.tsx';
-import Toaster from './components/Toaster.tsx';
-import { go } from './result.ts';
+import { AppProviders } from './app-providers';
+import Toaster from './components/Toaster';
+import { go } from './result';
 
 // Sentry for the SSR Node workers (errors only — no tracing). The DSN is
 // inherited from the BEAM's environment; falls back to the frontend DSN

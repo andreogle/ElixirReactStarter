@@ -1,10 +1,10 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-import Button from '../../components/Button.tsx';
-import GuestTopBar from '../../components/GuestTopBar.tsx';
-import Link from '../../components/Link.tsx';
-import { routes } from '../../routes.ts';
-import type { CurrentUser } from '../../types.ts';
+import Button from '../../components/Button';
+import GuestTopBar from '../../components/GuestTopBar';
+import Link from '../../components/Link';
+import { routes } from '../../routes';
+import type { CurrentUser } from '../../types';
 
 export default function Home() {
   const { current_user } = usePage<{ current_user: CurrentUser | null }>().props;

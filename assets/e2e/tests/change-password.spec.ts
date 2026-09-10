@@ -1,5 +1,5 @@
-import { expect, test } from '../fixtures.ts';
-import { gotoSettingsViaMenu, loginAs, logoutViaMenu, provisionUser } from '../helpers.ts';
+import { expect, test } from '../fixtures';
+import { gotoSettingsViaMenu, loginAs, logoutViaMenu, provisionUser } from '../helpers';
 
 function passwordSection(page: import('@playwright/test').Page) {
   return page.locator('section').filter({ has: page.getByRole('heading', { name: 'Change password' }) });

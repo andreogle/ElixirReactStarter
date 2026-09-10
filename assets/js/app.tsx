@@ -1,18 +1,18 @@
 // Init Sentry first so its global error handlers are installed before any
 // other module can throw. No-op unless a DSN was stamped into <head>.
-import './sentry.ts';
-import './i18n/index.ts';
+import './sentry';
+import './i18n/index';
 import { createInertiaApp, router } from '@inertiajs/react';
 import { createElement, StrictMode, useEffect } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
-import pages, { serverRenderedPages } from './_pages.ts';
-import { AppProviders } from './app-providers.tsx';
-import ErrorBoundary from './components/ErrorBoundary.tsx';
-import { syncLocale } from './components/syncLocale.ts';
-import Toaster from './components/Toaster.tsx';
-import { toast } from './components/toast.ts';
-import { go } from './result.ts';
-import { startThemeWatcher } from './theme.ts';
+import pages, { serverRenderedPages } from './_pages';
+import { AppProviders } from './app-providers';
+import ErrorBoundary from './components/ErrorBoundary';
+import { syncLocale } from './components/syncLocale';
+import Toaster from './components/Toaster';
+import { toast } from './components/toast';
+import { go } from './result';
+import { startThemeWatcher } from './theme';
 
 interface Flash {
   info?: string;

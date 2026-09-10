@@ -1,8 +1,8 @@
 import { usePage } from '@inertiajs/react';
 import type { Channel, Socket } from 'phoenix';
 import { createContext, type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { createSocket } from './socket.ts';
-import type { ChannelEntry, ChannelStatus, ConnectionStatus } from './types.ts';
+import { createSocket } from './socket';
+import type { ChannelEntry, ChannelStatus, ConnectionStatus } from './types';
 
 export interface RealtimeContextValue {
   socket: Socket | null;

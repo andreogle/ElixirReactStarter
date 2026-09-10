@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { useConnectionStatus } from '../realtime/hooks.ts';
-import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip.tsx';
+import { useConnectionStatus } from '../realtime/hooks';
+import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip';
 
 /**
  * Status dot for the realtime socket. Slow-pulsing green when
