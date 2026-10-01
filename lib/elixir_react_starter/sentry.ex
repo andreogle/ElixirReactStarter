@@ -1,13 +1,11 @@
 defmodule ElixirReactStarter.Sentry do
   @moduledoc """
-  Sentry glue that enforces the project's no-PII rule on everything that
-  leaves the system.
+  Limits structured user and request data sent to Sentry.
 
   Two hooks:
 
-    * `before_send/1` — the last gate every event passes through. It strips
-      the user's email (we keep the user *id* for correlation, never the
-      address) so a misconfigured call site can't leak one into Sentry.
+    * `before_send/1` — keeps only the user's ID and the request method/URL
+      without its query string. Drops bodies, cookies, headers and IPs.
     * `scrub_params/1` — a `Sentry.PlugContext` body scrubber. It extends
       the SDK default (which masks `password`/`secret`/…) to also drop the
       email/token/code params that flow through auth and account routes.
@@ -22,14 +20,26 @@ defmodule ElixirReactStarter.Sentry do
   @pii_params ~w(email new_email current_password password password_confirmation token code secret)
 
   @doc """
-  `before_send` callback. Drops the email from the event's user context;
-  returns the event otherwise unchanged so it still ships.
+  Keeps user IDs and request locations while limiting personal data.
   """
-  def before_send(%Sentry.Event{user: user} = event) when is_map(user) do
-    %{event | user: Map.drop(user, [:email, "email"])}
+  def before_send(%Sentry.Event{} = event) do
+    user = if is_map(event.user), do: Map.take(event.user, [:id, "id"]), else: event.user
+    %{event | user: user, request: scrub_request(event.request)}
   end
 
-  def before_send(%Sentry.Event{} = event), do: event
+  defp scrub_request(nil), do: nil
+
+  defp scrub_request(request) do
+    url =
+      if request.url do
+        request.url
+        |> URI.parse()
+        |> Map.merge(%{query: nil, fragment: nil, userinfo: nil})
+        |> URI.to_string()
+      end
+
+    %Sentry.Interfaces.Request{method: request.method, url: url}
+  end
 
   @doc """
   `Sentry.PlugContext` body scrubber. Runs the SDK default scrubber, then

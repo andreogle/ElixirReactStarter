@@ -8,6 +8,7 @@ import pages, { ssrClientOnly } from './_ssr_pages.ts';
 import { AppProviders } from './app-providers';
 import Toaster from './components/Toaster';
 import { go } from './result';
+import { dataCollection, userFromProps } from './sentry-config.ts';
 
 // Sentry for the SSR Node workers (errors only — no tracing). The DSN is
 // inherited from the BEAM's environment; falls back to the frontend DSN
@@ -18,6 +19,7 @@ if (sentryDsn) {
     dsn: sentryDsn,
     environment: process.env.DEPLOY_ENV || 'production',
     release: process.env.SENTRY_RELEASE || process.env.RENDER_GIT_COMMIT,
+    dataCollection,
   });
 }
 
@@ -26,13 +28,15 @@ if (sentryDsn) {
 // Inertia itself, not by our own code, so it's opaque on the Node side.
 // biome-ignore lint/suspicious/noExplicitAny: protocol-level payload from Inertia
 export async function render(page: any) {
+  // Per-event context avoids leaking identity between pooled SSR requests.
+  const user = userFromProps(page.props ?? {}) ?? undefined;
   // Sync locale before rendering so SSR output matches
   const locale = page.props?.locale as string | undefined;
   if (locale && locale !== i18n.language) {
     const [localeError] = await go(() => i18n.changeLanguage(locale));
     if (localeError) {
       if (sentryDsn) {
-        Sentry.captureException(localeError);
+        Sentry.captureException(localeError, { user });
       }
       throw localeError;
     }
@@ -86,7 +90,7 @@ export async function render(page: any) {
   // `raise_on_ssr_failure`).
   if (error) {
     if (sentryDsn) {
-      Sentry.captureException(error);
+      Sentry.captureException(error, { user });
     }
     throw error;
   }

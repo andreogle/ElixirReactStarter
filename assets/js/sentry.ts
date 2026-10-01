@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react';
+import { dataCollection, userFromProps } from './sentry-config.ts';
 
 // Read config the server stamped into <head> (see root.html.heex). The
 // tags are absent unless SENTRY_DSN_FRONTEND is set, so dev and any
@@ -18,10 +19,22 @@ if (dsn) {
     dsn,
     environment: metaContent('sentry-environment'),
     release: metaContent('sentry-release'),
+    dataCollection,
   });
 }
 
 export const sentryEnabled = dsn !== undefined;
+
+/** Follow the current page's user without copying email or other props. */
+export function identifyViewer(props: Record<string, unknown>): void {
+  if (!sentryEnabled) {
+    return;
+  }
+  const user = userFromProps(props);
+  if (user !== undefined) {
+    Sentry.setUser(user);
+  }
+}
 
 /** Report a caught exception. No-op when Sentry isn't configured. */
 export function captureException(error: unknown, context?: Record<string, unknown>): void {

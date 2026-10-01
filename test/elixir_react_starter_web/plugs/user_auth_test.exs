@@ -24,11 +24,14 @@ defmodule ElixirReactStarterWeb.UserAuthTest do
       conn = conn |> put_session(@session_key, token) |> UserAuth.fetch_current_user([])
 
       assert conn.assigns.current_user.id == user.id
+      assert Sentry.Context.get_all().user == %{id: user.id}
     end
 
     test "assigns nil when no token is present", %{conn: conn} do
+      Sentry.Context.set_user_context(%{id: "previous-user"})
       conn = UserAuth.fetch_current_user(conn, [])
       assert conn.assigns.current_user == nil
+      assert Sentry.Context.get_all().user == %{id: nil}
     end
 
     test "assigns nil for a token that doesn't match any session", %{conn: conn} do
