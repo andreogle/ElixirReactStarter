@@ -144,7 +144,7 @@
     },
     {
       // Node-side code.
-      "includes": ["build/**", "e2e/**", "playwright.config.ts", "js/ssr.tsx", "js/result.test.ts"],
+      "includes": ["build/**", "e2e/**", "playwright.config.ts", "js/ssr.tsx", "js/**/*.test.ts"],
       "linter": {
         "rules": {
           "correctness": {

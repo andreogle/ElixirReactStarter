@@ -62,6 +62,7 @@ defmodule ElixirReactStarterWeb.UserAuth do
     conn = fetch_cookies(conn)
     locale = request_locale(conn, user)
     _ = Gettext.put_locale(ElixirReactStarterWeb.Gettext, locale)
+    Sentry.Context.set_user_context(%{id: user && user.id})
 
     conn
     |> assign(:current_user, user)

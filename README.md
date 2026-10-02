@@ -127,6 +127,22 @@ Dockerfile to `--max-old-space-size=160`, caps each SSR worker's V8 heap) are
 optional. The last two are the main levers on the Node-side memory the SSR pool
 uses — see [Frontend Pages: SSR vs. Client](docs/frontend-pages.md).
 
+### Error monitoring
+
+Sentry is opt-in through `SENTRY_DSN` and `SENTRY_DSN_FRONTEND`.
+SSR uses `SENTRY_DSN_SSR`, falling back to the frontend DSN. Errors include
+the signed-in user's ID, without copying their email or other profile fields.
+Browser identity follows Inertia navigation and clears on logout; SSR identity
+is attached per error so pooled workers do not share users.
+
+The JavaScript SDKs explicitly disable automatic user/IP, cookie, header,
+body, query-parameter, database payload, AI input/output, queue argument,
+GraphQL document/variable and stack-variable collection. Tracing and replay
+remain unconfigured. Backend events retain only user ID and request method/URL,
+with query strings, fragments and URL credentials removed. Error messages,
+stack traces and breadcrumbs still provide diagnostics; do not put personal
+data or secrets in custom error messages or context.
+
 ### Behind a proxy
 
 If traffic reaches the app through a load balancer or CDN — Render, Fly, an ALB,

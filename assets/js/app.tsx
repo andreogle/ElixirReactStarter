@@ -1,6 +1,6 @@
 // Init Sentry first so its global error handlers are installed before any
 // other module can throw. No-op unless a DSN was stamped into <head>.
-import './sentry';
+import { identifyViewer } from './sentry';
 import './i18n/index';
 import { createInertiaApp, router } from '@inertiajs/react';
 import { createElement, StrictMode, useEffect } from 'react';
@@ -77,6 +77,7 @@ const startApp = () => {
     },
     setup({ App, el, props }) {
       syncLocale(props.initialPage.props);
+      identifyViewer(props.initialPage.props);
       startThemeWatcher();
 
       // Dev-only accessibility auditing. The whole branch — and axe-core —
@@ -98,6 +99,12 @@ const startApp = () => {
       // because Inertia treats same-URL responses as history replace).
       router.on('success', (event) => {
         applyFlash(event.detail.page.props.flash as Flash | undefined);
+        identifyViewer(event.detail.page.props);
+      });
+
+      // History restores do not fire `success`.
+      router.on('navigate', (event) => {
+        identifyViewer(event.detail.page.props);
       });
 
       const tree = (

@@ -106,7 +106,7 @@ config :phoenix, :json_library, Jason
 # Sentry error monitoring (backend). The DSN is set per-environment in
 # config/runtime.exs — without it the SDK is inert, so dev/test report
 # nothing. Errors only: no tracing/spans are configured. `before_send`
-# enforces the project's no-PII rule on every event (see
+# limits structured user and request data on every event (see
 # ElixirReactStarter.Sentry).
 config :sentry,
   enable_source_code_context: true,

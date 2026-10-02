@@ -4,15 +4,21 @@ defmodule ElixirReactStarter.SentryTest do
   alias ElixirReactStarter.Sentry, as: SentryGlue
 
   describe "before_send/1" do
-    test "drops the email from the user context but keeps the id" do
-      event = build_event(user: %{id: 42, email: "jane@example.com"})
+    test "keeps only the id from the user context" do
+      event =
+        build_event(
+          user: %{id: 42, email: "jane@example.com", username: "Jane", ip_address: "192.0.2.1"}
+        )
 
       assert %Sentry.Event{user: user} = SentryGlue.before_send(event)
       assert user == %{id: 42}
     end
 
-    test "drops a string-keyed email too" do
-      event = build_event(user: %{"id" => 42, "email" => "jane@example.com"})
+    test "keeps only the id with string keys too" do
+      event =
+        build_event(
+          user: %{"id" => 42, "email" => "jane@example.com", "ip_address" => "192.0.2.1"}
+        )
 
       assert %Sentry.Event{user: user} = SentryGlue.before_send(event)
       assert user == %{"id" => 42}
@@ -21,6 +27,31 @@ defmodule ElixirReactStarter.SentryTest do
     test "passes through an event with no user context unchanged" do
       event = build_event(user: nil)
 
+      assert SentryGlue.before_send(event) == event
+    end
+
+    test "keeps the request location but drops request data and IP addresses" do
+      event =
+        build_event(
+          request: %Sentry.Interfaces.Request{
+            method: "POST",
+            url: "https://user:password@example.com/login?email=jane@example.com#secret",
+            query_string: "email=jane@example.com",
+            data: %{"name" => "Jane"},
+            cookies: %{"session" => "secret"},
+            headers: %{"x-forwarded-for" => "192.0.2.1"},
+            env: %{"REMOTE_ADDR" => "192.0.2.1"}
+          }
+        )
+
+      assert SentryGlue.before_send(event).request == %Sentry.Interfaces.Request{
+               method: "POST",
+               url: "https://example.com/login"
+             }
+    end
+
+    test "preserves errors outside a request" do
+      event = build_event(request: nil, user: nil)
       assert SentryGlue.before_send(event) == event
     end
   end
