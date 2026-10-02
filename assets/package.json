@@ -23,7 +23,7 @@
     "@radix-ui/react-select": "^2.3.7",
     "@radix-ui/react-toast": "^1.2.23",
     "@radix-ui/react-tooltip": "^1.2.16",
-    "@sentry/node": "^11.0.0",
+    "@sentry/node": "^11.1.0",
     "@sentry/react": "^11.1.0",
     "@types/phoenix": "^1.6.7",
     "i18next": "^26.4.2",
