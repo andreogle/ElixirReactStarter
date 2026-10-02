@@ -138,6 +138,14 @@ ENV PORT=4000
 # this bounds the Node side of memory alongside SSR_POOL_SIZE. Override in
 # the deploy env if a heavier SSR page needs more headroom.
 ENV NODE_OPTIONS="--max-old-space-size=160"
+# The SSR workers' Node server (the `nodejs` package's `server.js`) loads
+# `priv/ssr.js` afresh on every render unless NODE_ENV is "production", for
+# hot reload in development. Each reload keeps about 7.5 MB of heap, so
+# under the cap above a worker ran out after about 20 renders and aborted
+# (exit 134). Production also gives SSR the same production React build the
+# browser runs.
+ENV NODE_ENV=production
+
 EXPOSE 4000
 
 COPY --from=builder --chown=app:app /app/_build/prod/rel/elixir_react_starter ./
