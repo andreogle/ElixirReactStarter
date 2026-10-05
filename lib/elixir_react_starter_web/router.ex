@@ -104,13 +104,15 @@ defmodule ElixirReactStarterWeb.Router do
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
 
-    # E2E fixture provisioning. JSON only — the Playwright suite (assets/e2e)
-    # POSTs here to mint a confirmed user and skip the email-link round-trip.
+    # E2E fixtures. JSON only — the Playwright suite (assets/e2e) POSTs here
+    # to mint a confirmed user and skip the email-link round-trip, and
+    # DELETEs every account a test made once it ends.
     # See ElixirReactStarterWeb.DevE2EController.
     scope "/dev", ElixirReactStarterWeb do
       pipe_through :api
 
       post "/e2e/users", DevE2EController, :create
+      delete "/e2e/users", DevE2EController, :delete
     end
   end
 end

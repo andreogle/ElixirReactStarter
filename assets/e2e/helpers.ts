@@ -1,4 +1,5 @@
 import { type APIRequestContext, expect, type Page } from '@playwright/test';
+import { trackEmail, waitForHydration } from './fixtures';
 
 /**
  * Helpers shared across the Playwright suite.
@@ -15,13 +16,16 @@ import { type APIRequestContext, expect, type Page } from '@playwright/test';
 
 /**
  * Build an email guaranteed to be unique within the run. The `e2e-test-`
- * prefix matches the cleanup pattern in `priv/repo/e2e.exs`, so anything
- * provisioned this way is wiped before the next run.
+ * prefix is the only pattern the `/dev/e2e` endpoints accept. The email is
+ * recorded, so whatever account ends up behind it (provisioned, registered
+ * through the UI, or changed to) is deleted when the test ends.
  */
 export function uniqueEmail(label: string): string {
   const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   const stamp = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-  return `e2e-test-${slug}-${stamp}@example.com`;
+  const email = `e2e-test-${slug}-${stamp}@example.com`;
+  trackEmail(email);
+  return email;
 }
 
 // =============================================================================
@@ -61,11 +65,12 @@ export async function provisionUser(
 
 /**
  * Log in via the /login form. Asserts the redirect to /dashboard so callers
- * don't repeat it in every spec. Hydration is handled by the wrapped
- * `page.goto` in fixtures.ts, so this can drive the form immediately.
+ * don't repeat it in every spec.
  */
 export async function loginAs(page: Page, user: { email: string; password: string }): Promise<void> {
   await page.goto('/login');
+  // The test's own `page.goto` already waits; this covers a second page.
+  await waitForHydration(page);
   await page.getByLabel('Email').fill(user.email);
   await page.getByLabel('Password').fill(user.password);
   await page.getByRole('button', { name: 'Log in' }).click();

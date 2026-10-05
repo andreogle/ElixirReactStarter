@@ -98,6 +98,12 @@ config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
 # Enable dev routes for dashboard and mailbox
 config :elixir_react_starter, dev_routes: true
 
+# Run the server-rendering workers with NODE_ENV=production and restart them
+# when priv/ssr.js is rebuilt (ElixirReactStarterWeb.SSRReloader), instead of
+# the `nodejs` package reloading the bundle on every render until a worker
+# runs out of heap and a page load (often mid E2E run) fails with a 500.
+config :elixir_react_starter, reload_ssr: true
+
 # Disable auth rate limiting in development. The Playwright E2E suite drives
 # this server and legitimately makes many requests from one IP; throttling
 # is a production concern (and the limiter is covered by rate_limit_test).

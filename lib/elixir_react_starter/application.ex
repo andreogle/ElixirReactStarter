@@ -21,6 +21,14 @@ defmodule ElixirReactStarter.Application do
     # id, so primary keys are strictly ordered from the very first insert.
     UUIDv7.init()
 
+    # The server-rendering workers are Node processes and inherit this
+    # environment. Without NODE_ENV=production the `nodejs` package loads
+    # the SSR bundle again on every render and a worker runs out of heap
+    # after a few hundred renders. Development sets it here, and
+    # `ElixirReactStarterWeb.SSRReloader` picks up rebuilt bundles.
+    if Application.get_env(:elixir_react_starter, :reload_ssr),
+      do: System.put_env("NODE_ENV", "production")
+
     children = [
       ElixirReactStarterWeb.Telemetry,
       ElixirReactStarter.Repo,
@@ -32,6 +40,7 @@ defmodule ElixirReactStarter.Application do
       {ElixirReactStarter.RateLimit, [clean_period: :timer.minutes(10)]},
       {Inertia.SSR,
        path: Application.app_dir(:elixir_react_starter, "priv"), pool_size: ssr_pool_size()},
+      ssr_reloader(),
       # Background jobs. Config (queues, plugins) lives under the `Oban`
       # key in config/config.exs; tests run it in `:manual` mode. Starts
       # after the Repo so its tables are reachable.
@@ -43,7 +52,19 @@ defmodule ElixirReactStarter.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: ElixirReactStarter.Supervisor]
-    Supervisor.start_link(children, opts)
+    Supervisor.start_link(List.flatten(children), opts)
+  end
+
+  # Development restarts the SSR workers when their bundle is rebuilt.
+  defp ssr_reloader do
+    if Application.get_env(:elixir_react_starter, :reload_ssr) do
+      [
+        {ElixirReactStarterWeb.SSRReloader,
+         path: Application.app_dir(:elixir_react_starter, "priv/ssr.js")}
+      ]
+    else
+      []
+    end
   end
 
   # Number of Node.js workers in the Inertia SSR pool. Each worker loads the

@@ -5,7 +5,16 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "includes": ["**", "!**/node_modules/", "!js/_pages.ts", "!js/_ssr_pages.ts", "!js/routes.ts"]
+    "includes": [
+      "**",
+      "!**/node_modules/",
+      "!js/_pages.ts",
+      "!js/_ssr_pages.ts",
+      "!js/routes.ts",
+      // Playwright output (gitignored), written by every local E2E run.
+      "!**/playwright-report",
+      "!**/test-results"
+    ]
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "formatter": {
