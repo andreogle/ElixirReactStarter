@@ -125,7 +125,9 @@ in emails). `PORT` (default `4000`), `POOL_SIZE`, `ECTO_IPV6`,
 (number of Inertia SSR Node workers, default `2`), and `NODE_OPTIONS` (set in the
 Dockerfile to `--max-old-space-size=160`, caps each SSR worker's V8 heap) are
 optional. The last two are the main levers on the Node-side memory the SSR pool
-uses — see [Frontend Pages: SSR vs. Client](docs/frontend-pages.md).
+uses — see [Frontend Pages: SSR vs. Client](docs/frontend-pages.md). The
+Dockerfile also sets `NODE_ENV=production`; don't override it — without it each
+SSR worker reloads the bundle on every render, leaking heap until it aborts.
 
 ### Error monitoring
 
