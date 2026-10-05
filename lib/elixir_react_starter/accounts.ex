@@ -24,6 +24,7 @@ defmodule ElixirReactStarter.Accounts do
 
   require Logger
 
+  alias Ecto.Changeset
   alias ElixirReactStarter.Accounts.{User, UserToken}
   alias ElixirReactStarter.Repo
 
@@ -241,11 +242,11 @@ defmodule ElixirReactStarter.Accounts do
       not changeset.valid? ->
         changeset
 
-      Ecto.Changeset.get_change(changeset, :email) == nil ->
-        Ecto.Changeset.add_error(changeset, :email, "is the same as your current email")
+      Changeset.get_change(changeset, :email) == nil ->
+        Changeset.add_error(changeset, :email, "is the same as your current email")
 
-      get_user_by(email: Ecto.Changeset.get_change(changeset, :email)) ->
-        Ecto.Changeset.add_error(changeset, :email, "has already been taken")
+      get_user_by(email: Changeset.get_change(changeset, :email)) ->
+        Changeset.add_error(changeset, :email, "has already been taken")
 
       true ->
         changeset
@@ -275,8 +276,8 @@ defmodule ElixirReactStarter.Accounts do
 
       changeset =
         user
-        |> Ecto.Changeset.change()
-        |> Ecto.Changeset.add_error(:current_password, "is incorrect")
+        |> Changeset.change()
+        |> Changeset.add_error(:current_password, "is incorrect")
 
       {:error, changeset}
     end

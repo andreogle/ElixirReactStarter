@@ -148,6 +148,7 @@ defmodule ElixirReactStarter.MixProject do
 
       # Dev/test
       {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:ex_slop, "~> 0.4", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:ex_doc, "~> 0.34", only: [:dev, :test], runtime: false},

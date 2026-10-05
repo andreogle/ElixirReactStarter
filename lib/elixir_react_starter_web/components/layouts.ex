@@ -1,7 +1,7 @@
 defmodule ElixirReactStarterWeb.Layouts do
   @moduledoc """
-  This module holds layouts and related functionality
-  used by your application.
+  Embeds `root.html.heex`, the Inertia shell — the only HEEx template the
+  app ships. Every page is rendered by React inside it.
   """
   use ElixirReactStarterWeb, :html
 

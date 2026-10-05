@@ -141,7 +141,7 @@ defmodule Mix.Tasks.Routes.Gen do
     dupes =
       entries
       |> Enum.group_by(& &1.name)
-      |> Enum.filter(fn {_name, group} -> length(group) > 1 end)
+      |> Enum.filter(fn {_name, group} -> match?([_, _ | _], group) end)
 
     if dupes != [] do
       detail =

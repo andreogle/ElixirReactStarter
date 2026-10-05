@@ -459,7 +459,7 @@ defmodule Mix.Tasks.I18n.Check do
   defp prose?(text) do
     words = Regex.scan(~r/[A-Za-z]{2,}/, text) |> Enum.map(&hd/1)
 
-    length(words) >= 3 and
+    Enum.count_until(words, 3) == 3 and
       Enum.any?(words, &(String.length(&1) >= 4)) and
       Regex.match?(~r/[a-z]/, text)
   end
@@ -529,7 +529,7 @@ defmodule Mix.Tasks.I18n.Check do
   defp msgid_of(%Message.Singular{msgid: msgid}), do: join(msgid)
   defp msgid_of(%Message.Plural{msgid: msgid}), do: join(msgid)
 
-  defp join(parts) when is_list(parts), do: Enum.join(parts, "")
+  defp join(parts) when is_list(parts), do: Enum.join(parts)
   defp join(nil), do: ""
 
   defp empty?(nil), do: true

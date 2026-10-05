@@ -68,9 +68,11 @@ defmodule ElixirReactStarterWeb.Plugs.ClientIp do
   @impl true
   def call(conn, opts), do: RemoteIp.call(conn, opts)
 
-  @doc false
-  # Returning no headers is how the plug switches itself off: with nothing to
-  # parse, RemoteIp falls back to `conn.remote_ip` untouched.
+  @doc """
+  The headers RemoteIp reads the client IP from, looked up on every request
+  (see `init/1`). Returning none is how the plug switches itself off: with
+  nothing to parse, RemoteIp leaves `conn.remote_ip` untouched.
+  """
   def headers do
     if Application.get_env(:elixir_react_starter, :trust_proxy_headers, false) do
       Application.get_env(:elixir_react_starter, :client_ip_headers, @default_headers)
@@ -79,7 +81,7 @@ defmodule ElixirReactStarterWeb.Plugs.ClientIp do
     end
   end
 
-  @doc false
+  @doc "The proxies whose forwarding headers are trusted, looked up on every request."
   def proxies do
     Application.get_env(:elixir_react_starter, :trusted_proxies, [])
   end

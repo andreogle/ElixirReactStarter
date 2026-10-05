@@ -129,7 +129,7 @@ The template already includes these — extend them, don't rebuild them.
 **Theme** (`assets/js/theme.ts`, `ThemeToggle`)
 - light / dark / system, stored in a `theme` cookie. An inline bootstrap in `root.html.heex` applies the `dark` class before first paint (no flash). Dark mode is class-based (`@custom-variant dark`)
 
-**Static analysis** — `mix precommit` stays fast; CI runs `mix precommit.full` which adds dialyzer.
+**Static analysis** — `mix precommit` stays fast; CI runs `mix precommit.full` which adds dialyzer. Credo runs strict with every [ExSlop](https://hex.pm/packages/ex_slop) check enabled (blanket rescues, narrator docs/comments, N+1 queries, identity `with`/`case`, …) — fix the code, don't disable the check
 
 ## UI/UX bar
 
