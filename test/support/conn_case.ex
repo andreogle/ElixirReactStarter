@@ -23,6 +23,7 @@ defmodule ElixirReactStarterWeb.ConnCase do
 
       import Plug.Conn
       import Phoenix.ConnTest
+      import Inertia.Testing
       import ElixirReactStarterWeb.ConnCase
       import ElixirReactStarter.Factory
     end

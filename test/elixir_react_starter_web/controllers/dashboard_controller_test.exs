@@ -5,7 +5,8 @@ defmodule ElixirReactStarterWeb.DashboardControllerTest do
     @tag :authenticated
     test "renders the Dashboard Inertia page", %{conn: conn} do
       conn = get(conn, ~p"/dashboard")
-      assert html_response(conn, 200) =~ ~s(&quot;component&quot;:&quot;Dashboard&quot;)
+      assert html_response(conn, 200)
+      assert inertia_component(conn) == "Dashboard"
     end
 
     test "redirects to /login when not authenticated", %{conn: conn} do
