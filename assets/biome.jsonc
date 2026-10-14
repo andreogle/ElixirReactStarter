@@ -1,7 +1,11 @@
-// Strict by default: `preset: "all"` + every stable group at "error", so rules
-// added by Biome upgrades are enforced automatically. Nursery rules are opt-in.
-// Group-level "error" is a string, so per-rule opt-outs/options live in the
-// `**` override below — each opt-out carries its reason.
+// Strict by default: `preset: "all"` enables every stable rule, so rules added
+// by Biome upgrades are enforced automatically; `--error-on-warnings` (the
+// `lint` script) fails on any of them. Nursery rules are opt-in. Per-rule
+// opt-outs/options live in the `**` override below — each carries its reason.
+//
+// Don't set groups to "error" (`"correctness": "error"`): since Biome 2.5.15
+// that counts as enabling every rule in the group explicitly, which overrides
+// the `"none"` domains below and turns on Solid/Qwik/Vue rules for React code.
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
@@ -58,13 +62,6 @@
     },
     "rules": {
       "preset": "all",
-      "a11y": "error",
-      "complexity": "error",
-      "correctness": "error",
-      "performance": "error",
-      "security": "error",
-      "style": "error",
-      "suspicious": "error",
       "nursery": {
         "noReactStringRefs": "error",
         "useTestHooksInOrder": "error",
