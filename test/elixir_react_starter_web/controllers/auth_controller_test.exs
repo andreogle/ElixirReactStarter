@@ -17,26 +17,30 @@ defmodule ElixirReactStarterWeb.AuthControllerTest do
   describe "GET /register" do
     test "renders the Inertia Register page", %{conn: conn} do
       conn = get(conn, ~p"/register")
-      assert html_response(conn, 200) =~ ~s(&quot;component&quot;:&quot;Auth/Register&quot;)
+      assert html_response(conn, 200)
+      assert inertia_component(conn) == "Auth/Register"
     end
   end
 
   describe "GET guest auth pages" do
     test "GET /login renders the Inertia Login page", %{conn: conn} do
       conn = get(conn, ~p"/login")
-      assert html_response(conn, 200) =~ ~s(&quot;component&quot;:&quot;Auth/Login&quot;)
+      assert html_response(conn, 200)
+      assert inertia_component(conn) == "Auth/Login"
     end
 
     test "GET /forgot-password renders the Inertia ForgotPassword page", %{conn: conn} do
       conn = get(conn, ~p"/forgot-password")
-      assert html_response(conn, 200) =~ ~s(&quot;component&quot;:&quot;Auth/ForgotPassword&quot;)
+      assert html_response(conn, 200)
+      assert inertia_component(conn) == "Auth/ForgotPassword"
     end
 
     test "GET /resend-confirmation renders the Inertia ResendConfirmation page", %{conn: conn} do
       conn = get(conn, ~p"/resend-confirmation")
 
-      assert html_response(conn, 200) =~
-               ~s(&quot;component&quot;:&quot;Auth/ResendConfirmation&quot;)
+      assert html_response(conn, 200)
+
+      assert inertia_component(conn) == "Auth/ResendConfirmation"
     end
   end
 
@@ -54,6 +58,12 @@ defmodule ElixirReactStarterWeb.AuthControllerTest do
         # The link must contain a token query param.
         assert email.text_body =~ ~r{/confirm-email\?token=[\w-]+}
       end)
+
+      # The frontend toasts `page.flash`; flash is a page key, not a prop.
+      conn = conn |> recycle() |> get(~p"/login")
+      assert inertia_flash(conn)["info"] =~ "confirmation link"
+      props = inertia_props(conn)
+      refute Map.has_key?(props, :flash) or Map.has_key?(props, "flash")
     end
 
     test "renders errors on an invalid email", %{conn: conn} do
@@ -219,8 +229,8 @@ defmodule ElixirReactStarterWeb.AuthControllerTest do
 
       conn = get(conn, ~p"/reset-password?token=#{token}")
 
-      body = html_response(conn, 200)
-      assert body =~ ~s(&quot;component&quot;:&quot;Auth/ResetPassword&quot;)
+      assert html_response(conn, 200)
+      assert inertia_component(conn) == "Auth/ResetPassword"
     end
 
     test "redirects on an invalid token", %{conn: conn} do

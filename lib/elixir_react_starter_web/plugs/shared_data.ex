@@ -4,10 +4,12 @@ defmodule ElixirReactStarterWeb.Plugs.SharedData do
 
     * `current_user` — `%{id, email, locale}`, or `nil` when anonymous.
     * `locale` — the resolved request locale (defaults to `"en"`).
-    * `flash` — the flash map.
     * `socket_token` — a short-lived signed token the React realtime
       provider hands to `Phoenix.Socket` on connect; `nil` when
       anonymous so the frontend skips wiring up the socket.
+
+  The flash isn't a prop: Inertia puts `conn.assigns.flash` on the page
+  object itself (`page.flash` on the frontend).
 
   Runs after `:fetch_current_user` in the browser pipeline so
   `conn.assigns[:current_user]` and `:locale` are populated.
@@ -33,7 +35,6 @@ defmodule ElixirReactStarterWeb.Plugs.SharedData do
     )
     |> assign_prop(:current_user, serialize_user(user))
     |> assign_prop(:locale, conn.assigns[:locale] || "en")
-    |> assign_prop(:flash, conn.assigns[:flash] || %{})
     |> assign_prop(:socket_token, socket_token_for(user))
   end
 

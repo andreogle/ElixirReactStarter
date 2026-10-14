@@ -11,7 +11,10 @@ config :inertia,
   endpoint: ElixirReactStarterWeb.Endpoint,
   history: [encrypt: true],
   ssr: true,
-  raise_on_ssr_failure: true
+  raise_on_ssr_failure: true,
+  # Stamp the per-request CSP nonce (Plugs.ContentSecurityPolicy) on the
+  # <script> that carries the page data, like every other inline script.
+  csp_nonce_assign_key: :csp_nonce
 
 config :elixir_react_starter,
   ecto_repos: [ElixirReactStarter.Repo],

@@ -60,6 +60,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   // back in, userId flips through null and the socket is re-created
   // with the fresh token at that point.
   // ===========================================================================
+  // biome-ignore lint/correctness/useExhaustiveDependencies: keyed on userId only; `token` rotates every page response (see above).
   useEffect(() => {
     if (!(token && userId)) {
       setStatus('idle');

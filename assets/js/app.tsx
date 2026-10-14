@@ -13,11 +13,7 @@ import Toaster from './components/Toaster';
 import { toast } from './components/toast';
 import { go } from './result';
 import { startThemeWatcher } from './theme';
-
-interface Flash {
-  info?: string;
-  error?: string;
-}
+import type { Flash } from './types';
 
 function applyFlash(flash?: Flash) {
   if (!flash) {
@@ -98,7 +94,7 @@ const startApp = () => {
       // including same-URL POST → redirect flows (where `navigate` is skipped
       // because Inertia treats same-URL responses as history replace).
       router.on('success', (event) => {
-        applyFlash(event.detail.page.props.flash as Flash | undefined);
+        applyFlash(event.detail.page.flash);
         identifyViewer(event.detail.page.props);
       });
 
@@ -124,7 +120,7 @@ const startApp = () => {
               </AppProviders>
             )}
           </App>
-          <InitialFlash flash={props.initialPage.props.flash as Flash | undefined} />
+          <InitialFlash flash={props.initialPage.flash} />
           <Toaster />
         </StrictMode>
       );

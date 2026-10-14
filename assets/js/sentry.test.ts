@@ -55,7 +55,7 @@ test('browser initialization limits collection and tracks only the current user 
   assert.ok(!payload.includes('private@example.com'));
   assert.ok(!payload.includes('private-token'));
 
-  identifyViewer({ flash: {} });
+  identifyViewer({});
   assert.deepEqual(Sentry.getIsolationScope().getUser(), { id: 'user-1' });
 
   identifyViewer({ current_user: { id: 'user-2' } });

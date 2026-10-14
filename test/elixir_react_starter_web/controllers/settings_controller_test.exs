@@ -14,7 +14,8 @@ defmodule ElixirReactStarterWeb.SettingsControllerTest do
     @tag :authenticated
     test "renders the Settings Inertia page", %{conn: conn} do
       conn = get(conn, ~p"/settings")
-      assert html_response(conn, 200) =~ ~s(&quot;component&quot;:&quot;Settings&quot;)
+      assert html_response(conn, 200)
+      assert inertia_component(conn) == "Settings"
     end
 
     test "redirects to /login when not authenticated", %{conn: conn} do
