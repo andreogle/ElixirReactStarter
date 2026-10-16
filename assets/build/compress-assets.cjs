@@ -10,6 +10,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const zlib = require('node:zlib');
+const writeFileAtomically = require('./write-file-atomically.cjs');
 
 const ROOT = path.join(__dirname, '..', '..', 'priv', 'static');
 const COMPRESSIBLE = new Set(['.js', '.css', '.svg', '.json', '.txt', '.html', '.xml', '.map']);
@@ -25,11 +26,17 @@ let skipped = 0;
 let savedBytes = 0;
 
 function walk(dir) {
-  if (!fs.existsSync(dir)) {
-    return;
+  let entries;
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return;
+    }
+    throw error;
   }
 
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+  for (const entry of entries) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       walk(full);
@@ -49,24 +56,36 @@ function maybeCompress(file) {
     return;
   }
 
-  const stat = fs.statSync(file);
-  if (stat.size < MIN_SIZE) {
-    skipped += 1;
-    return;
-  }
-
   const outPath = `${file}.br`;
-
-  // Skip if an up-to-date `.br` already exists.
-  if (fs.existsSync(outPath)) {
-    const outStat = fs.statSync(outPath);
-    if (outStat.mtimeMs >= stat.mtimeMs) {
+  let input;
+  // Inspect and read the same open file, even if its path is replaced.
+  // biome-ignore lint/suspicious/noBitwiseOperators: open flags are a bitmask.
+  const fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
+  try {
+    const stat = fs.fstatSync(fd);
+    if (stat.size < MIN_SIZE) {
       skipped += 1;
       return;
     }
+
+    // This is only a cache check; writes atomically replace the output path.
+    try {
+      const outStat = fs.lstatSync(outPath);
+      if (outStat.isFile() && outStat.mtimeMs >= stat.mtimeMs) {
+        skipped += 1;
+        return;
+      }
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
+    input = fs.readFileSync(fd);
+  } finally {
+    fs.closeSync(fd);
   }
 
-  const input = fs.readFileSync(file);
   const br = zlib.brotliCompressSync(input, {
     params: {
       [zlib.constants.BROTLI_PARAM_QUALITY]: QUALITY,
@@ -74,7 +93,7 @@ function maybeCompress(file) {
     },
   });
 
-  fs.writeFileSync(outPath, br);
+  writeFileAtomically(outPath, br);
   compressed += 1;
   savedBytes += input.length - br.length;
 }

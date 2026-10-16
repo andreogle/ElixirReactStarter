@@ -14,6 +14,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const writeFileAtomically = require('./write-file-atomically.cjs');
 
 const PAGES_DIR = path.join(__dirname, '..', 'js', 'pages');
 const CLIENT_OUTPUT = path.join(__dirname, '..', 'js', '_pages.ts');
@@ -22,11 +23,16 @@ const SSR_OUTPUT = path.join(__dirname, '..', 'js', '_ssr_pages.ts');
 const STRATEGIES = ['ssr', 'client'];
 
 function findPages(dir, base = '') {
-  if (!fs.existsSync(dir)) {
-    return [];
+  let entries;
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return [];
+    }
+    throw error;
   }
 
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
   const pages = [];
 
   for (const entry of entries) {
@@ -63,9 +69,16 @@ const setLiteral = (names) =>
   names.length > 0 ? `new Set<string>([\n${names.map((n) => `  '${n}',`).join('\n')}\n])` : EMPTY_SET;
 
 function writeIfChanged(file, content, label) {
-  const existing = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '';
+  let existing = '';
+  try {
+    existing = fs.readFileSync(file, 'utf8');
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      throw error;
+    }
+  }
   if (existing !== content) {
-    fs.writeFileSync(file, content);
+    writeFileAtomically(file, content);
     console.log(label);
   }
 }
