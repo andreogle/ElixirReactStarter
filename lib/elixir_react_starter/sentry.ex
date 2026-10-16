@@ -8,7 +8,7 @@ defmodule ElixirReactStarter.Sentry do
       without its query string. Drops bodies, cookies, headers and IPs.
     * `scrub_params/1` — a `Sentry.PlugContext` body scrubber. It extends
       the SDK default (which masks `password`/`secret`/…) to also drop the
-      email/token/code params that flow through auth and account routes.
+      email/token/code params recursively, including nested maps and lists.
 
   Wired in `config/config.exs` (`before_send`) and on the endpoint's
   `Sentry.PlugContext` plug (`scrub_params`).
@@ -48,6 +48,15 @@ defmodule ElixirReactStarter.Sentry do
   def scrub_params(conn) do
     conn
     |> Sentry.PlugContext.default_body_scrubber()
-    |> Map.drop(@pii_params)
+    |> scrub_content()
   end
+
+  defp scrub_content(params) when is_map(params) do
+    params
+    |> Map.drop(@pii_params)
+    |> Map.new(fn {key, value} -> {key, scrub_content(value)} end)
+  end
+
+  defp scrub_content(params) when is_list(params), do: Enum.map(params, &scrub_content/1)
+  defp scrub_content(value), do: value
 end

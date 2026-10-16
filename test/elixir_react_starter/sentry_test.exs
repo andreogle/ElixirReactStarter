@@ -63,6 +63,25 @@ defmodule ElixirReactStarter.SentryTest do
   end
 
   describe "scrub_params/1" do
+    test "removes sensitive fields from nested maps and lists" do
+      conn = %Plug.Conn{
+        params: %{
+          "account" => %{"email" => "test@example.com", "locale" => "en"},
+          "entries" => [
+            %{"token" => "secret-token", "id" => 1},
+            %{"nested" => %{"new_email" => "other@example.com", "code" => "123456"}},
+            "unchanged",
+            nil
+          ]
+        }
+      }
+
+      assert SentryGlue.scrub_params(conn) == %{
+               "account" => %{"locale" => "en"},
+               "entries" => [%{"id" => 1}, %{"nested" => %{}}, "unchanged", nil]
+             }
+    end
+
     test "drops PII/secret params while keeping benign ones" do
       conn = %Plug.Conn{
         params: %{

@@ -24,6 +24,8 @@ defmodule ElixirReactStarter.Accounts do
 
   require Logger
 
+  import Ecto.Query, only: [from: 2]
+
   alias Ecto.Changeset
   alias ElixirReactStarter.Accounts.{User, UserToken}
   alias ElixirReactStarter.Repo
@@ -258,16 +260,14 @@ defmodule ElixirReactStarter.Accounts do
   # =============================================================================
   @doc """
   Changes the user's password after verifying the current one.
-  Invalidates every session token — the caller should reissue a fresh
-  session for the current browser to keep it logged in.
+  On success, invalidates every session token — the caller should reissue
+  a fresh session for the current browser to keep it logged in. A rejected
+  password leaves existing sessions intact.
   """
   def change_user_password(user, current_password, new_password_attrs) do
     if User.valid_password?(user, current_password) do
-      Repo.delete_all(UserToken.delete_user_tokens_by_context_query(user.id, "session"))
-
       user
-      |> User.password_changeset(new_password_attrs)
-      |> Repo.update()
+      |> update_password_and_delete_tokens(new_password_attrs, ["session"])
       |> log_result("Password changed for user #{user.id}")
     else
       Logger.warning(
@@ -305,22 +305,35 @@ defmodule ElixirReactStarter.Accounts do
   # Password reset (unauthenticated)
   # =============================================================================
   @doc """
-  Resets the user's password. Deletes all password-reset tokens and all
-  session tokens (forcing re-login on every device).
+  Resets the user's password. On success, deletes all password-reset tokens
+  and session tokens (forcing re-login on every device). A rejected password
+  leaves the reset link and sessions intact so the user can retry.
   """
   def reset_user_password(user, attrs) do
-    Repo.delete_all(UserToken.delete_user_tokens_by_context_query(user.id, "password_reset"))
-    Repo.delete_all(UserToken.delete_user_tokens_by_context_query(user.id, "session"))
-
     user
-    |> User.password_changeset(attrs)
-    |> Repo.update()
+    |> update_password_and_delete_tokens(attrs, ["password_reset", "session"])
     |> log_result("Password reset for user #{user.id}")
   end
 
   # =============================================================================
   # Private
   # =============================================================================
+  defp update_password_and_delete_tokens(user, attrs, contexts) do
+    changeset = User.password_changeset(user, attrs)
+    tokens = from t in UserToken, where: t.user_id == ^user.id and t.context in ^contexts
+
+    Repo.transaction(fn ->
+      case Repo.update(changeset) do
+        {:ok, updated} ->
+          Repo.delete_all(tokens)
+          updated
+
+        {:error, changeset} ->
+          Repo.rollback(changeset)
+      end
+    end)
+  end
+
   defp log_result({:ok, _} = result, message) do
     Logger.info(message)
     result

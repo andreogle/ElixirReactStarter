@@ -70,3 +70,24 @@ them whenever a page file is added or removed.
 
 The registries regenerate automatically; you never touch `_pages.ts` or
 `_ssr_pages.ts`.
+
+## Typed routes
+
+Use the generated `routes` helper for internal URLs. `mix routes.gen` derives
+builder names from every path segment, including parameter names, so `/items`
+and `/items/:id` become `routes.items()` and `routes.itemsId({ id })`. Dashes,
+underscores, and dots separate words; `/calendar.ics` becomes `routes.calendarIcs()`.
+Every builder accepts an optional query object.
+
+The build and dev watcher regenerate `assets/js/routes.ts`. Run `mix routes.gen`
+after changing routes, and update callers if a path's builder name changed.
+`mix routes.gen --check` checks for drift without changing the file.
+
+## Static assets in production
+
+`mix assets.deploy` generates gzip and Brotli siblings. The endpoint serves
+Brotli when the browser accepts it, with gzip and uncompressed fallbacks.
+Root-level static files also need an `only_matching` prefix in the endpoint
+so their digested filenames are reachable; the template includes `favicon-`
+and `robots-`. Assets inside an allowed directory keep the same first path
+segment and need no extra prefix.

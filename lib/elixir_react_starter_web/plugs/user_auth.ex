@@ -131,7 +131,12 @@ defmodule ElixirReactStarterWeb.UserAuth do
   # URLs like "//evil.com/path" parse as the host "evil.com", which the
   # browser would treat as an external redirect).
   defp local_path?("//" <> _), do: false
-  defp local_path?("/" <> _), do: true
+
+  defp local_path?("/" <> _ = path) do
+    # Reject characters a browser removes or reinterprets as URL separators.
+    not String.contains?(path, ["\\", "/%09", "/\t", "\n", "\r"])
+  end
+
   defp local_path?(_), do: false
 
   @doc """
@@ -162,11 +167,12 @@ defmodule ElixirReactStarterWeb.UserAuth do
   def log_in_user(conn, user) do
     token = Accounts.generate_user_session_token(user)
     return_to = get_session(conn, @return_to_key)
+    redirect_path = if local_path?(return_to), do: return_to, else: ~p"/dashboard"
 
     conn
     |> renew_session()
     |> put_session(@session_key, token)
-    |> redirect(to: return_to || ~p"/dashboard")
+    |> redirect(to: redirect_path)
   end
 
   @doc """
