@@ -204,6 +204,17 @@ defmodule ElixirReactStarter.AccountsTest do
       %{user: :user |> build() |> confirmed() |> insert()}
     end
 
+    test "an invalid new password preserves existing sessions", %{user: user} do
+      session = Accounts.generate_user_session_token(user)
+
+      assert {:error, changeset} =
+               Accounts.change_user_password(user, "valid_password123", %{password: "short"})
+
+      assert errors_on(changeset).password != []
+      assert Accounts.get_user_by_session_token(session).id == user.id
+      assert Accounts.get_user_by_email_and_password(user.email, "valid_password123")
+    end
+
     test "updates the password and wipes all sessions", %{user: user} do
       _session1 = Accounts.generate_user_session_token(user)
       _session2 = Accounts.generate_user_session_token(user)
@@ -273,6 +284,24 @@ defmodule ElixirReactStarter.AccountsTest do
   end
 
   describe "reset_user_password/2" do
+    test "an invalid password preserves the reset link and existing sessions for a retry" do
+      user = :user |> build() |> confirmed() |> insert()
+      session = Accounts.generate_user_session_token(user)
+      reset = Accounts.generate_user_link_token(user, "password_reset")
+
+      assert {:error, changeset} = Accounts.reset_user_password(user, %{password: "short"})
+      assert errors_on(changeset).password != []
+      assert Accounts.get_user_by_session_token(session).id == user.id
+      assert Accounts.verify_user_link_token(reset, "password_reset").id == user.id
+      assert Accounts.get_user_by_email_and_password(user.email, "valid_password123")
+
+      assert {:ok, _updated} =
+               Accounts.reset_user_password(user, %{password: "brand_new_password"})
+
+      refute Accounts.get_user_by_session_token(session)
+      refute Accounts.verify_user_link_token(reset, "password_reset")
+    end
+
     test "updates the password and wipes session + reset tokens" do
       user = :user |> build() |> confirmed() |> insert()
       _session = Accounts.generate_user_session_token(user)

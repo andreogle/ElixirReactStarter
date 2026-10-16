@@ -27,9 +27,10 @@ defmodule Mix.Tasks.Routes.Gen do
     * `@excluded_path_prefixes` — dev-only mount points
 
   Adjust those module attributes if the surface changes. Route *names* are
-  derived from the static path segments (`/settings/email/apply-change` →
-  `settingsEmailApplyChange`); if two paths collapse to the same name the
-  task raises rather than emit a silently-shadowed builder.
+  derived from all path segments, including parameter names (`/items/:id`
+  → `itemsId`). Dashes, underscores, and dots separate words (`/calendar.ics`
+  → `calendarIcs`). If two paths still collapse to the same name the task
+  raises rather than emit a silently-shadowed builder.
   """
 
   use Mix.Task
@@ -92,9 +93,10 @@ defmodule Mix.Tasks.Routes.Gen do
   # =============================================================================
   # Route extraction
   # =============================================================================
-  defp build_module do
+  @doc "Builds the frontend route module for a Phoenix router without writing files."
+  def build_module(router \\ @router) do
     entries =
-      @router
+      router
       |> Phoenix.Router.routes()
       |> Enum.filter(&included?/1)
       |> Enum.map(& &1.path)
@@ -124,15 +126,11 @@ defmodule Mix.Tasks.Routes.Gen do
 
   defp param_segment?(seg), do: String.starts_with?(seg, ":")
 
-  # Name from the static segments; fall back to the param names only if a
-  # path is entirely dynamic (e.g. "/:id"). Root is "root".
+  # Include parameter names so collection and detail routes stay distinct.
   defp route_name([]), do: "root"
 
   defp route_name(segments) do
-    static = Enum.reject(segments, &param_segment?/1)
-    source = if static == [], do: segments, else: static
-
-    source
+    segments
     |> Enum.flat_map(&segment_words/1)
     |> camelize()
   end
@@ -231,7 +229,7 @@ defmodule Mix.Tasks.Routes.Gen do
   defp segment_words(seg) do
     seg
     |> String.trim_leading(":")
-    |> String.split(["-", "_"], trim: true)
+    |> String.split(["-", "_", "."], trim: true)
   end
 
   defp js_name(param), do: param |> segment_words() |> camelize()

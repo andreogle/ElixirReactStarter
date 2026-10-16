@@ -146,6 +146,28 @@ defmodule ElixirReactStarterWeb.UserAuthTest do
   end
 
   describe "log_in_user/2" do
+    test "rejects unsafe stored destinations and clears them on login", %{conn: conn, user: user} do
+      for destination <- [
+            "https://example.com",
+            "//example.com",
+            "/\\example.com",
+            "/\t/example.com",
+            "/%09/example.com",
+            "/\n/example.com",
+            "/\r/example.com",
+            "relative",
+            "",
+            42
+          ] do
+        logged_in =
+          conn |> put_session(@return_to_key, destination) |> UserAuth.log_in_user(user)
+
+        assert redirected_to(logged_in) == ~p"/dashboard"
+        assert get_session(logged_in, @return_to_key) == nil
+        assert get_session(logged_in, @session_key)
+      end
+    end
+
     test "writes a session token and redirects to /dashboard", %{conn: conn, user: user} do
       conn = UserAuth.log_in_user(conn, user)
 
@@ -154,9 +176,10 @@ defmodule ElixirReactStarterWeb.UserAuthTest do
     end
 
     test "redirects to user_return_to when set", %{conn: conn, user: user} do
-      conn = conn |> put_session(@return_to_key, "/somewhere") |> UserAuth.log_in_user(user)
+      conn =
+        conn |> put_session(@return_to_key, "/somewhere?page=2") |> UserAuth.log_in_user(user)
 
-      assert redirected_to(conn) == "/somewhere"
+      assert redirected_to(conn) == "/somewhere?page=2"
     end
   end
 
