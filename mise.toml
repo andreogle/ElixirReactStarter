@@ -8,3 +8,5 @@ erlang = "29"
 # Erlang/OTP 29 above.
 elixir = "1.20.4-otp-29"
 node = "26"
+# Isolates parallel coding agents in Git worktrees (`wt`).
+worktrunk = "0.80.0"
