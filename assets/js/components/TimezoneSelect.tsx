@@ -121,7 +121,7 @@ export default function TimezoneSelect({
         aria-haspopup="listbox"
         aria-controls={open ? listboxId : undefined}
         disabled={disabled}
-        className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 ${selected ? '' : 'text-gray-400'} ${className}`}
+        className={`focus-visible:ring-primary flex w-full cursor-pointer items-center justify-between gap-2 rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 ${selected ? '' : 'text-gray-400'} ${className}`}
         {...ariaProps}
       >
         <span className="truncate">{triggerLabel}</span>
@@ -136,7 +136,7 @@ export default function TimezoneSelect({
           className="z-50 max-h-[min(24rem,var(--radix-popover-content-available-height))] w-(--radix-popover-trigger-width) overflow-hidden rounded border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <div className="flex items-center gap-2 border-gray-200 border-b px-3 py-2 dark:border-gray-800">
+          <div className="flex items-center gap-2 border-b border-gray-200 px-3 py-2 dark:border-gray-800">
             <Search className="size-4 shrink-0 text-gray-500" aria-hidden="true" />
             <input
               ref={inputRef}
@@ -170,7 +170,7 @@ export default function TimezoneSelect({
             className="max-h-80 overflow-y-auto p-1"
           >
             {filtered.length === 0 ? (
-              <div className="px-3 py-2 text-gray-500 text-sm italic">{t('common.noResults')}</div>
+              <div className="px-3 py-2 text-sm text-gray-500 italic">{t('common.noResults')}</div>
             ) : (
               filtered.map((opt, i) => {
                 const isActive = i === activeIndex;
@@ -187,10 +187,10 @@ export default function TimezoneSelect({
                     onMouseEnter={() => setActiveIndex(i)}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => commit(opt)}
-                    className={`flex cursor-pointer select-none items-center justify-between gap-2 rounded px-3 py-2 text-sm ${isActive ? 'bg-gray-100 dark:bg-gray-800' : ''} ${isSelected ? 'font-medium' : ''}`}
+                    className={`flex cursor-pointer items-center justify-between gap-2 rounded px-3 py-2 text-sm select-none ${isActive ? 'bg-gray-100 dark:bg-gray-800' : ''} ${isSelected ? 'font-medium' : ''}`}
                   >
                     <span className="truncate">{opt.label}</span>
-                    {isSelected && <Check className="size-4 shrink-0 text-primary" aria-hidden="true" />}
+                    {isSelected && <Check className="text-primary size-4 shrink-0" aria-hidden="true" />}
                   </div>
                 );
               })

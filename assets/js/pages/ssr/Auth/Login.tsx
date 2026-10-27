@@ -37,7 +37,7 @@ export default function Login() {
             className={inputClass}
             required
           />
-          {errors.email ? <p className="mt-1 text-red-600 text-sm">{errors.email}</p> : null}
+          {errors.email ? <p className="mt-1 text-sm text-red-600">{errors.email}</p> : null}
         </div>
 
         <div>

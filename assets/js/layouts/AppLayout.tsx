@@ -47,10 +47,10 @@ export default function AppLayout({ title, children }: AppLayoutProps) {
     <>
       <Head title={title} />
       <div className="min-h-screen">
-        <header className="border-gray-200 border-b dark:border-gray-800">
+        <header className="border-b border-gray-200 dark:border-gray-800">
           <div className={`${containerClass} flex items-center justify-between gap-3 py-3`}>
             <div className="flex min-w-0 items-center gap-6">
-              <Link href={routes.dashboard()} className="shrink-0 font-semibold text-base">
+              <Link href={routes.dashboard()} className="shrink-0 text-base font-semibold">
                 {BRAND}
               </Link>
               <nav aria-label={t('common.mainNav')} className="hidden items-center gap-1 md:flex">
@@ -93,7 +93,7 @@ function PrimaryNavLink({ item, active }: { item: NavItem; active: boolean }) {
     <Link
       href={item.href}
       aria-current={active ? 'page' : undefined}
-      className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+      className={`focus-visible:outline-primary inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 ${
         active ? 'bg-gray-100 font-medium dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-gray-900'
       }`}
     >
@@ -116,15 +116,15 @@ function UserMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={t('common.userMenu')}
-        className="flex cursor-pointer items-center gap-1.5 rounded px-2 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+        className="focus-visible:outline-primary flex cursor-pointer items-center gap-1.5 rounded px-2 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2"
       >
         <CircleUserRound className="size-5" aria-hidden="true" />
         <span className="sr-only max-w-40 truncate sm:not-sr-only">{displayName}</span>
         <ChevronDown className="size-4" aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <div className="border-gray-200 border-b px-3 py-2 dark:border-gray-800">
-          <p className="truncate font-medium text-sm">{displayName}</p>
+        <div className="border-b border-gray-200 px-3 py-2 dark:border-gray-800">
+          <p className="truncate text-sm font-medium">{displayName}</p>
         </div>
 
         {/* Primary nav fallback — only visible when the desktop nav is hidden. */}

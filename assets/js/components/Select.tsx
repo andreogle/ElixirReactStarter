@@ -33,7 +33,7 @@ export default function Select({
     <RadixSelect.Root value={value} onValueChange={onValueChange} disabled={disabled}>
       <RadixSelect.Trigger
         id={id}
-        className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-gray-400 dark:border-gray-700 dark:bg-gray-900 ${className}`}
+        className={`focus-visible:ring-primary flex w-full cursor-pointer items-center justify-between gap-2 rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-gray-400 dark:border-gray-700 dark:bg-gray-900 ${className}`}
         {...ariaProps}
       >
         <RadixSelect.Value placeholder={placeholder} />
@@ -55,11 +55,11 @@ export default function Select({
               <RadixSelect.Item
                 key={opt.value}
                 value={opt.value}
-                className="flex cursor-pointer select-none items-center justify-between gap-2 rounded px-3 py-2 text-sm outline-none data-[highlighted]:bg-gray-100 data-[state=checked]:font-medium dark:data-[highlighted]:bg-gray-800"
+                className="flex cursor-pointer items-center justify-between gap-2 rounded px-3 py-2 text-sm outline-none select-none data-[highlighted]:bg-gray-100 data-[state=checked]:font-medium dark:data-[highlighted]:bg-gray-800"
               >
                 <RadixSelect.ItemText>{opt.label}</RadixSelect.ItemText>
                 <RadixSelect.ItemIndicator>
-                  <Check className="size-4 text-primary" />
+                  <Check className="text-primary size-4" />
                 </RadixSelect.ItemIndicator>
               </RadixSelect.Item>
             ))}

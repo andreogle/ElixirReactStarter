@@ -46,7 +46,7 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={t('common.theme')}
-        className={`flex cursor-pointer items-center justify-center rounded p-1.5 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${className}`}
+        className={`focus-visible:outline-primary flex cursor-pointer items-center justify-center rounded p-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 ${className}`}
       >
         <Current className="size-4" aria-hidden="true" />
       </DropdownMenuTrigger>
@@ -57,7 +57,7 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
             <DropdownMenuItem key={value} onSelect={() => handleSelect(value)}>
               <Icon className="size-4" aria-hidden="true" />
               <span className="flex-1">{labelFor(value, t)}</span>
-              {theme === value && <Check className="size-4 text-primary" aria-hidden="true" />}
+              {theme === value && <Check className="text-primary size-4" aria-hidden="true" />}
             </DropdownMenuItem>
           );
         })}

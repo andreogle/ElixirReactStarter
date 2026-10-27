@@ -36,7 +36,7 @@ export function DropdownMenuItem({
 }: ComponentPropsWithoutRef<typeof RadixDropdownMenu.Item>) {
   return (
     <RadixDropdownMenu.Item
-      className={`flex cursor-pointer select-none items-center gap-2 px-3 py-2 text-sm outline-none data-[disabled]:pointer-events-none data-[highlighted]:bg-gray-100 data-[disabled]:opacity-50 dark:data-[highlighted]:bg-gray-800 ${className}`}
+      className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-gray-100 dark:data-[highlighted]:bg-gray-800 ${className}`}
       {...props}
     />
   );

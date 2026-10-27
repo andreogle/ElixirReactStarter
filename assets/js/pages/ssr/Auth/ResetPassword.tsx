@@ -41,7 +41,7 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
             required
             minLength={8}
           />
-          {errors.password ? <p className="mt-1 text-red-600 text-sm">{errors.password}</p> : null}
+          {errors.password ? <p className="mt-1 text-sm text-red-600">{errors.password}</p> : null}
         </div>
 
         <Button type="submit" disabled={processing} className="w-full">

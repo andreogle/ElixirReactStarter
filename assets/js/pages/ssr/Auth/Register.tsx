@@ -37,7 +37,7 @@ export default function Register() {
             className={inputClass}
             required
           />
-          {errors.email ? <p className="mt-1 text-red-600 text-sm">{errors.email}</p> : null}
+          {errors.email ? <p className="mt-1 text-sm text-red-600">{errors.email}</p> : null}
         </div>
 
         <div>
@@ -54,7 +54,7 @@ export default function Register() {
             required
             minLength={8}
           />
-          {errors.password ? <p className="mt-1 text-red-600 text-sm">{errors.password}</p> : null}
+          {errors.password ? <p className="mt-1 text-sm text-red-600">{errors.password}</p> : null}
         </div>
 
         <Button type="submit" disabled={processing} className="w-full">

@@ -33,7 +33,7 @@ export default function LocaleSelector({ className = '' }: LocaleSelectorProps) 
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Change language"
-        className={`flex cursor-pointer items-center gap-1.5 rounded px-1.5 py-1 text-sm focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${className}`}
+        className={`focus-visible:outline-primary flex cursor-pointer items-center gap-1.5 rounded px-1.5 py-1 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 ${className}`}
       >
         <current.flag className="h-4 w-5 rounded-sm" />
         <ChevronDown className="size-3.5" />
@@ -43,11 +43,11 @@ export default function LocaleSelector({ className = '' }: LocaleSelectorProps) 
           <DropdownMenuItem
             key={code}
             onSelect={() => handleSelect(code)}
-            className={code === locale ? 'font-medium text-primary' : ''}
+            className={code === locale ? 'text-primary font-medium' : ''}
           >
             <Flag className="h-4 w-5 shrink-0 rounded-sm" />
             <span className="flex-1">{label}</span>
-            {code === locale && <Check className="size-4 text-primary" aria-hidden="true" />}
+            {code === locale && <Check className="text-primary size-4" aria-hidden="true" />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

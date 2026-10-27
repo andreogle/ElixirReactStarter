@@ -21,7 +21,7 @@ export default function Settings() {
   return (
     <AppLayout title={t('settings.title')}>
       <div className="max-w-xl space-y-12">
-        <h1 className="font-semibold text-2xl">{t('settings.title')}</h1>
+        <h1 className="text-2xl font-semibold">{t('settings.title')}</h1>
         <ChangeEmailSection />
         <ChangePasswordSection />
         <DeleteAccountSection />
@@ -42,8 +42,8 @@ function ChangeEmailSection() {
   return (
     <section className="space-y-4">
       <header>
-        <h2 className="font-medium text-lg">{t('settings.changeEmail.title')}</h2>
-        <p className="text-gray-600 text-sm dark:text-gray-400">
+        <h2 className="text-lg font-medium">{t('settings.changeEmail.title')}</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
           {t('settings.changeEmail.current', { email: currentEmail })}
         </p>
       </header>
@@ -67,7 +67,7 @@ function ChangeEmailSection() {
             className={inputClass}
             required
           />
-          {errors.email ? <p className="mt-1 text-red-600 text-sm">{errors.email}</p> : null}
+          {errors.email ? <p className="mt-1 text-sm text-red-600">{errors.email}</p> : null}
         </div>
 
         <div>
@@ -83,7 +83,7 @@ function ChangeEmailSection() {
             className={inputClass}
             required
           />
-          {errors.current_password ? <p className="mt-1 text-red-600 text-sm">{errors.current_password}</p> : null}
+          {errors.current_password ? <p className="mt-1 text-sm text-red-600">{errors.current_password}</p> : null}
         </div>
 
         <Button type="submit" disabled={processing}>
@@ -105,8 +105,8 @@ function ChangePasswordSection() {
   return (
     <section className="space-y-4">
       <header>
-        <h2 className="font-medium text-lg">{t('settings.changePassword.title')}</h2>
-        <p className="text-gray-600 text-sm dark:text-gray-400">{t('settings.changePassword.warning')}</p>
+        <h2 className="text-lg font-medium">{t('settings.changePassword.title')}</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.changePassword.warning')}</p>
       </header>
       <form
         onSubmit={(e) => {
@@ -128,7 +128,7 @@ function ChangePasswordSection() {
             className={inputClass}
             required
           />
-          {errors.current_password ? <p className="mt-1 text-red-600 text-sm">{errors.current_password}</p> : null}
+          {errors.current_password ? <p className="mt-1 text-sm text-red-600">{errors.current_password}</p> : null}
         </div>
 
         <div>
@@ -145,7 +145,7 @@ function ChangePasswordSection() {
             required
             minLength={8}
           />
-          {errors.password ? <p className="mt-1 text-red-600 text-sm">{errors.password}</p> : null}
+          {errors.password ? <p className="mt-1 text-sm text-red-600">{errors.password}</p> : null}
         </div>
 
         <Button type="submit" disabled={processing}>
@@ -173,8 +173,8 @@ function DeleteAccountSection() {
   return (
     <section className="space-y-4">
       <header>
-        <h2 className="font-medium text-lg">{t('settings.deleteAccount.title')}</h2>
-        <p className="text-gray-600 text-sm dark:text-gray-400">{t('settings.deleteAccount.warning')}</p>
+        <h2 className="text-lg font-medium">{t('settings.deleteAccount.title')}</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.deleteAccount.warning')}</p>
       </header>
 
       <AlertDialog
@@ -213,7 +213,7 @@ function DeleteAccountSection() {
               required
               aria-label={t('settings.deleteAccount.passwordPlaceholder')}
             />
-            {errors.password ? <p className="text-red-600 text-sm">{errors.password}</p> : null}
+            {errors.password ? <p className="text-sm text-red-600">{errors.password}</p> : null}
 
             <AlertDialogFooter>
               <AlertDialogCancel asChild>
