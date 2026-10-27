@@ -59,6 +59,28 @@ The generator runs before both esbuild bundles in `mix assets.build` /
 `_ssr_pages.ts`), and a dev watcher (`build/watch-ssr-pages.cjs`) regenerates
 them whenever a page file is added or removed.
 
+The browser hydrates only when the page is in `pages/ssr/` and its container
+has `data-server-rendered`. If server rendering fails in production, Inertia
+sends an empty container with the page JSON; the browser mounts it fresh.
+
+## Lazy page props
+
+Wrap database reads, storage reads, and expensive computations in zero-argument
+functions so partial reloads only run the work for requested props:
+
+```elixir
+conn
+|> assign_prop(:items, fn -> Catalog.list_items(user) end)
+|> render_inertia("Items")
+```
+
+Keep access checks outside these callbacks: a partial reload must still verify
+who is asking and what they may see. Cheap values already on the connection
+can remain plain props. Shared token signing is lazy too, so redirects and
+reloads that omit `socket_token` skip it. The adapter requires Inertia 3.1 or
+newer to leave excluded callbacks unevaluated; `partial_reload_test.exs` guards
+that behavior. Flash is top-level `page.flash` and need not be requested as a prop.
+
 ## Adding a page
 
 1. Decide: is it reachable without logging in? → `pages/ssr/`. Otherwise →

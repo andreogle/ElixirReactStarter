@@ -33,9 +33,11 @@ defmodule ElixirReactStarterWeb.Plugs.SharedData do
       :sentry_client,
       Application.get_env(:elixir_react_starter, :sentry_client)
     )
-    |> assign_prop(:current_user, serialize_user(user))
+    |> assign_prop(:current_user, fn -> serialize_user(user) end)
     |> assign_prop(:locale, conn.assigns[:locale] || "en")
-    |> assign_prop(:socket_token, socket_token_for(user))
+    # Sign only when the response includes the token. Redirects and partial
+    # reloads that omit it need no new token.
+    |> assign_prop(:socket_token, fn -> socket_token_for(user) end)
   end
 
   defp serialize_user(nil), do: nil

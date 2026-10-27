@@ -123,7 +123,7 @@ defmodule ElixirReactStarter.MixProject do
   defp deps do
     [
       {:argon2_elixir, "~> 4.1"},
-      {:inertia, "~> 3.0"},
+      {:inertia, "~> 3.1"},
       # Optional in inertia 3; the default Node.js SSR adapter needs it.
       {:nodejs, ">= 3.1.4 and < 4.0.0"},
       {:bandit, "~> 1.5"},

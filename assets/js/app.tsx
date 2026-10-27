@@ -141,7 +141,9 @@ const startApp = () => {
       // Both branches render the identical tree — only the mount differs. This
       // is also why `ssr.tsx` renders `<Toaster />`: anything at the root on one
       // side but not the other is a mismatch.
-      if (serverRenderedPages.has(props.initialPage.component)) {
+      // A failed server render falls back to an empty container. Mount it
+      // fresh instead of making React recover from a hydration mismatch.
+      if (serverRenderedPages.has(props.initialPage.component) && el.hasAttribute('data-server-rendered')) {
         hydrateRoot(el, tree);
       } else {
         createRoot(el).render(tree);

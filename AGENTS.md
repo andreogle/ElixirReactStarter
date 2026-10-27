@@ -27,6 +27,7 @@ These are the rules that must not be forgotten or looked up — they're the ones
 
 **Inertia (this project's frontend)**
 - Use `render_inertia/2|3`, never `render/3`, for Inertia pages. Don't use LiveView for Inertia pages
+- Props that query the database, read storage, or do expensive work must be zero-argument functions (`assign_prop(conn, :items, fn -> ... end)`) so partial reloads skip excluded work. Keep authentication and authorization outside these callbacks so they run on every request. Inertia must stay on 3.1 or newer; 3.0.1 evaluates excluded callbacks.
 - Page components are **always** `.tsx` (TypeScript), under `assets/js/pages/` in one of two strategy dirs: **`pages/ssr/`** (server-rendered: public / SEO / first-paint pages) or **`pages/client/`** (client-only: authenticated, interactive, heavy pages — kept out of the Node SSR bundle). The strategy dir is stripped from the Inertia page name, so `render_inertia("Dashboard")` maps to `pages/client/Dashboard.tsx`. The `_pages.ts` / `_ssr_pages.ts` registries are auto-generated from these dirs by `build/generate-ssr-pages.cjs` — never edit them by hand. New public page → `ssr/`; new authed page → `client/`
 - Layout components live in `assets/js/layouts/` (e.g. `AppLayout`, `AuthLayout`)
 - Reusable UI primitives live flat in `assets/js/components/` (`Button`, `Spinner`, `Select`, `DropdownMenu`, `AlertDialog`, …) — no sub-folders
