@@ -26,12 +26,12 @@
     "@sentry/node": "^11.9.0",
     "@sentry/react": "^11.9.0",
     "@types/phoenix": "^1.6.8",
-    "i18next": "^26.5.10",
+    "i18next": "^26.5.11",
     "lucide-react": "^1.61.0",
     "phoenix": "^1.8.16",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-i18next": "^17.1.8"
+    "react-i18next": "^17.1.9"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.3",
