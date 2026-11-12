@@ -2,14 +2,29 @@ import Config
 
 # Configure your database
 #
-# The MIX_TEST_PARTITION environment variable can be used
-# to provide built-in test partitioning in CI environment.
-# Run `mix help test` for more information.
+# Each linked Git worktree (`wt switch --create`) tests against a database
+# of its own, named after its directory (`<repo>.<branch>`, the part after
+# the first dot), so test runs in several worktrees at once (the pre-commit
+# hook's included) never share rows. The main checkout, whose `.git` is a
+# directory rather than a file, keeps the plain name. The slug is capped so
+# the name stays under Postgres's 63-character limit. MIX_TEST_PARTITION
+# (`mix test --partitions`) splits it further.
+root = Path.expand("..", __DIR__)
+
+worktree =
+  if File.regular?(Path.join(root, ".git")) do
+    dir = root |> Path.basename() |> String.split(".", parts: 2) |> List.last()
+    slug = dir |> String.downcase() |> String.replace(~r/[^a-z0-9]+/, "_")
+    "_" <> String.slice(slug, 0, 24)
+  else
+    ""
+  end
+
 config :elixir_react_starter, ElixirReactStarter.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "elixir_react_starter_test#{System.get_env("MIX_TEST_PARTITION")}",
+  database: "elixir_react_starter_test#{worktree}#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 

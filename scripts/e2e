@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Run the named browser specs against this worktree's own server, then stop
+# it. For checking a change in a real browser, not for looking at a branch:
+# that is `scripts/preview` / `wt serve`.
+#
+#   scripts/e2e login             # one spec
+#   scripts/e2e login -g "bad"    # any Playwright arguments
+#   scripts/e2e --drop            # remove this branch's E2E database
+#
+# Name the specs: CI runs the whole suite on every pull request, so a local
+# run is for the one flow a change touches.
+#
+# The server gets a free port and a database of its own,
+# elixir_react_starter_e2e_<branch>, created and migrated here, so a run never
+# depends on the shared dev database being up to date and never writes into
+# it. The database stays between runs, so the next one only migrates what is
+# new. Assets are built once, up front, and the server runs without
+# watchers, as on CI, so no request lands mid-rebuild.
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+branch=$(git rev-parse --abbrev-ref HEAD)
+slug=$(printf '%s' "$branch" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '_')
+export MIX_ENV=dev DEV_DATABASE="elixir_react_starter_e2e_${slug:0:36}"
+
+if [ "${1:-}" = "--drop" ]; then
+  mise exec -- mix ecto.drop
+  exit 0
+fi
+
+if [ $# -eq 0 ]; then
+  echo "Name the spec(s) to run, e.g. scripts/e2e login. CI runs the whole suite." >&2
+  exit 2
+fi
+
+port_open() { (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null; }
+
+port=$((5000 + RANDOM % 1000))
+while port_open "$port"; do port=$((port + 1)); done
+
+# A fresh worktree may predate its lock files' last change.
+mise exec -- mix deps.get >/dev/null
+[ -d assets/node_modules ] || mise exec -- npm ci --prefix assets >/dev/null
+# The browser build that this Playwright version drives; a no-op once there.
+(cd assets && mise exec -- npx playwright install chromium >/dev/null)
+
+echo "Preparing $DEV_DATABASE and the assets..."
+mise exec -- mix do ecto.create --quiet + ecto.migrate --quiet + assets.setup + assets.build >/dev/null
+
+log=$(mktemp -t e2e-server.XXXXXX)
+PORT=$port DISABLE_WATCHERS=true mise exec -- mix phx.server >"$log" 2>&1 &
+server=$!
+trap 'kill "$server" 2>/dev/null; wait "$server" 2>/dev/null; rm -f "$log"' EXIT
+trap 'exit 130' INT TERM
+
+# Compiled above, so the server is up in seconds; a minute means it isn't
+# coming, and its log says why.
+code=000
+for _ in $(seq 1 60); do
+  code=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:$port/login" || true)
+  [ "$code" = 200 ] && break
+  kill -0 "$server" 2>/dev/null || break
+  sleep 1
+done
+if [ "$code" != 200 ]; then
+  echo "The server on :$port did not come up (last answer: $code). Its log:" >&2
+  tail -n 40 "$log" >&2
+  exit 1
+fi
+
+cd assets
+E2E_BASE_URL="http://localhost:$port" mise exec -- npx playwright test "$@"

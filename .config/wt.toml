@@ -1,0 +1,18 @@
+# Worktrunk's project config, shared by everyone who works in this repo.
+# See https://worktrunk.dev/config/#project-configuration.
+
+[aliases]
+# `wt serve` runs a worktree's app beside :4000 (scripts/preview):
+#   wt serve           pick the worktree from a list
+#   wt serve 957       the worktree of PR #957
+#   wt serve <branch>  a branch's worktree
+# It runs the main checkout's copy of the script, so a branch need not
+# carry it, and it never moves your shell.
+serve = """
+set -- {{ args }}
+case "${1:-}" in
+  '' | *[!0-9]*) ;;
+  *) set -- "pr:$1" ;;
+esac
+wt switch --no-cd "$@" -x '{{ primary_worktree_path }}/scripts/preview'
+"""

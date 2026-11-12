@@ -75,13 +75,74 @@ Visit [`localhost:4000`](http://localhost:4000). With shell activation enabled
 (`eval "$(mise activate zsh)"` in `~/.zshrc`), mise switches to the project's
 toolchain automatically when you `cd` in.
 
+## Working in a worktree
+
+Each branch can have a worktree of its own, a separate checkout made with
+[Worktrunk][worktrunk] (`wt`, pinned in `mise.toml`), so several people or
+agents can work at once without stopping :4000 or getting in each other's way:
+
+```bash
+wt switch --create andre/123-some-fix --base origin/main   # a new worktree and branch
+mise trust                       # once, in the new worktree
+wt serve andre/123-some-fix      # look at it in the browser, beside :4000 (Ctrl+C stops it)
+mix test                         # unit tests, on the worktree's own test database
+scripts/e2e login                # browser specs, on the worktree's own server
+scripts/e2e --drop               # when done: remove its browser-test database
+wt remove andre/123-some-fix     # and the worktree
+```
+
+`mix test` in a linked worktree uses a test database named after the
+worktree's directory (the main checkout keeps `elixir_react_starter_test`),
+so test runs in several worktrees, the pre-commit hook's included, never see
+each other's rows.
+
+### Previewing a worktree
+
+To see a worktree in the browser without stopping the server on :4000, serve
+it beside it:
+
+```bash
+wt serve                     # pick the worktree from a list
+wt serve andre/some-branch   # a branch's worktree
+wt serve 957                 # the worktree of PR #957
+scripts/preview              # or this, from inside the worktree
+```
+
+`wt serve` is defined in the repo's Worktrunk config (`.config/wt.toml`), so
+Worktrunk asks you once to approve it. It runs the main checkout's copy of
+`scripts/preview`, and your shell stays where it is.
+
+The preview prints its address, the same for a branch every time (between
+4100 and 4899). It uses the same dev database as :4000, so log in as usual.
+Its background jobs run inline on its own code and stay out of :4000's
+queue, so its emails land in its own `/dev/mailbox`. It never runs database
+migrations: a branch that adds some shows the pending-migrations page until
+you run `mix ecto.migrate` yourself.
+
+To see which worktree is being served where, add a Preview column to your own
+Worktrunk config (`~/.config/worktrunk/config.toml`; Worktrunk reads columns
+only from there). It shows in `wt list` and the `wt serve` picker:
+
+```toml
+[projects."github.com/andreogle/ElixirReactStarter".list.custom-columns.Preview]
+template = "{{ git.branch.previewurl }}"
+```
+
 ## Testing
 
 ```bash
 mix test                       # unit + integration, with coverage gate (mix test --cover)
 mix precommit                  # format, credo, biome, i18n, tests — run before every commit
-npm --prefix assets run e2e    # Playwright E2E (needs a running server; see the guide)
+scripts/e2e login              # Playwright specs for one flow, on a server of their own
 ```
+
+`scripts/e2e` runs the specs you name against a server of the worktree's
+own, then stops it. The server gets a free port and a database of its own,
+`elixir_react_starter_e2e_<branch>`, which the script creates and migrates,
+so it never needs the dev database to be up to date and never changes it,
+and several worktrees can run specs at once. Any Playwright arguments pass
+through (`scripts/e2e login -g "bad"`). CI runs the whole suite on every
+pull request.
 
 See the [End-to-End Testing guide](docs/e2e-testing.md) for the [Playwright][playwright] setup.
 
@@ -223,6 +284,7 @@ Released under the **WTFPL** (see the `LICENSE` file) — do what the fuck you w
 [exmachina]: https://hexdocs.pm/ex_machina/
 [playwright]: https://playwright.dev/
 [mise]: https://mise.jdx.dev
+[worktrunk]: https://worktrunk.dev
 [credo]: https://hexdocs.pm/credo/
 [dialyxir]: https://github.com/jeremyjh/dialyxir
 [exdoc]: https://hexdocs.pm/ex_doc/

@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Run this worktree's app on a port of its own, beside the main dev server
+# on :4000, to see a branch's changes without stopping anything.
+#
+#   scripts/preview            # from inside a worktree
+#   wt serve                   # the same, through the repo's Worktrunk alias
+#                              # (.config/wt.toml), picking the worktree
+#                              # from a list; or
+#   wt serve 957               # the worktree of PR #957, or
+#   wt serve <branch>          # a branch's. The alias runs the main
+#                              # checkout's copy of this script, so a
+#                              # branch need not carry it
+#
+# The port comes from the branch name, so a branch keeps the same address
+# (4100-4899); if it is taken, the next free one is used. PORT=... picks one.
+#
+# It shares the dev database. Its Oban jobs run inline on its own code and
+# never enter the shared job table, so it and the main server never take
+# each other's jobs (PREVIEW_SERVER=1, see config/dev.exs). Its emails land
+# in its own dev mailbox. It never migrates: a branch with migrations of its
+# own shows the pending-migrations page, and migrating is a choice for
+# whoever owns the main server, since it changes that server's database too.
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+# A branch from before previews has no PREVIEW_SERVER in its config: its
+# server would run Oban's queues on the shared database, taking the main
+# server's jobs and running them on the branch's code.
+if ! grep -q PREVIEW_SERVER config/dev.exs; then
+  echo "$branch predates previews: its config/dev.exs would run background jobs on the" >&2
+  echo "shared database alongside :4000. Merge or rebase origin/main into it, then try again." >&2
+  exit 1
+fi
+
+if [ -n "${PORT:-}" ]; then
+  port=$PORT
+else
+  port=$((4100 + $(printf '%s' "$branch" | cksum | cut -d' ' -f1) % 800))
+  while (exec 3<>"/dev/tcp/127.0.0.1/$port") 2>/dev/null; do port=$((port + 1)); done
+fi
+
+# A fresh worktree may predate its lock files' last change, and lacks the
+# generated page registries the bundle imports.
+mise exec -- mix deps.get >/dev/null
+[ -d assets/node_modules ] || mise exec -- npm ci --prefix assets >/dev/null
+mise exec -- node assets/build/generate-ssr-pages.cjs >/dev/null
+
+echo "Previewing $branch at http://localhost:$port"
+
+# While it runs, the address is in the branch's git config, which a Preview
+# column in your own Worktrunk config can show in `wt list` and the
+# `wt serve` picker (see the README). Cleared when the server stops; a
+# preview killed outright leaves its address until the next one for the
+# branch replaces it.
+key="branch.$branch.previewurl"
+git config "$key" "http://localhost:$port"
+trap 'git config --unset "$key" 2>/dev/null || true' EXIT
+trap 'exit 130' INT TERM
+
+export PORT=$port PREVIEW_SERVER=1
+if [ -t 0 ]; then
+  mise exec -- iex -S mix phx.server
+else
+  mise exec -- mix phx.server
+fi

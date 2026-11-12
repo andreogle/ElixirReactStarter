@@ -1,11 +1,13 @@
 import Config
 
-# Configure your database
+# Configure your database. DEV_DATABASE points a server at another one:
+# `scripts/e2e` gives each worktree's browser tests a database of their own,
+# so they never wait on, or write into, the shared dev database.
 config :elixir_react_starter, ElixirReactStarter.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "elixir_react_starter_dev",
+  database: System.get_env("DEV_DATABASE", "elixir_react_starter_dev"),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -44,13 +46,27 @@ watchers =
     ]
   end
 
+# A preview server (`scripts/preview`) runs a worktree beside the main dev
+# server, on the same database. Its Oban jobs run inline, where they are
+# inserted, on the preview's own code, and never touch the shared job table:
+# the preview never takes the main server's jobs nor hands it its own, and
+# its emails reach its own dev mailbox. A job scheduled for later runs at
+# once, and a slow one holds up its request.
+if System.get_env("PREVIEW_SERVER") do
+  config :elixir_react_starter, Oban, testing: :inline
+end
+
+# PORT lets a preview or E2E server run beside the one on :4000.
+port = String.to_integer(System.get_env("PORT", "4000"))
+
 config :elixir_react_starter, ElixirReactStarterWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4000],
-  # Used by `Endpoint.url/0` (e.g. when building email links). Prod
-  # overrides this in runtime.exs from PHX_HOST + standard https port.
-  url: [host: "localhost", port: 4000],
+  http: [ip: {127, 0, 0, 1}, port: port],
+  # Used by `Endpoint.url/0` (e.g. when building email links), so it follows
+  # PORT and a preview's links point at itself. Prod overrides this in
+  # runtime.exs from PHX_HOST + standard https port.
+  url: [host: "localhost", port: port],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
