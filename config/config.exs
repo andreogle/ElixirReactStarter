@@ -59,7 +59,7 @@ config :elixir_react_starter, ElixirReactStarter.Mailer, adapter: Swoosh.Adapter
 
 # Configure esbuild (the version is required)
 config :esbuild,
-  version: "0.28.0",
+  version: "0.28.2",
   elixir_react_starter: [
     # --conditions=production picks the "production" branch of every
     # subpath in package.json `exports` blocks. Some packages gate
@@ -89,7 +89,7 @@ config :esbuild,
 
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "4.1.12",
+  version: "4.3.5",
   elixir_react_starter: [
     args: ~w(
       --input=assets/css/app.css
