@@ -1,6 +1,17 @@
 # Worktrunk's project config, shared by everyone who works in this repo.
 # See https://worktrunk.dev/config/#project-configuration.
 
+# A removed worktree takes its databases with it: the test database named
+# after its directory (config/test.exs) and the E2E one named after its
+# branch (scripts/e2e). Both derive the names the same way; change them
+# together.
+post-remove = """
+test=$(printf '%s' '{{ worktree_name }}' | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/_/g' | cut -c1-30)
+dropdb --if-exists -h localhost -U postgres "elixir_react_starter_test_$test"
+e2e=$(printf '%s' '{{ branch }}' | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '_' | cut -c1-36)
+[ -n "$e2e" ] && dropdb --if-exists -h localhost -U postgres "elixir_react_starter_e2e_$e2e" || true
+"""
+
 [aliases]
 # `wt serve` runs a worktree's app beside :4000 (scripts/preview):
 #   wt serve           pick the worktree from a list

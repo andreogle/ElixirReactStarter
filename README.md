@@ -87,14 +87,24 @@ mise trust                       # once, in the new worktree
 wt serve andre/123-some-fix      # look at it in the browser, beside :4000 (Ctrl+C stops it)
 mix test                         # unit tests, on the worktree's own test database
 scripts/e2e login                # browser specs, on the worktree's own server
-scripts/e2e --drop               # when done: remove its browser-test database
-wt remove andre/123-some-fix     # and the worktree
+wt remove andre/123-some-fix     # when done: the worktree and its databases
 ```
 
 `mix test` in a linked worktree uses a test database named after the
 worktree's directory (the main checkout keeps `elixir_react_starter_test`),
 so test runs in several worktrees, the pre-commit hook's included, never see
-each other's rows.
+each other's rows. `wt remove` drops that database and the worktree's E2E
+one through the `post-remove` hook in `.config/wt.toml`, which Worktrunk asks
+you to approve once.
+
+Where worktrees go is up to your own Worktrunk config
+(`~/.config/worktrunk/config.toml`). To keep them out of the project
+directory and prune merged ones whenever you start a new one:
+
+```toml
+worktree-path = "~/.worktrees/{{ repo }}/{{ branch | sanitize }}"
+post-start = "git fetch -q origin && wt step prune"
+```
 
 ### Previewing a worktree
 

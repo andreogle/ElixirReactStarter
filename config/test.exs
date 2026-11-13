@@ -3,19 +3,19 @@ import Config
 # Configure your database
 #
 # Each linked Git worktree (`wt switch --create`) tests against a database
-# of its own, named after its directory (`<repo>.<branch>`, the part after
-# the first dot), so test runs in several worktrees at once (the pre-commit
-# hook's included) never share rows. The main checkout, whose `.git` is a
-# directory rather than a file, keeps the plain name. The slug is capped so
-# the name stays under Postgres's 63-character limit. MIX_TEST_PARTITION
-# (`mix test --partitions`) splits it further.
+# of its own, named after its directory, so test runs in several worktrees at
+# once (the pre-commit hook's included) never share rows. The main checkout,
+# whose `.git` is a directory rather than a file, keeps the plain name. The
+# slug is capped so the name stays under Postgres's 63-character limit.
+# MIX_TEST_PARTITION (`mix test --partitions`) splits it further. The
+# post-remove hook in .config/wt.toml derives the same name to drop it, so
+# change both together.
 root = Path.expand("..", __DIR__)
 
 worktree =
   if File.regular?(Path.join(root, ".git")) do
-    dir = root |> Path.basename() |> String.split(".", parts: 2) |> List.last()
-    slug = dir |> String.downcase() |> String.replace(~r/[^a-z0-9]+/, "_")
-    "_" <> String.slice(slug, 0, 24)
+    slug = root |> Path.basename() |> String.downcase() |> String.replace(~r/[^a-z0-9]+/, "_")
+    "_" <> String.slice(slug, 0, 30)
   else
     ""
   end
