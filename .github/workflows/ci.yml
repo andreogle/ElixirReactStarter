@@ -59,6 +59,18 @@ jobs:
         with:
           cache: true
 
+      # Compiled artifacts (deps/_build with their NIFs, dialyzer PLTs) only
+      # fit the runner image and toolchain that built them. `ubuntu-latest`
+      # moves between Ubuntu releases and `erlang = "29"` in mise.toml floats
+      # across patch releases, so both go into the cache keys below. Keyed on
+      # `runner.os` alone, a new image restored the old image's PLT and
+      # dialyzer refused it ("Old PLT file").
+      - name: Toolchain cache key
+        id: toolchain
+        run: |
+          otp=$(erl -noshell -eval '{ok, V} = file:read_file(filename:join([code:root_dir(), "releases", erlang:system_info(otp_release), "OTP_VERSION"])), io:put_chars(string:trim(V)), halt().')
+          echo "key=${ImageOS}-otp-${otp}-elixir-$(elixir --short-version)" >> "$GITHUB_OUTPUT"
+
       - name: Install hex + rebar
         run: |
           mix local.hex --force
@@ -77,15 +89,15 @@ jobs:
           path: |
             deps
             _build
-          key: ${{ runner.os }}-mix-${{ hashFiles('mix.lock') }}
-          restore-keys: ${{ runner.os }}-mix-
+          key: ${{ runner.os }}-${{ steps.toolchain.outputs.key }}-mix-${{ hashFiles('mix.lock') }}
+          restore-keys: ${{ runner.os }}-${{ steps.toolchain.outputs.key }}-mix-
 
       - name: Cache dialyzer PLTs
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: priv/plts
-          key: ${{ runner.os }}-plt-${{ hashFiles('mix.lock') }}
-          restore-keys: ${{ runner.os }}-plt-
+          key: ${{ runner.os }}-${{ steps.toolchain.outputs.key }}-plt-${{ hashFiles('mix.lock') }}
+          restore-keys: ${{ runner.os }}-${{ steps.toolchain.outputs.key }}-plt-
 
       - name: Install Elixir deps
         run: mix deps.get
@@ -165,6 +177,13 @@ jobs:
         with:
           cache: true
 
+      # Same key as the build job's step: see the comment there.
+      - name: Toolchain cache key
+        id: toolchain
+        run: |
+          otp=$(erl -noshell -eval '{ok, V} = file:read_file(filename:join([code:root_dir(), "releases", erlang:system_info(otp_release), "OTP_VERSION"])), io:put_chars(string:trim(V)), halt().')
+          echo "key=${ImageOS}-otp-${otp}-elixir-$(elixir --short-version)" >> "$GITHUB_OUTPUT"
+
       - name: Install hex + rebar
         run: |
           mix local.hex --force
@@ -185,8 +204,8 @@ jobs:
           path: |
             deps
             _build
-          key: ${{ runner.os }}-mix-dev-${{ hashFiles('mix.lock') }}
-          restore-keys: ${{ runner.os }}-mix-dev-
+          key: ${{ runner.os }}-${{ steps.toolchain.outputs.key }}-mix-dev-${{ hashFiles('mix.lock') }}
+          restore-keys: ${{ runner.os }}-${{ steps.toolchain.outputs.key }}-mix-dev-
 
       - name: Install Elixir deps
         run: mix deps.get
