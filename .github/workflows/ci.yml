@@ -55,7 +55,7 @@ jobs:
       # developers use locally. `cache: true` caches the toolchain so the
       # one-time Erlang source compile doesn't repeat on every run.
       - name: Set up Erlang / Elixir / Node (mise)
-        uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+        uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
         with:
           cache: true
 
@@ -173,7 +173,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Erlang / Elixir / Node (mise)
-        uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+        uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
         with:
           cache: true
 
@@ -294,6 +294,6 @@ jobs:
           persist-credentials: false
 
       - name: Review dependency changes
-        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        uses: actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec # v5.0.1
         with:
           fail-on-severity: high
